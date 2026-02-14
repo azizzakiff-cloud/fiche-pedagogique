@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fiche Péda">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%231565C0'/%3E%3Crect x='28' y='36' width='136' height='10' rx='5' fill='%23C9A84C'/%3E%3Crect x='28' y='56' width='136' height='8' rx='4' fill='white' opacity='.9'/%3E%3Crect x='28' y='74' width='136' height='8' rx='4' fill='white' opacity='.7'/%3E%3Crect x='28' y='92' width='90' height='8' rx='4' fill='white' opacity='.7'/%3E%3Crect x='28' y='112' width='136' height='60' rx='6' fill='white' opacity='.15'/%3E%3Ctext x='96' y='152' font-family='serif' font-size='28' font-weight='bold' fill='%23C9A84C' text-anchor='middle'%3EPDF%3C/text%3E%3C/svg%3E">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" id="pwa-manifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
@@ -1125,55 +1125,6 @@ if ('serviceWorker' in navigator) {
     border-left-color: #9C27B0;
   }
 
-  /* Toggle pour prévisualisation en direct */
-  .toggle-preview {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding: 10px;
-    background: var(--off-white);
-    border-radius: 8px;
-  }
-  .toggle-switch {
-    position: relative;
-    width: 50px;
-    height: 26px;
-  }
-  .toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  .toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    border-radius: 26px;
-    transition: 0.3s;
-  }
-  .toggle-slider:before {
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    border-radius: 50%;
-    transition: 0.3s;
-  }
-  .toggle-switch input:checked + .toggle-slider {
-    background-color: var(--blue);
-  }
-  .toggle-switch input:checked + .toggle-slider:before {
-    transform: translateX(24px);
-  }
-
 
   /* Ajustement marges */
   .marge-controls {
@@ -1623,17 +1574,8 @@ if ('serviceWorker' in navigator) {
     Remplissez l'en-tête et les étapes, puis revenez ici pour voir un aperçu avant génération.
   </div>
 
-  <!-- NOUVEAU : Toggle pour prévisualisation en direct -->
-  <label class="toggle-preview">
-    <div class="toggle-switch">
-      <input type="checkbox" id="toggle-preview-live" onchange="togglePreviewLive()">
-      <span class="toggle-slider"></span>
-    </div>
-    <span>👁️ Prévisualisation en temps réel avec codes couleurs</span>
-  </label>
-
-  <!-- NOUVEAU : Aperçu avec codes couleurs thématiques -->
-  <div id="preview-live-container" class="preview-live" style="display: none;">
+  <!-- Aperçu avec codes couleurs thématiques -->
+  <div id="preview-live-container" class="preview-live">
     <div class="preview-live-header">
       <h2 style="margin: 0;">📋 APERÇU DE LA FICHE</h2>
       <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">
@@ -1726,7 +1668,7 @@ function showTab(name) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
-  if (name === 'apercu') rafraichirApercu();
+  if (name === 'apercu') { rafraichirApercu(); genererPreviewLive(); }
 }
 
 // ═══════════════════════════════════════════════════
@@ -3625,18 +3567,12 @@ function genererPDF() {
     doc.text(normaliserTexte(entete.prof || ''), endX, PH-4, {align:'right'});
   }
 
-  // Sauvegarde — téléchargement direct (compatible PWA Android)
+  // Sauvegarde — méthode spéciale AppsGeyser WebView
   const safeName = (entete.activite || 'fiche').replace(/[^a-zA-Z0-9\u00C0-\u024F]/gi,'_').slice(0,40);
   const pdfFileName = `FichePedagogique_${safeName}_${entete.niveau || 'N'}.pdf`;
-  const pdfBlob = doc.output('blob');
-  const pdfUrl = URL.createObjectURL(pdfBlob);
-  const a = document.createElement('a');
-  a.href = pdfUrl;
-  a.download = pdfFileName;
-  a.style.display = 'none';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(pdfUrl); }, 3000);
+  
+  // Téléchargement direct en un clic
+  doc.save(pdfFileName);
 
   showToast();
   
@@ -3746,18 +3682,7 @@ function showToast() {
 // NOUVELLES FONCTIONNALITÉS
 // ═══════════════════════════════════════════════════
 
-// ────── PRÉVISUALISATION EN TEMPS RÉEL ──────
-function togglePreviewLive() {
-  const container = document.getElementById('preview-live-container');
-  const isActive = document.getElementById('toggle-preview-live').checked;
-  
-  if (isActive) {
-    container.style.display = 'block';
-    genererPreviewLive();
-  } else {
-    container.style.display = 'none';
-  }
-}
+
 
 // ────── COLLECTER DONNÉES ──────
 function collecterDonnees() {
@@ -3773,76 +3698,122 @@ function collecterDonnees() {
 }
 
 function genererPreviewLive() {
-  const donnees = collecterDonnees();
+  const entete  = collecterEntete();
+  const etapes  = collecterEtapes();
+  const P       = collecterParams();
   const content = document.getElementById('preview-live-content');
-  
-  let html = '';
-  
-  // Section : Mise en situation (vert)
-  html += `
-    <div class="preview-section mise-situation">
-      <h3 class="titre-section-principal">🌱 I. MISE EN SITUATION</h3>
-      <p>${donnees.entete.support || 'Non défini'}</p>
-      <p style="margin-top: 8px; font-size: 13px; color: var(--muted);">
-        <span class="icone-duree"></span> Durée estimée : 5 min
-      </p>
+  if (!content) return;
+
+  const couleur = (document.getElementById('p-color-main')?.value) || '#1565C0';
+  const accent  = (document.getElementById('p-color-accent')?.value) || '#C9A84C';
+
+  // ── EN-TÊTE ──
+  let html = `<div style="margin:0 0 14px;padding:12px 14px;border:2px solid ${couleur};border-radius:10px;background:#fff;font-size:13px;line-height:1.7;">`;
+
+  // Ligne prof / niveau
+  html += `<div style="display:flex;gap:6px;margin-bottom:4px;">
+    <div style="flex:1;padding:5px 8px;background:${couleur}15;border-radius:5px;">
+      <span style="font-weight:700;color:${couleur};font-size:11px;text-transform:uppercase;">${entete.labelProf||'Prof'} :</span>
+      <span style="color:#222;"> ${entete.prof||'—'}</span>
     </div>
-  `;
-  
-  // Section : Identification (bleu)
-  html += `
-    <div class="preview-section identification">
-      <h3 class="titre-section-principal">🔍 II. IDENTIFICATION</h3>
-      <p><span class="mot-cle">Module :</span> ${donnees.entete.module || 'Non défini'}</p>
-      <p><span class="mot-cle">Activité :</span> ${donnees.entete.activite || 'Non définie'}</p>
-      <p><span class="mot-cle">Niveau :</span> ${donnees.entete.niveau || 'Non défini'}</p>
+    <div style="min-width:90px;padding:5px 8px;background:${couleur}15;border-radius:5px;">
+      <span style="font-weight:700;color:${couleur};font-size:11px;text-transform:uppercase;">${entete.labelNiveau||'Niveau'} :</span>
+      <span style="color:#222;"> ${entete.niveau||'—'}</span>
     </div>
-  `;
-  
-  // Section : Axes d'analyse (orange)
-  if (donnees.etapes && donnees.etapes.length > 0) {
-    html += `
-      <div class="preview-section axes">
-        <h3 class="titre-section-principal">📊 III. AXES D'ANALYSE</h3>
-    `;
-    
-    donnees.etapes.forEach((etape, index) => {
-      html += `
-        <div style="margin-bottom: 12px; padding-left: 15px; border-left: 3px solid #FF9800;">
-          <h4 class="titre-section-secondaire">Axe ${index + 1} : ${etape.titre || 'Sans titre'}</h4>
-          <p style="font-size: 13px; color: var(--muted);">
-            <span class="icone-duree"></span> ${etape.duree || '10'} minutes
-          </p>
-        </div>
-      `;
-    });
-    
-    html += `</div>`;
+  </div>`;
+
+  // Module
+  if (entete.module || entete.labelModule) {
+    html += `<div style="padding:4px 8px;margin-bottom:3px;"><span style="font-weight:700;color:${couleur};font-size:11px;text-transform:uppercase;">${entete.labelModule||'Module'} :</span> <span style="color:#222;">${entete.module||'—'}</span></div>`;
   }
-  
-  // Section : Synthèse (violet)
-  html += `
-    <div class="preview-section synthese">
-      <h3 class="titre-section-principal">✨ IV. SYNTHÈSE</h3>
-      <p>Section de clôture et synthèse des apprentissages</p>
-      <p style="margin-top: 8px; font-size: 13px; color: var(--muted);">
-        <span class="icone-duree"></span> Durée estimée : 10 min
-      </p>
+
+  // Séquence
+  if (entete.sequence || entete.labelSequence) {
+    html += `<div style="padding:4px 8px;margin-bottom:3px;"><span style="font-weight:700;color:${couleur};font-size:11px;text-transform:uppercase;">${entete.labelSequence||'Séquence'} :</span> <span style="color:#222;">${entete.sequence||'—'}</span></div>`;
+  }
+
+  // Activité / Support
+  html += `<div style="display:flex;gap:6px;margin-bottom:4px;">
+    <div style="flex:1;padding:4px 8px;background:${accent}22;border-radius:5px;">
+      <span style="font-weight:700;color:${couleur};font-size:11px;text-transform:uppercase;">${entete.labelActivite||'Activité'} :</span>
+      <span style="color:#222;"> ${entete.activite||'—'}</span>
     </div>
-  `;
-  
+    <div style="min-width:90px;padding:4px 8px;background:${accent}22;border-radius:5px;">
+      <span style="font-weight:700;color:${couleur};font-size:11px;text-transform:uppercase;">${entete.labelSupport||'Support'} :</span>
+      <span style="color:#222;"> ${entete.support||'—'}</span>
+    </div>
+  </div>`;
+
+  // Lignes libres
+  if (entete.lignesLibres && entete.lignesLibres.length > 0) {
+    entete.lignesLibres.forEach(ll => {
+      if (ll.type === 'simple') {
+        html += `<div style="padding:4px 8px;margin-bottom:3px;"><span style="font-weight:700;color:${couleur};font-size:11px;text-transform:uppercase;">${ll.label||'Champ'} :</span> <span style="color:#222;">${ll.val1||'—'}</span></div>`;
+      } else {
+        html += `<div style="display:flex;gap:6px;margin-bottom:3px;">
+          <div style="flex:1;padding:4px 8px;background:${couleur}0d;border-radius:5px;">
+            <span style="font-weight:700;color:${couleur};font-size:11px;text-transform:uppercase;">${ll.label1||'A'} :</span>
+            <span style="color:#222;"> ${ll.val1||'—'}</span>
+          </div>
+          <div style="flex:1;padding:4px 8px;background:${couleur}0d;border-radius:5px;">
+            <span style="font-weight:700;color:${couleur};font-size:11px;text-transform:uppercase;">${ll.label2||'B'} :</span>
+            <span style="color:#222;"> ${ll.val2||'—'}</span>
+          </div>
+        </div>`;
+      }
+    });
+  }
+
+  // Objectif
+  const objTxt = getQuillText('objectif-wrapper') || '—';
+  html += `<div style="padding:5px 8px;margin-top:2px;border-top:1px solid ${couleur}33;">
+    <span style="font-weight:700;color:${couleur};font-size:11px;text-transform:uppercase;">${entete.labelObjectif||'Objectif(s)'} :</span>
+    <span style="color:#444;font-style:italic;"> ${objTxt.substring(0,200)}${objTxt.length>200?'…':''}</span>
+  </div>`;
+
+  html += `</div>`;
+
+  // ── TABLEAU DES ÉTAPES ──
+  if (etapes.length === 0) {
+    html += `<p style="color:#999;font-size:13px;text-align:center;padding:20px;">Aucune étape saisie.</p>`;
+  } else {
+    const colsSup = P.colsSup || [];
+    html += `<div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <thead>
+        <tr style="background:${couleur};color:white;">
+          <th style="padding:7px 8px;border:1px solid ${couleur};text-align:left;font-weight:700;">${P.labelColEtapes||'Étapes'}</th>
+          <th style="padding:7px 8px;border:1px solid ${couleur};text-align:left;font-weight:700;">${P.labelColDeroulement||'Déroulement de la séance'}</th>
+          ${colsSup.map(c => `<th style="padding:7px 8px;border:1px solid ${couleur};text-align:left;font-weight:700;">${c.label}</th>`).join('')}
+          <th style="padding:7px 8px;border:1px solid ${couleur};text-align:center;font-weight:700;">${P.labelColDuree||'Durée'}</th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+    etapes.forEach((e, i) => {
+      const bg = i % 2 === 0 ? '#fff' : `${couleur}08`;
+      // Extraire le texte brut du HTML enseignant
+      const div = document.createElement('div');
+      div.innerHTML = e.enseignant || '';
+      const enseignantTxt = div.textContent || '';
+      html += `<tr style="background:${bg};">
+          <td style="padding:6px 8px;border:1px solid ${couleur}44;font-weight:600;color:${couleur};">${e.nom||'—'}</td>
+          <td style="padding:6px 8px;border:1px solid ${couleur}44;color:#333;">${enseignantTxt||'—'}</td>
+          ${colsSup.map(c => `<td style="padding:6px 8px;border:1px solid ${couleur}44;color:#555;">${e.supVals?.[c.n]||'—'}</td>`).join('')}
+          <td style="padding:6px 8px;border:1px solid ${couleur}44;text-align:center;color:#555;">${e.duree||'—'}</td>
+        </tr>`;
+    });
+
+    html += `</tbody></table></div>`;
+  }
+
   content.innerHTML = html;
 }
 
 // Mettre à jour la prévisualisation quand les données changent
 document.addEventListener('input', function() {
-  const isActive = document.getElementById('toggle-preview-live') && 
-                   document.getElementById('toggle-preview-live').checked;
-  if (isActive) {
-    // Debounce pour éviter trop d'appels
-    clearTimeout(window.previewTimeout);
-    window.previewTimeout = setTimeout(genererPreviewLive, 500);
-  }
+  clearTimeout(window.previewTimeout);
+  window.previewTimeout = setTimeout(genererPreviewLive, 500);
 });
 
 // ────── EXPORT DOCX (OpenXML via JSZip) ──────
@@ -3970,16 +3941,32 @@ function genererDOCX() {
           ext = 'gif';
         }
         
+        // Calculer les dimensions réelles de l'image
+        let natW = 400, natH = 300; // valeurs par défaut
+        try {
+          const tmpImg = new Image();
+          tmpImg.src = seg.src;
+          if (tmpImg.naturalWidth > 0) { natW = tmpImg.naturalWidth; natH = tmpImg.naturalHeight; }
+        } catch(e) {}
+        
+        // Largeur max ~14cm (5386800 EMU), hauteur max ~10cm (3600000 EMU)
+        // 1 pixel = 9525 EMU (à 96 DPI)
+        const MAX_W_EMU = 5000000;
+        const MAX_H_EMU = 3600000;
+        const ratio = natH / (natW || 1);
+        let widthEMU = Math.min(MAX_W_EMU, natW * 9525);
+        let heightEMU = Math.round(widthEMU * ratio);
+        if (heightEMU > MAX_H_EMU) {
+          heightEMU = MAX_H_EMU;
+          widthEMU = Math.round(heightEMU / ratio);
+        }
+        
         docxImages.push({
           id: imageId,
           rId: rId,
           src: seg.src,
           ext: ext
         });
-        
-        // Dimensions en EMU - comme le test qui fonctionne
-        const widthEMU = 914400;   // 1 inch
-        const heightEMU = 914400;  // 1 inch (carré)
         
         // Structure XML EXACTEMENT comme le test qui fonctionne
         output += `<w:p>
@@ -4195,6 +4182,10 @@ function genererDOCX() {
     return segments;
   }
 
+  // Réinitialiser le compteur d'images AVANT de construire les tables (qui appellent htmlToWParagraphs)
+  docxImages = [];
+  docxImageCounter = 0;
+
   // Ligne simple : [LABEL | valeur pleine largeur]
   const rowFull = (lbl, val) => `<w:tr>${cell(lbl,true,true,LBL_W,false,false)}${cell(val,false,false,VAL_W,false,false)}</w:tr>`;
 
@@ -4338,11 +4329,7 @@ function genererDOCX() {
     ${etapesRows}
   </w:tbl>`;
 
-  // Réinitialiser le compteur d'images AVANT de générer le document
-  docxImages = [];
-  docxImageCounter = 0;
-  
-  // ── document.xml ── (ceci collectera les images via htmlToWParagraphs)
+  // ── document.xml ── (les images ont déjà été collectées lors de la construction des tables)
   const documentXML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
   <w:body>
@@ -4452,14 +4439,17 @@ function genererDOCX() {
     .then(function(blob) {
       const safeName = (entete.activite || 'fiche').replace(/[^a-zA-Z0-9\u00C0-\u024F]/gi,'_').slice(0,40);
       const docxFileName = `FichePedagogique_${safeName}_${Date.now()}.docx`;
+
+      // Téléchargement direct en un clic
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = docxFileName;
-      a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
-      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 3000);
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
       const toast = document.getElementById('toast');
       toast.textContent = '📘 Fiche exportée en DOCX (Word)';
       showToast();
