@@ -1,0 +1,4333 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Fiche Pédagogique — EZ-ZAKY AZIZ</title>
+<meta name="description" content="Générateur de fiches pédagogiques PDF">
+<meta name="theme-color" content="#1565C0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fiche Péda">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%231565C0'/%3E%3Crect x='28' y='36' width='136' height='10' rx='5' fill='%23C9A84C'/%3E%3Crect x='28' y='56' width='136' height='8' rx='4' fill='white' opacity='.9'/%3E%3Crect x='28' y='74' width='136' height='8' rx='4' fill='white' opacity='.7'/%3E%3Crect x='28' y='92' width='90' height='8' rx='4' fill='white' opacity='.7'/%3E%3Crect x='28' y='112' width='136' height='60' rx='6' fill='white' opacity='.15'/%3E%3Ctext x='96' y='152' font-family='serif' font-size='28' font-weight='bold' fill='%23C9A84C' text-anchor='middle'%3EPDF%3C/text%3E%3C/svg%3E">
+<link rel="manifest" id="pwa-manifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<!-- Quill.js pour l'édition de texte riche -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<!-- JSZip pour créer des fichiers DOCX valides -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+// ── PWA : Manifest inline ──
+(function() {
+  const manifest = {
+    name: "Fiche Pédagogique — EZ-ZAKY AZIZ",
+    short_name: "Fiche Péda",
+    description: "Générateur de fiches pédagogiques PDF",
+    start_url: "./",
+    display: "standalone",
+    background_color: "#F7F5F0",
+    theme_color: "#1565C0",
+    orientation: "portrait",
+    icons: [
+      {
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%231565C0'/%3E%3Crect x='28' y='36' width='136' height='10' rx='5' fill='%23C9A84C'/%3E%3Crect x='28' y='56' width='136' height='8' rx='4' fill='white' opacity='.9'/%3E%3Crect x='28' y='74' width='136' height='8' rx='4' fill='white' opacity='.7'/%3E%3Crect x='28' y='92' width='90' height='8' rx='4' fill='white' opacity='.7'/%3E%3Crect x='28' y='112' width='136' height='60' rx='6' fill='white' opacity='.15'/%3E%3Ctext x='96' y='152' font-family='serif' font-size='28' font-weight='bold' fill='%23C9A84C' text-anchor='middle'%3EPDF%3C/text%3E%3C/svg%3E",
+        sizes: "192x192",
+        type: "image/svg+xml",
+        purpose: "any maskable"
+      },
+      {
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%231565C0'/%3E%3Crect x='72' y='96' width='368' height='28' rx='14' fill='%23C9A84C'/%3E%3Crect x='72' y='144' width='368' height='22' rx='11' fill='white' opacity='.9'/%3E%3Crect x='72' y='178' width='368' height='22' rx='11' fill='white' opacity='.7'/%3E%3Crect x='72' y='212' width='240' height='22' rx='11' fill='white' opacity='.7'/%3E%3Crect x='72' y='256' width='368' height='160' rx='16' fill='white' opacity='.15'/%3E%3Ctext x='256' y='356' font-family='serif' font-size='72' font-weight='bold' fill='%23C9A84C' text-anchor='middle'%3EPDF%3C/text%3E%3C/svg%3E",
+        sizes: "512x512",
+        type: "image/svg+xml",
+        purpose: "any maskable"
+      }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  document.getElementById('pwa-manifest').setAttribute('href', url);
+})();
+
+// ── PWA : Service Worker inline (offline-first) ──
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'fiche-peda-v4';
+    const EXTERNAL = [
+      'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
+      'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap',
+      'https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css',
+      'https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js'
+    ];
+
+    // Pré-cache au premier chargement (page + ressources externes)
+    self.addEventListener('install', e => {
+      self.skipWaiting();
+      e.waitUntil(
+        caches.open(CACHE).then(cache => {
+          cache.add(self.location.href).catch(() => {});
+          return Promise.allSettled(
+            EXTERNAL.map(url =>
+              fetch(url, { mode: 'cors' })
+                .then(r => r.ok ? cache.put(url, r) : null)
+                .catch(() => null)
+            )
+          );
+        })
+      );
+    });
+
+    // Nettoyage des anciens caches
+    self.addEventListener('activate', e => {
+      e.waitUntil(
+        caches.keys().then(keys =>
+          Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+        ).then(() => self.clients.claim())
+      );
+    });
+
+    // Stratégie : Cache-first pour ressources externes, Network-first pour la page
+    self.addEventListener('fetch', e => {
+      const url = e.request.url;
+      const isExternal = EXTERNAL.some(ext => url.startsWith(ext.split('?')[0]));
+      const isFont = url.includes('fonts.googleapis.com') || url.includes('fonts.gstatic.com');
+
+      if (isExternal || isFont) {
+        // Cache-first : si en cache → sert depuis cache, sinon réseau puis mise en cache
+        e.respondWith(
+          caches.open(CACHE).then(cache =>
+            cache.match(e.request).then(cached => {
+              if (cached) return cached;
+              return fetch(e.request).then(response => {
+                if (response && response.ok) {
+                  cache.put(e.request, response.clone());
+                }
+                return response;
+              }).catch(() => cached || new Response('', { status: 503 }));
+            })
+          )
+        );
+      } else {
+        // Network-first pour la page principale : réseau d'abord, cache en fallback
+        e.respondWith(
+          fetch(e.request)
+            .then(response => {
+              if (response && response.ok) {
+                const clone = response.clone();
+                caches.open(CACHE).then(cache => cache.put(e.request, clone));
+              }
+              return response;
+            })
+            .catch(() => caches.match(e.request).then(r => r || new Response('Hors ligne', { status: 503 })))
+        );
+      }
+    });
+  `;
+  const swBlob = new Blob([swCode], {type: 'application/javascript'});
+  const swUrl = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl)
+    .then(reg => {
+      // Vérifie périodiquement si une mise à jour est disponible
+      setInterval(() => reg.update(), 60 * 60 * 1000);
+    })
+    .catch(() => {});
+}
+</script>
+<style>
+  :root {
+    --blue: #1565C0;
+    --blue-light: #1976D2;
+    --blue-dark: #0D47A1;
+    --blue-pale: #E3F2FD;
+    --gold: #C9A84C;
+    --white: #FFFFFF;
+    --off-white: #F7F5F0;
+    --ink: #1A1A2E;
+    --muted: #6B7280;
+    --border: #DDD8CE;
+    --success: #2E7D32;
+    --shadow: 0 4px 24px rgba(21,101,192,0.12);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--off-white);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─── */
+  .app-header {
+    background: var(--blue);
+    padding: 18px 24px 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+  .app-header .logo {
+    width: 38px; height: 38px;
+    background: var(--gold);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .app-header h1 {
+    font-family: 'Playfair Display', serif;
+    color: white;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .app-header h1 span {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.65);
+    font-family: 'Source Serif 4', serif;
+    letter-spacing: 0.04em;
+    margin-top: 2px;
+  }
+
+  /* ─── TABS ─── */
+  .tabs {
+    display: flex;
+    background: white;
+    border-bottom: 2px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex: 1;
+    min-width: 90px;
+    padding: 12px 8px;
+    background: none;
+    border: none;
+    font-family: 'Source Serif 4', serif;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    color: var(--blue);
+    border-bottom-color: var(--blue);
+  }
+  .tab-btn .tab-icon { font-size: 18px; }
+
+  /* ─── CONTENT PANELS ─── */
+  .panel { display: none; padding: 16px; }
+  .panel.active { display: block; }
+
+  /* ─── SECTION CARD ─── */
+  .card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .card-header {
+    background: var(--blue);
+    padding: 10px 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-header h2 {
+    font-family: 'Playfair Display', serif;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+  .card-header .badge {
+    background: var(--gold);
+    color: white;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-family: 'Source Serif 4', serif;
+  }
+  .card-body { padding: 14px; }
+
+  /* ─── FORM FIELDS ─── */
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--blue-dark);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .field label .required { color: #E53935; margin-left: 2px; }
+  .field input, .field textarea, .field select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--off-white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(21,101,192,0.1);
+    background: white;
+  }
+  .field textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.6;
+  }
+  .field textarea.tall { min-height: 120px; }
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .field-hint {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* ─── ÉTAPES ─── */
+  .etape-card {
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .etape-header {
+    background: var(--blue-pale);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .etape-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    color: var(--blue-dark);
+  }
+  .etape-num {
+    background: var(--blue);
+    color: white;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .etape-body { padding: 12px; }
+  .btn-remove-etape {
+    background: none;
+    border: 1px solid #FFCDD2;
+    color: #C62828;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'Source Serif 4', serif;
+  }
+  .btn-add-etape {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    border: 2px dashed var(--blue-light);
+    color: var(--blue);
+    border-radius: 10px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-bottom: 16px;
+  }
+  .btn-add-etape:hover { background: var(--blue-pale); }
+
+  /* ─── PARAMÈTRES ─── */
+  .param-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .param-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .param-item label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--blue-dark);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .param-item input[type="number"],
+  .param-item input[type="color"],
+  .param-item select {
+    padding: 8px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 13px;
+    background: var(--off-white);
+  }
+  .param-item input[type="color"] {
+    height: 40px;
+    padding: 4px;
+    cursor: pointer;
+  }
+  .param-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    color: var(--blue-dark);
+    padding: 8px 0 6px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+    margin-top: 6px;
+  }
+
+  /* ─── BOUTON GÉNÉRER ─── */
+  .btn-generate {
+    width: 100%;
+    padding: 16px;
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 16px rgba(21,101,192,0.35);
+    transition: all 0.2s;
+    margin-bottom: 20px;
+  }
+  .btn-generate:active { transform: scale(0.98); }
+  .btn-generate:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--success);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-size: 13px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── PREVIEW PANEL ─── */
+  .preview-info {
+    background: var(--blue-pale);
+    border: 1px solid #BBDEFB;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--blue-dark);
+    line-height: 1.6;
+  }
+  .preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    border: 1.5px solid var(--blue);
+  }
+  .preview-table th {
+    background: var(--blue);
+    color: white;
+    padding: 6px 4px;
+    text-align: center;
+    font-family: 'Source Serif 4', serif;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  .preview-table td {
+    border: 1px solid var(--border);
+    padding: 5px 4px;
+    vertical-align: top;
+    line-height: 1.4;
+  }
+  .preview-table tr.etape-sep td {
+    border-top: 2px solid var(--blue);
+  }
+  .etape-label {
+    font-weight: 700;
+    color: var(--blue-dark);
+    font-size: 10px;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* ─── EN-TÊTE FLEXIBLE ─── */
+  .editable-field-wrap { position: relative; }
+  .editable-label {
+    display: flex; align-items: center; gap: 5px;
+    cursor: default;
+  }
+  .editable-label .label-edit-hint {
+    font-size: 10px; opacity: 0; transition: opacity 0.2s;
+    cursor: pointer;
+  }
+  .editable-field-wrap:hover .label-edit-hint { opacity: 0.6; }
+  .editable-label.editing-mode .label-edit-hint { display: none; }
+  .label-edit-input {
+    border: 1.5px solid var(--gold);
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--blue-dark);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-family: 'Source Serif 4', serif;
+    background: white;
+    outline: none;
+    min-width: 80px;
+    box-shadow: 0 0 0 2px rgba(201,168,76,0.2);
+  }
+  .fgrp-title {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .fixed-row-group { margin-bottom: 18px; }
+  .fixed-row-group:last-child { margin-bottom: 0; }
+
+  /* Lignes libres */
+  .ligne-libre-card {
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    background: white;
+  }
+  .ligne-libre-header {
+    background: var(--blue-pale);
+    padding: 7px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .ligne-libre-header .ll-title {
+    font-size: 12px; font-weight: 600; color: var(--blue-dark);
+    font-family: 'Playfair Display', serif;
+  }
+  .ll-actions { display: flex; gap: 6px; align-items: center; }
+  .btn-ll-move {
+    background: none; border: 1px solid var(--border); color: var(--muted);
+    border-radius: 5px; padding: 2px 7px; font-size: 12px; cursor: pointer;
+    line-height: 1;
+  }
+  .btn-ll-move:hover { background: var(--blue-pale); color: var(--blue); }
+  .btn-ll-del {
+    background: none; border: 1px solid #FFCDD2; color: #C62828;
+    border-radius: 5px; padding: 2px 8px; font-size: 11px; cursor: pointer;
+  }
+  .ligne-libre-body { padding: 12px; }
+  .ll-double { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Live preview de l'en-tête */
+  .live-preview-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 11px; border: 2px solid var(--blue);
+    border-radius: 4px; overflow: hidden;
+  }
+  .live-preview-row { display: flex; }
+  .lp-cell-label {
+    background: var(--blue); color: white;
+    padding: 5px 8px;
+    font-weight: 700; font-size: 10px;
+    white-space: nowrap; min-width: 70px;
+    display: flex; align-items: center;
+  }
+  .lp-cell-value {
+    background: white; color: var(--ink);
+    padding: 5px 8px; flex: 1;
+    font-size: 10px; border-bottom: 1px solid var(--border);
+    border-left: 1.5px solid var(--blue);
+    min-height: 24px; word-break: break-word;
+  }
+  .lp-cell-value.empty { color: var(--muted); font-style: italic; }
+  .lp-row-outer { border-bottom: 1px solid var(--blue); display: flex; }
+  .lp-row-outer:last-child { border-bottom: none; }
+  .lp-half { flex: 1; display: flex; }
+  .lp-half + .lp-half { border-left: 1.5px solid var(--blue); }
+  .lp-title-row {
+    background: var(--blue); color: white;
+    padding: 6px 10px; font-weight: 700; font-size: 11px;
+    display: flex; justify-content: space-between;
+    border-bottom: 2px solid var(--gold);
+  }
+  .lp-objectif-label {
+    background: var(--blue); color: white;
+    padding: 6px 8px; font-weight: 700; font-size: 10px;
+    min-width: 70px; display: flex; align-items: flex-start;
+  }
+  .lp-objectif-value {
+    background: white; padding: 6px 8px; flex: 1;
+    font-size: 10px; min-height: 36px; word-break: break-word;
+    border-left: 1.5px solid var(--blue); color: var(--ink);
+  }
+  .lp-objectif-value.empty { color: var(--muted); font-style: italic; }
+
+  /* ─── BANNIÈRE HORS LIGNE ─── */
+  #offline-banner {
+    display: none;
+    background: #E65100;
+    color: white;
+    text-align: center;
+    padding: 7px 16px;
+    font-size: 12px;
+    font-family: 'Source Serif 4', serif;
+    letter-spacing: 0.03em;
+    position: sticky;
+    top: 72px;
+    z-index: 99;
+  }
+  #offline-banner.show { display: block; }
+  #offline-banner.online-restored { background: #2E7D32; }
+
+  /* ─── THÈMES ─── */
+  .theme-swatch {
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2.5px solid transparent;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .theme-swatch:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+  .theme-swatch.active { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.3); }
+  .theme-swatch-bar { height: 22px; display:flex; align-items:center; padding: 0 7px; gap:5px; }
+  .theme-swatch-dot { width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,0.6); flex-shrink:0; }
+  .theme-swatch-body { background:white; padding:5px 7px; display:flex; flex-direction:column; gap:3px; }
+  .theme-swatch-line { height:5px; border-radius:2px; }
+  .theme-swatch-row { display:flex; gap:4px; }
+  .theme-swatch-name { font-size:10px; font-weight:700; color:var(--ink); text-align:center; padding:4px 2px 2px; background:white; }
+
+  /* ─── STYLES QUILL.JS POUR TEXTE RICHE ─── */
+  .quill-wrapper {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--off-white);
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .quill-wrapper:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(21,101,192,0.1);
+    background: white;
+  }
+  /* Toolbar custom (pre-rendue) */
+  .quill-wrapper .ql-custom-toolbar-wrap {
+    background: #f8f9fa;
+    border-bottom: 1px solid var(--border);
+    padding: 4px 6px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+  }
+  /* Quill injecte .ql-toolbar sur notre div toolbar, conserver le style */
+  .quill-wrapper .ql-toolbar {
+    background: #f8f9fa;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    padding: 4px 6px;
+  }
+  .quill-wrapper .ql-container {
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    border: none;
+  }
+  .quill-wrapper .ql-editor {
+    min-height: 80px;
+    padding: 10px 12px;
+    line-height: 1.6;
+  }
+  .quill-wrapper .ql-editor.ql-blank::before {
+    color: #999;
+    font-style: italic;
+  }
+  /* Ajustement pour les textarea larges avec Quill */
+  .quill-wrapper.tall .ql-editor {
+    min-height: 120px;
+  }
+
+  /* ─── TABLEAU DANS L'ÉDITEUR QUILL ─── */
+  .ql-editor table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+  .ql-editor table td, .ql-editor table th {
+    border: 1.5px solid #1565C0;
+    padding: 5px 8px;
+    min-width: 40px;
+    min-height: 22px;
+    vertical-align: top;
+    word-break: break-word;
+  }
+  .ql-editor table th {
+    background: #E3F2FD;
+    font-weight: 700;
+    text-align: center;
+  }
+  .ql-editor img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border: 1.5px solid var(--border);
+    margin: 4px 0;
+    display: block;
+  }
+
+  /* ─── BOUTONS PERSONNALISÉS DANS LA TOOLBAR QUILL ─── */
+  .ql-toolbar .ql-custom-table,
+  .ql-toolbar .ql-custom-image,
+  .ql-toolbar .ql-custom-symbol {
+    background: none;
+    border: 1px solid var(--border) !important;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 16px;
+    line-height: 1;
+    color: #444;
+    transition: background 0.15s, border-color 0.15s;
+    min-width: 32px;
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2px;
+    vertical-align: middle;
+  }
+  .ql-toolbar .ql-custom-table:hover,
+  .ql-toolbar .ql-custom-image:hover,
+  .ql-toolbar .ql-custom-symbol:hover,
+  .ql-toolbar .ql-custom-table:active,
+  .ql-toolbar .ql-custom-image:active,
+  .ql-toolbar .ql-custom-symbol:active {
+    background: #e8f0fe !important;
+    border-color: var(--blue) !important;
+    color: var(--blue);
+  }
+  .ql-toolbar .ql-custom-symbol.active {
+    background: var(--blue-pale) !important;
+    border-color: var(--blue) !important;
+    color: var(--blue);
+  }
+
+  /* ─── PANNEAU SÉLECTEUR DE SYMBOLES ─── */
+  .symbol-picker {
+    display: none;
+    position: fixed;
+    z-index: 8500;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(21,101,192,0.20), 0 2px 8px rgba(0,0,0,0.10);
+    width: 300px;
+    max-width: 95vw;
+    max-height: 380px;
+    overflow: hidden;
+    flex-direction: column;
+    font-family: 'Source Serif 4', serif;
+    border: 1.5px solid var(--border);
+  }
+  .symbol-picker.show { display: flex; }
+  .symbol-picker-header {
+    background: var(--blue);
+    padding: 9px 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .symbol-picker-header span {
+    color: white;
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .symbol-picker-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.8);
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 2px;
+  }
+  .symbol-picker-close:hover { color: white; }
+  .symbol-picker-tabs {
+    display: flex;
+    background: #f4f6fa;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex-shrink: 0;
+  }
+  .symbol-picker-tabs::-webkit-scrollbar { display: none; }
+  .sym-tab {
+    flex-shrink: 0;
+    padding: 7px 11px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    background: none;
+    border: none;
+    border-bottom: 2.5px solid transparent;
+    cursor: pointer;
+    font-family: 'Source Serif 4', serif;
+    white-space: nowrap;
+    transition: color 0.15s;
+  }
+  .sym-tab.active {
+    color: var(--blue);
+    border-bottom-color: var(--blue);
+    background: white;
+  }
+  .sym-tab:hover:not(.active) { color: var(--blue-light); }
+  .symbol-picker-body {
+    overflow-y: auto;
+    padding: 10px;
+    flex: 1;
+  }
+  .sym-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+  }
+  .sym-btn {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    background: none;
+    transition: background 0.1s, border-color 0.1s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 38px;
+  }
+  .sym-btn:hover, .sym-btn:active {
+    background: var(--blue-pale);
+    border-color: var(--blue);
+  }
+  .sym-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 8px 0 5px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sym-label:first-child { margin-top: 0; }
+
+  /* ─── MODAL INSERTION TABLEAU ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 9000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 8px 40px rgba(21,101,192,0.22);
+    padding: 24px 22px 18px;
+    width: 300px;
+    max-width: 95vw;
+    font-family: 'Source Serif 4', serif;
+  }
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--blue-dark);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .modal-field {
+    margin-bottom: 12px;
+  }
+  .modal-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--blue-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 5px;
+  }
+  .modal-field input[type="number"] {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    background: var(--off-white);
+  }
+  .modal-field input[type="number"]:focus {
+    outline: none;
+    border-color: var(--blue);
+    background: white;
+  }
+  .modal-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ink);
+    margin-bottom: 14px;
+    cursor: pointer;
+  }
+  .modal-check input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--blue); }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .btn-modal-ok {
+    flex: 1;
+    padding: 10px;
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-modal-ok:hover { background: var(--blue-dark); }
+  .btn-modal-cancel {
+    flex: 1;
+    padding: 10px;
+    background: var(--off-white);
+    color: var(--muted);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     AMÉLIORATIONS VISUELLES - CODES COULEURS THÉMATIQUES
+     ═══════════════════════════════════════════════════════════ */
+  
+  /* Couleurs pour sections PDF */
+  :root {
+    --color-mise-situation: #E8F5E9;  /* Vert clair */
+    --color-identification: #E3F2FD;  /* Bleu clair */
+    --color-axes: #FFF3E0;            /* Orange clair */
+    --color-synthese: #F3E5F5;        /* Violet clair */
+  }
+
+  /* Icônes pédagogiques */
+  .icone-lecture::before { content: '📖 '; }
+  .icone-reflexion::before { content: '💭 '; }
+  .icone-ecriture::before { content: '✍️ '; }
+  .icone-groupe::before { content: '👥 '; }
+  .icone-duree::before { content: '⏱️ '; }
+
+  /* Alternance de couleurs pour lignes de tableau */
+  .tableau-alterne tr:nth-child(even) {
+    background-color: rgba(21, 101, 192, 0.03);
+  }
+  .tableau-alterne tr:nth-child(odd) {
+    background-color: white;
+  }
+
+  /* Bordures arrondies et ombres */
+  .carte-section {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  /* Typographie améliorée */
+  .titre-section-principal {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--blue);
+  }
+  .titre-section-secondaire {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .mot-cle {
+    font-weight: 700;
+    color: var(--blue);
+  }
+
+  /* En-tête visuel personnalisable */
+  .entete-personnalise {
+    background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+    padding: 20px;
+    border-radius: 12px 12px 0 0;
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .logo-etablissement {
+    max-width: 80px;
+    max-height: 80px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+  }
+
+  /* Boutons export multiples */
+  .btn-export-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .btn-export {
+    flex: 1;
+    min-width: 150px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-export-pdf {
+    background: #D32F2F;
+    color: white;
+    box-shadow: 0 2px 8px rgba(211, 47, 47, 0.3);
+  }
+  .btn-export-pdf:hover {
+    background: #B71C1C;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4);
+  }
+  .btn-export-docx {
+    background: #1976D2;
+    color: white;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+  }
+  .btn-export-docx:hover {
+    background: #1565C0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+  }
+
+
+  /* Prévisualisation temps réel */
+  .preview-live {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+  .preview-live-header {
+    background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .preview-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid var(--blue);
+  }
+  .preview-section.mise-situation {
+    background: var(--color-mise-situation);
+    border-left-color: #4CAF50;
+  }
+  .preview-section.identification {
+    background: var(--color-identification);
+    border-left-color: #2196F3;
+  }
+  .preview-section.axes {
+    background: var(--color-axes);
+    border-left-color: #FF9800;
+  }
+  .preview-section.synthese {
+    background: var(--color-synthese);
+    border-left-color: #9C27B0;
+  }
+
+  /* Toggle pour prévisualisation en direct */
+  .toggle-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: var(--off-white);
+    border-radius: 8px;
+  }
+  .toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+  }
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 26px;
+    transition: 0.3s;
+  }
+  .toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+  }
+  .toggle-switch input:checked + .toggle-slider {
+    background-color: var(--blue);
+  }
+  .toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+  }
+
+
+  /* Ajustement marges */
+  .marge-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+  }
+  .marge-control {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .marge-control label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .marge-control input {
+    padding: 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+  }
+
+
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="logo">📋</div>
+  <h1>Fiche Pédagogique
+    <span>EZ-ZAKY AZIZ — Générateur PDF</span>
+  </h1>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TABS DE NAVIGATION                                 -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('entete')" id="tab-entete">
+    <span class="tab-icon">📝</span>En-tête
+  </button>
+  <button class="tab-btn" onclick="showTab('etapes')" id="tab-etapes">
+    <span class="tab-icon">📚</span>Étapes
+  </button>
+  <button class="tab-btn" onclick="showTab('params')" id="tab-params">
+    <span class="tab-icon">⚙️</span>Paramètres
+  </button>
+  <button class="tab-btn" onclick="showTab('apercu')" id="tab-apercu">
+    <span class="tab-icon">👁️</span>Aperçu
+  </button>
+</div>
+
+<div id="offline-banner">📵 Mode hors ligne — La génération PDF reste disponible</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- PANEL 1 : EN-TÊTE FLEXIBLE -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="panel active" id="panel-entete">
+
+  <!-- Aperçu live de l'en-tête -->
+  <div class="card" id="card-entete-preview">
+    <div class="card-header" style="justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <h2>APERÇU DE L'EN-TÊTE</h2>
+        <span class="badge">Live</span>
+      </div>
+      <span style="font-size:10px;color:rgba(255,255,255,0.7);font-style:italic;">cliquez sur un champ pour éditer</span>
+    </div>
+    <div class="card-body" style="padding:10px;">
+      <div id="entete-live-preview"></div>
+    </div>
+  </div>
+
+  <!-- Champs fixes (labels editables) -->
+  <div class="card">
+    <div class="card-header" style="justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <h2>CHAMPS FIXES</h2>
+        <span class="badge">Labels modifiables</span>
+      </div>
+      <span style="font-size:10px;color:rgba(255,255,255,0.7);font-style:italic;">✏️ double-cliquez le label</span>
+    </div>
+    <div class="card-body" id="fixed-fields-container">
+
+      <!-- Ligne 1 : Prof + Niveau (côte à côte) -->
+      <div class="fixed-row-group" id="fgrp-ligne1">
+        <div class="fgrp-title">Ligne 1 — Identification</div>
+        <div class="field-row">
+          <div class="field editable-field-wrap">
+            <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier">
+              <span class="label-text">Professeur</span>
+              <span class="label-edit-hint">✏️</span>
+            </label>
+            <input type="text" id="prof" value="EZ-ZAKY AZIZ" oninput="updateLivePreview()">
+          </div>
+          <div class="field editable-field-wrap">
+            <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier">
+              <span class="label-text">Niveau</span>
+              <span class="label-edit-hint">✏️</span>
+            </label>
+            <input type="text" id="niveau" placeholder="Ex : 1BAC, 2BAC, TC…" oninput="updateLivePreview()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Ligne 2 : Module -->
+      <div class="fixed-row-group" id="fgrp-module">
+        <div class="fgrp-title">Ligne 2</div>
+        <div class="field editable-field-wrap">
+          <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier">
+            <span class="label-text">Module</span>
+            <span class="label-edit-hint">✏️</span>
+          </label>
+          <input type="text" id="module" placeholder="Intitulé exact du module" oninput="updateLivePreview()">
+        </div>
+      </div>
+
+      <!-- Ligne 3 : Séquence -->
+      <div class="fixed-row-group" id="fgrp-sequence">
+        <div class="fgrp-title">Ligne 3</div>
+        <div class="field editable-field-wrap">
+          <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier">
+            <span class="label-text">Séquence</span>
+            <span class="label-edit-hint">✏️</span>
+          </label>
+          <input type="text" id="sequence" placeholder="Intitulé exact de la séquence" oninput="updateLivePreview()">
+        </div>
+      </div>
+
+      <!-- Ligne 4 : Activité + Support -->
+      <div class="fixed-row-group" id="fgrp-ligne4">
+        <div class="fgrp-title">Ligne 4</div>
+        <div class="field-row">
+          <div class="field editable-field-wrap">
+            <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier">
+              <span class="label-text">Activité</span>
+              <span class="label-edit-hint">✏️</span>
+            </label>
+            <input type="text" id="activite" placeholder="Intitulé de l'activité" oninput="updateLivePreview()">
+          </div>
+          <div class="field editable-field-wrap">
+            <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier">
+              <span class="label-text">Support</span>
+              <span class="label-edit-hint">✏️</span>
+            </label>
+            <input type="text" id="support" placeholder="Titre / référence support" oninput="updateLivePreview()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Ligne 5 : Objectif -->
+      <div class="fixed-row-group" id="fgrp-objectif">
+        <div class="fgrp-title">Ligne 5 — Objectif</div>
+        <div class="field editable-field-wrap">
+          <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier">
+            <span class="label-text">Objectif(s)</span>
+            <span class="label-edit-hint">✏️</span>
+          </label>
+          <div id="objectif-wrapper" class="quill-wrapper tall"></div>
+          <div class="field-hint">Zone étendue dans le PDF. Utilisez la barre d'outils pour mettre en forme.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Lignes supplémentaires libres -->
+  <div class="card">
+    <div class="card-header" style="justify-content:space-between; flex-wrap:wrap; gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <h2>LIGNES SUPPLÉMENTAIRES</h2>
+        <span class="badge">Optionnel</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="ajouterLigneLibre('simple')" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;">+ Champ simple</button>
+        <button onclick="ajouterLigneLibre('double')" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;">+ 2 champs côte à côte</button>
+      </div>
+    </div>
+    <div class="card-body" id="lignes-libres-container">
+      <p id="no-lignes-libres-msg" style="color:var(--muted);font-size:12px;text-align:center;padding:12px 0;">
+        Aucune ligne supplémentaire. Utilisez les boutons ci-dessus pour en ajouter.
+      </p>
+    </div>
+  </div>
+
+  <button class="btn-generate" onclick="showTab('etapes')">
+    Suivant : Saisir les étapes →
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- PANEL 2 : ÉTAPES -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="panel" id="panel-etapes">
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-header"><h2>TABLEAU PÉDAGOGIQUE — ÉTAPES DE LA SÉANCE</h2></div>
+    <div class="card-body" style="padding:10px 14px; font-size:12px; color:var(--muted); line-height:1.6;">
+      Chaque étape correspond à un bloc de lignes dans le tableau PDF.<br>
+      Collez votre contenu tel quel dans chaque champ.
+    </div>
+  </div>
+
+  <div id="etapes-container"></div>
+
+  <button class="btn-add-etape" onclick="ajouterEtape()">
+    + Ajouter une étape
+  </button>
+
+  <!-- Boutons export multiples -->
+  <div class="btn-export-group">
+    <button class="btn-export btn-export-pdf" onclick="genererPDF()">
+      📄 Exporter en PDF
+    </button>
+    <button class="btn-export btn-export-docx" onclick="genererDOCX()">
+      📘 Exporter en Word (.docx)
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- PANEL 3 : PARAMÈTRES -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="panel" id="panel-params">
+
+  <div class="card">
+    <div class="card-header"><h2>MISE EN PAGE — MARGES</h2></div>
+    <div class="card-body">
+      <div class="param-grid">
+        <div class="param-item">
+          <label>Marge (pts)</label>
+          <input type="number" id="p-marge" value="8.5" min="0" max="50" step="0.5">
+        </div>
+        <div class="param-item">
+          <label>Esp. en-tête/tableau (pts)</label>
+          <input type="number" id="p-gap" value="5" min="0" max="30" step="1">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h2>TYPOGRAPHIE</h2></div>
+    <div class="card-body">
+      <div class="param-section-title">En-tête de la fiche</div>
+      <div class="param-grid">
+        <div class="param-item">
+          <label>Taille étiquettes (pt)</label>
+          <input type="number" id="p-font-entete-label" value="11" min="6" max="18" step="0.5">
+        </div>
+        <div class="param-item">
+          <label>Taille contenu (pt)</label>
+          <input type="number" id="p-font-entete-content" value="10" min="6" max="16" step="0.5">
+        </div>
+      </div>
+      <div class="param-section-title">Tableau pédagogique</div>
+      <div class="param-grid">
+        <div class="param-item">
+          <label>En-têtes colonnes (pt)</label>
+          <input type="number" id="p-font-table-header" value="10" min="6" max="16" step="0.5">
+        </div>
+        <div class="param-item">
+          <label>Contenu cellules (pt)</label>
+          <input type="number" id="p-font-table-content" value="9" min="6" max="14" step="0.5">
+        </div>
+        <div class="param-item">
+          <label>Hauteur ligne données (pt)</label>
+          <input type="number" id="p-row-height" value="8" min="6" max="20" step="0.5">
+        </div>
+        <div class="param-item">
+          <label>Hauteur en-tête tableau (pt)</label>
+          <input type="number" id="p-table-header-h" value="18" min="12" max="30" step="1">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h2>EN-TÊTE — DIMENSIONS</h2></div>
+    <div class="card-body">
+      <div class="param-grid">
+        <div class="param-item">
+          <label>Hauteur totale en-tête (pt)</label>
+          <input type="number" id="p-header-h" value="100" min="60" max="160" step="2">
+        </div>
+        <div class="param-item">
+          <label>Hauteur ligne 1 (pt)</label>
+          <input type="number" id="p-l1h" value="22" min="14" max="40" step="1">
+        </div>
+        <div class="param-item">
+          <label>Hauteur lignes 2/3/4 (pt)</label>
+          <input type="number" id="p-l234h" value="18" min="12" max="30" step="1">
+        </div>
+        <div class="param-item">
+          <label>Hauteur ligne 5 / Objectif (pt)</label>
+          <input type="number" id="p-l5h" value="40" min="24" max="80" step="2">
+        </div>
+        <div class="param-item">
+          <label>Séparateur 1 (% largeur)</label>
+          <input type="number" id="p-sep1" value="32" min="10" max="60" step="1">
+        </div>
+        <div class="param-item">
+          <label>Séparateur 2 (% largeur)</label>
+          <input type="number" id="p-sep2" value="60" min="30" max="80" step="1">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h2>PROPORTIONS DES COLONNES DU TABLEAU</h2></div>
+    <div class="card-body">
+      <div class="param-grid">
+        <div class="param-item">
+          <label>Étapes (%)</label>
+          <input type="number" id="p-col1" value="20" min="10" max="30" step="1">
+        </div>
+        <div class="param-item">
+          <label>Déroulement (%)</label>
+          <input type="number" id="p-col2" value="65" min="50" max="75" step="1">
+        </div>
+      </div>
+      <div class="field-hint" style="margin-top:8px;">La colonne « Durée » prend le reste (100 % − somme des autres).</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h2>📝 LABELS DES COLONNES D'ÉTAPES</h2></div>
+    <div class="card-body">
+      <p style="margin-bottom: 12px; color: var(--muted); font-size: 13px;">
+        Personnalisez les noms des colonnes dans le tableau des étapes (PDF et Word).
+      </p>
+      <div class="field">
+        <label>Nom de la colonne 1 (Étapes)</label>
+        <input type="text" id="label-col-etapes" value="Étapes" placeholder="Ex: Phases, Moments, Parties...">
+      </div>
+      <div class="field">
+        <label>Nom de la colonne 2 (Déroulement)</label>
+        <input type="text" id="label-col-deroulement" value="Déroulement de la séance" placeholder="Ex: Activités, Description, Contenu...">
+      </div>
+      <div class="field">
+        <label>Nom de la colonne 3 (Durée)</label>
+        <input type="text" id="label-col-duree" value="Durée" placeholder="Ex: Temps, Timing...">
+      </div>
+      
+      <div style="margin-top: 16px; padding: 12px; background: var(--blue-pale); border-radius: 6px;">
+        <p style="font-size: 12px; color: var(--blue-dark); margin-bottom: 8px;">
+          <strong>🔮 Fonctionnalité future :</strong>
+        </p>
+        <p style="font-size: 12px; color: var(--muted);">
+          L'ajout de colonnes supplémentaires sera disponible dans une prochaine version.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h2>🎨 THÈME DE MISE EN PAGE</h2></div>
+    <div class="card-body">
+
+      <!-- Thèmes prédéfinis -->
+      <div class="param-section-title">Thèmes prédéfinis</div>
+      <div id="theme-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px;"></div>
+
+      <!-- Couleurs personnalisées -->
+      <div class="param-section-title">Personnaliser</div>
+      <div class="param-grid" style="margin-top:8px;">
+        <div class="param-item">
+          <label>Couleur principale</label>
+          <input type="color" id="p-color-main" value="#1565C0" oninput="applyThemePreview()">
+        </div>
+        <div class="param-item">
+          <label>Couleur accent (or)</label>
+          <input type="color" id="p-color-accent" value="#C9A84C" oninput="applyThemePreview()">
+        </div>
+        <div class="param-item">
+          <label>Couleur bordures</label>
+          <input type="color" id="p-color-grid" value="#AAAAAA" oninput="applyThemePreview()">
+        </div>
+        <div class="param-item">
+          <label>Texte étapes (tableau)</label>
+          <input type="color" id="p-color-etape-text" value="#1565C0" oninput="applyThemePreview()">
+        </div>
+      </div>
+
+      <!-- Aperçu mini -->
+      <div style="margin-top:14px;">
+        <div class="param-section-title">Aperçu du thème</div>
+        <div id="theme-preview" style="margin-top:8px; border-radius:8px; overflow:hidden; border:1.5px solid var(--border);">
+          <div id="tp-header" style="padding:7px 10px; display:flex; gap:8px; align-items:center;">
+            <div id="tp-badge" style="width:12px;height:12px;border-radius:3px;flex-shrink:0;"></div>
+            <span id="tp-title" style="color:white;font-size:11px;font-weight:700;">FICHE PÉDAGOGIQUE</span>
+            <span id="tp-sub" style="color:rgba(255,255,255,0.7);font-size:10px;margin-left:auto;">EZ-ZAKY AZIZ</span>
+          </div>
+          <div style="background:white;padding:6px 10px;display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;gap:6px;align-items:center;">
+              <span id="tp-label1" style="font-size:9px;font-weight:700;">MODULE :</span>
+              <div style="flex:1;height:10px;background:#f0f0f0;border-radius:2px;border:0.5px solid #ddd;"></div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <span id="tp-label2" style="font-size:9px;font-weight:700;">OBJECTIF :</span>
+              <div style="flex:1;height:10px;background:#f0f0f0;border-radius:2px;border:0.5px solid #ddd;"></div>
+            </div>
+          </div>
+          <div id="tp-table-header" style="padding:5px 10px;display:flex;gap:0;">
+            <span style="color:white;font-size:9px;font-weight:700;flex:2;text-align:center;">Étapes</span>
+            <span style="color:white;font-size:9px;font-weight:700;flex:5;text-align:center;">Déroulement</span>
+            <span style="color:white;font-size:9px;font-weight:700;flex:1;text-align:center;">Durée</span>
+          </div>
+          <div style="background:white;display:flex;padding:5px 10px;gap:0;align-items:center;">
+            <span id="tp-etape" style="flex:2;font-size:9px;font-weight:700;text-align:center;">I. Intro</span>
+            <span style="flex:5;font-size:9px;color:#333;padding-left:4px;">Activité d'amorce...</span>
+            <span style="flex:1;font-size:9px;color:#666;text-align:center;">5 min</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+  <button class="btn-generate" onclick="genererPDF()">
+    📄 Générer la Fiche PDF
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- PANEL 4 : APERÇU -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="panel" id="panel-apercu">
+
+  <div class="preview-info" id="preview-summary">
+    Remplissez l'en-tête et les étapes, puis revenez ici pour voir un aperçu avant génération.
+  </div>
+
+  <!-- NOUVEAU : Toggle pour prévisualisation en direct -->
+  <label class="toggle-preview">
+    <div class="toggle-switch">
+      <input type="checkbox" id="toggle-preview-live" onchange="togglePreviewLive()">
+      <span class="toggle-slider"></span>
+    </div>
+    <span>👁️ Prévisualisation en temps réel avec codes couleurs</span>
+  </label>
+
+  <!-- NOUVEAU : Aperçu avec codes couleurs thématiques -->
+  <div id="preview-live-container" class="preview-live" style="display: none;">
+    <div class="preview-live-header">
+      <h2 style="margin: 0;">📋 APERÇU DE LA FICHE</h2>
+      <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.9;">
+        Prévisualisation avec codes couleurs par section
+      </p>
+    </div>
+    <div id="preview-live-content">
+      <!-- Le contenu sera généré dynamiquement -->
+    </div>
+  </div>
+
+  <div id="preview-table-container"></div>
+
+  <!-- Boutons export multiples (mis à jour) -->
+  <div class="btn-export-group">
+    <button class="btn-export btn-export-pdf" onclick="genererPDF()">
+      📄 Exporter en PDF
+    </button>
+    <button class="btn-export btn-export-docx" onclick="genererDOCX()">
+      📘 Exporter en Word (.docx)
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- PANNEAU SÉLECTEUR DE SYMBOLES                      -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="symbol-picker" id="symbol-picker">
+  <div class="symbol-picker-header">
+    <span>Ω Insérer un symbole</span>
+    <button class="symbol-picker-close" onclick="fermerSymbolPicker()" type="button">✕</button>
+  </div>
+  <div class="symbol-picker-tabs" id="sym-tabs">
+    <button class="sym-tab active" onclick="showSymTab('fleches',this)" type="button">Flèches</button>
+    <button class="sym-tab" onclick="showSymTab('puces',this)" type="button">Puces</button>
+    <button class="sym-tab" onclick="showSymTab('maths',this)" type="button">Maths</button>
+    <button class="sym-tab" onclick="showSymTab('etoiles',this)" type="button">Étoiles</button>
+    <button class="sym-tab" onclick="showSymTab('ponctuation',this)" type="button">Ponctuation</button>
+    <button class="sym-tab" onclick="showSymTab('exposants',this)" type="button">Exposants</button>
+  </div>
+  <div class="symbol-picker-body" id="sym-body"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- MODAL : INSERTION DE TABLEAU                       -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-tableau">
+  <div class="modal-box">
+    <div class="modal-title">⊞ Insérer un tableau</div>
+    <div class="modal-field">
+      <label>Nombre de colonnes</label>
+      <input type="number" id="tbl-cols" value="3" min="1" max="10">
+    </div>
+    <div class="modal-field">
+      <label>Nombre de lignes</label>
+      <input type="number" id="tbl-rows" value="3" min="1" max="20">
+    </div>
+    <label class="modal-check">
+      <input type="checkbox" id="tbl-header" checked>
+      Première ligne en en-tête
+    </label>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="fermerModalTableau()">Annuler</button>
+      <button class="btn-modal-ok" onclick="insererTableauQuill()">⊞ Insérer</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ PDF généré et téléchargé !</div>
+
+<!-- Bibliothèques externes — chargées depuis le cache du Service Worker si hors ligne -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+  onerror="document.getElementById('libs-warn').style.display='block'"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+  onerror="document.getElementById('libs-warn').style.display='block'"></script>
+
+<div id="libs-warn" style="display:none; background:#FFF3E0; border-left:4px solid #E65100; padding:12px 16px; margin:12px 16px; border-radius:8px; font-size:13px; color:#BF360C; font-family:'Source Serif 4',serif;">
+  ⚠️ <strong>Bibliothèques non chargées (PDF & Word).</strong><br>
+  • Si vous êtes <strong>hors ligne</strong> : Ces bibliothèques seront disponibles après une première visite en ligne.<br>
+  • Si vous êtes <strong>en ligne</strong> : Rechargez la page et attendez quelques secondes.
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'apercu') rafraichirApercu();
+}
+
+// ═══════════════════════════════════════════════════
+// GESTION DES ÉTAPES
+// ═══════════════════════════════════════════════════
+let etapeCount = 0;
+
+function ajouterEtape(data) {
+  etapeCount++;
+  const n = etapeCount;
+  const d = data || {};
+  const container = document.getElementById('etapes-container');
+
+  const div = document.createElement('div');
+  div.className = 'etape-card';
+  div.id = 'etape-' + n;
+  div.innerHTML = `
+    <div class="etape-header">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="etape-num">${n}</div>
+        <h3>Étape ${n}</h3>
+      </div>
+      <button class="btn-remove-etape" onclick="supprimerEtape(${n})">✕ Supprimer</button>
+    </div>
+    <div class="etape-body">
+      <div class="field">
+        <label>Nom de l'étape <span class="required">*</span></label>
+        <input type="text" id="e${n}-nom" placeholder="Ex : Mise en route, Présentation…" value="${d.nom||''}">
+      </div>
+      <div class="field">
+        <label>Déroulement de la séance <span class="required">*</span></label>
+        <div id="e${n}-enseignant-wrapper" class="quill-wrapper tall"></div>
+      </div>
+      <div class="field">
+        <label>Durée</label>
+        <input type="text" id="e${n}-duree" placeholder="Ex : 10 min" value="${d.duree||''}">
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+  
+  // Initialiser l'éditeur Quill pour cette étape
+  setTimeout(() => {
+    initQuillEditor(`e${n}-enseignant-wrapper`, 'Coller ici le déroulement complet de la séance : actions de l\'enseignant, tâches des apprenants, consignes, questions, exercices…');
+    // Si on restaure des données, les injecter
+    if (d.enseignant) {
+      setQuillHTML(`e${n}-enseignant-wrapper`, d.enseignant);
+    }
+  }, 0);
+}
+
+// ═══════════════════════════════════════════════════
+// QUILL.JS — INITIALISATION DES ÉDITEURS RICHES
+// ═══════════════════════════════════════════════════
+let quillInstances = {};
+
+// Éditeur Quill actif (pour les actions image/tableau)
+let activeQuillWrapper = null;
+
+// Compteur pour IDs de toolbar uniques
+let toolbarCount = 0;
+
+function initQuillEditor(wrapperId, placeholder = '') {
+  const wrapper = document.getElementById(wrapperId);
+  if (!wrapper) return null;
+
+  // ── Créer la toolbar HTML AVANT Quill, dans le wrapper parent ──
+  // On insère un div toolbar au-dessus du wrapper, puis on crée un div éditeur dedans.
+  toolbarCount++;
+  const tbId = 'ql-tb-' + toolbarCount;
+  const edId = 'ql-ed-' + toolbarCount;
+
+  // Vider le wrapper et y injecter toolbar + zone éditeur
+  wrapper.innerHTML = `
+    <div id="${tbId}" class="ql-custom-toolbar-wrap">
+      <span class="ql-formats">
+        <select class="ql-size" title="Taille">
+          <option value="small">Petit</option>
+          <option selected>Normal</option>
+          <option value="large">Grand</option>
+          <option value="huge">Très grand</option>
+        </select>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-bold" title="Gras"></button>
+        <button class="ql-italic" title="Italique"></button>
+        <button class="ql-underline" title="Souligné"></button>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-list" value="ordered" title="Liste numérotée"></button>
+        <button class="ql-list" value="bullet" title="Liste à puces"></button>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-custom-image" title="Insérer une image" type="button" onclick="(function(){ activeQuillWrapper='${wrapperId}'; ouvrirSelecteurImage('${wrapperId}'); })(); return false;">🖼</button>
+        <button class="ql-custom-table" title="Insérer un tableau" type="button" onclick="(function(){ activeQuillWrapper='${wrapperId}'; ouvrirModalTableau(); })(); return false;">⊞</button>
+        <button class="ql-custom-symbol" title="Insérer un symbole" type="button" id="sym-btn-${wrapperId}" onclick="(function(btn){ activeQuillWrapper='${wrapperId}'; ouvrirSymbolPicker(btn); })(this); return false;">Ω</button>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-clean" title="Effacer le formatage"></button>
+      </span>
+    </div>
+    <div id="${edId}"></div>
+  `;
+
+  // Initialiser Quill sur le div éditeur, en pointant vers la toolbar custom
+  const quill = new Quill('#' + edId, {
+    theme: 'snow',
+    modules: {
+      toolbar: '#' + tbId
+    },
+    placeholder: placeholder
+  });
+
+  // Déclencher updateLivePreview quand le contenu change
+  quill.on('text-change', function() {
+    if (wrapperId === 'objectif-wrapper') {
+      updateLivePreview();
+    }
+  });
+
+  quillInstances[wrapperId] = quill;
+  return quill;
+
+}
+
+
+// ═══════════════════════════════════════════════════
+// IMAGE — SÉLECTION ET INSERTION DANS QUILL
+
+// ═══════════════════════════════════════════════════
+// IMAGE — SÉLECTION ET INSERTION DANS QUILL
+// ═══════════════════════════════════════════════════
+function ouvrirSelecteurImage(wrapperId) {
+  // Créer un input file temporaire
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/png,image/jpeg,image/gif,image/webp';
+  input.style.display = 'none';
+  document.body.appendChild(input);
+  input.addEventListener('change', function() {
+    const file = input.files[0];
+    if (!file) { document.body.removeChild(input); return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const dataUrl = e.target.result;
+      insererImageQuill(wrapperId, dataUrl);
+      document.body.removeChild(input);
+    };
+    reader.readAsDataURL(file);
+  });
+  input.click();
+}
+
+function insererImageQuill(wrapperId, dataUrl) {
+  const quill = quillInstances[wrapperId];
+  if (!quill) return;
+  // Insérer l'image à la position du curseur
+  const range = quill.getSelection(true);
+  const index = range ? range.index : quill.getLength();
+  quill.insertEmbed(index, 'image', dataUrl, Quill.sources.USER);
+  quill.setSelection(index + 1, Quill.sources.SILENT);
+}
+
+// ═══════════════════════════════════════════════════
+// TABLEAU — MODAL ET INSERTION DANS QUILL
+// ═══════════════════════════════════════════════════
+function ouvrirModalTableau() {
+  document.getElementById('modal-tableau').classList.add('show');
+}
+
+function fermerModalTableau() {
+  document.getElementById('modal-tableau').classList.remove('show');
+}
+
+// Fermer le modal en cliquant l'overlay
+document.getElementById('modal-tableau').addEventListener('click', function(e) {
+  if (e.target === this) fermerModalTableau();
+});
+
+// ═══════════════════════════════════════════════════
+// SÉLECTEUR DE SYMBOLES
+// ═══════════════════════════════════════════════════
+const SYMBOLES = {
+  fleches: {
+    label: 'Flèches',
+    groupes: [
+      { titre: 'Directions simples', syms: ['→','←','↑','↓','↔','↕','↗','↘','↙','↖'] },
+      { titre: 'Doubles', syms: ['⇒','⇐','⇑','⇓','⇔','⇕','⇗','⇘'] },
+      { titre: 'Longues', syms: ['⟶','⟵','⟷','⟹','⟸','⟺'] },
+      { titre: 'Stylisées', syms: ['➜','➡','➢','➤','➥','➦','➧','➨','➩','➪','➫','➬','➭','➮','➯','➱'] },
+      { titre: 'Triangles / Pointeurs', syms: ['▶','◀','▲','▼','►','◄','▸','◂','▴','▾','⊳','⊲'] },
+      { titre: 'Courbées / Spéciales', syms: ['↩','↪','↫','↬','↭','↰','↱','↲','↳','↴','↵','↷','↶','⟳','⟲','↺','↻'] },
+    ]
+  },
+  puces: {
+    label: 'Puces & Listes',
+    groupes: [
+      { titre: 'Puces classiques', syms: ['•','◦','▪','▫','▸','▹','‣','⁃','⦾','⦿'] },
+      { titre: 'Carrés & Rectangles', syms: ['■','□','▪','▫','▬','▭','▮','▯','◼','◻','◾','◽'] },
+      { titre: 'Cercles & Ovales', syms: ['●','○','◉','◎','◌','◍','◔','◕','⬤','⭕'] },
+      { titre: 'Losanges & Étoiles', syms: ['◆','◇','◈','⬥','⬦','❖','✦','✧','✶','✷'] },
+      { titre: 'Coches & Croix', syms: ['✓','✔','✗','✘','☑','☒','✅','❌','❎','☐'] },
+    ]
+  },
+  maths: {
+    label: 'Mathématiques',
+    groupes: [
+      { titre: 'Opérateurs', syms: ['±','×','÷','·','∙','√','∛','∜','∞','%','‰','‱'] },
+      { titre: 'Relations', syms: ['=','≠','≡','≢','≈','≉','≤','≥','≪','≫','≺','≻','⊂','⊃','⊄','⊅','⊆','⊇'] },
+      { titre: 'Logique & Ensembles', syms: ['∧','∨','¬','∀','∃','∄','∅','∩','∪','∈','∉','∋','∌'] },
+      { titre: 'Lettres grecques', syms: ['α','β','γ','δ','ε','ζ','η','θ','ι','κ','λ','μ','ν','ξ','π','ρ','σ','τ','υ','φ','χ','ψ','ω','Δ','Σ','Π','Ω'] },
+      { titre: 'Calcul', syms: ['∂','∇','∫','∬','∭','∮','∑','∏','∐','⌀','⌁'] },
+      { titre: 'Fractions', syms: ['½','⅓','⅔','¼','¾','⅕','⅖','⅗','⅘','⅙','⅚','⅛','⅜','⅝','⅞'] },
+    ]
+  },
+  etoiles: {
+    label: 'Étoiles & Formes',
+    groupes: [
+      { titre: 'Étoiles', syms: ['★','☆','✩','✪','✫','✬','✭','✮','✯','✰','⭐','🌟'] },
+      { titre: 'Cœurs', syms: ['♥','♡','❤','❥','❣','❦','❧','💙','💚','💛','💜','🖤'] },
+      { titre: 'Fleurs & Nature', syms: ['✿','❀','❁','❂','❃','✾','⚘','☘','🌿','🍀'] },
+      { titre: 'Symboles divers', syms: ['☀','☁','☂','☃','☄','⚡','⚡','☎','✉','✂','✏','✒','🔑','🔒','🔓'] },
+      { titre: 'Médailles & Trophées', syms: ['🏆','🥇','🥈','🥉','🎖','🏅','🎗','🎯','🎪','🎨'] },
+    ]
+  },
+  ponctuation: {
+    label: 'Ponctuation',
+    groupes: [
+      { titre: 'Guillemets', syms: ['«','»','‹','›','"','"','„','‟','‚','\'','\u2018','\u2019'] },
+      { titre: 'Tirets & Traits', syms: ['–','—','―','‒','‑','‐','-','_','~','≈','≡'] },
+      { titre: 'Points & Ellipses', syms: ['…','·','•','‥','⁀','⁐','⁓'] },
+      { titre: 'Symboles spéciaux', syms: ['©','®','™','℃','℉','°','№','℗','℠','℡'] },
+      { titre: 'Monnaies', syms: ['€','£','¥','¢','₹','₽','₿','₺','₩','₪'] },
+    ]
+  },
+  exposants: {
+    label: 'Exp. & Indices',
+    groupes: [
+      { titre: 'Exposants chiffres', syms: ['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'] },
+      { titre: 'Exposants lettres', syms: ['ᵃ','ᵇ','ᶜ','ᵈ','ᵉ','ᶠ','ᵍ','ʰ','ⁱ','ʲ','ᵏ','ˡ','ᵐ','ⁿ','ᵒ','ᵖ','ʳ','ˢ','ᵗ','ᵘ','ᵛ','ʷ','ˣ','ʸ','ᶻ'] },
+      { titre: 'Indices chiffres', syms: ['₀','₁','₂','₃','₄','₅','₆','₇','₈','₉'] },
+      { titre: 'Indices lettres', syms: ['ₐ','ₑ','ₒ','ₓ','ₙ','ₘ','ₖ','ₜ','ₛ','ᵢ','ᵤ','ᵥ'] },
+    ]
+  }
+};
+
+let activeSymTab = 'fleches';
+let symPickerBtnEl = null;
+
+function showSymTab(tabId, btnEl) {
+  activeSymTab = tabId;
+  // Mettre à jour les onglets actifs
+  document.querySelectorAll('.sym-tab').forEach(b => b.classList.remove('active'));
+  btnEl.classList.add('active');
+  renderSymTab(tabId);
+}
+
+function renderSymTab(tabId) {
+  const body = document.getElementById('sym-body');
+  const data = SYMBOLES[tabId];
+  if (!data) return;
+  let html = '';
+  data.groupes.forEach(grp => {
+    html += `<div class="sym-label">${grp.titre}</div>`;
+    html += `<div class="sym-grid">`;
+    grp.syms.forEach(sym => {
+      // Encoder le symbole pour l'attribut data
+      html += `<button class="sym-btn" title="${sym}" type="button" onclick="insererSymbole(this.dataset.sym)" data-sym="${encodeURIComponent(sym)}">${sym}</button>`;
+    });
+    html += `</div>`;
+  });
+  body.innerHTML = html;
+}
+
+function ouvrirSymbolPicker(btnEl) {
+  const picker = document.getElementById('symbol-picker');
+  const isOpen = picker.classList.contains('show');
+
+  // Retirer la classe active de tous les anciens boutons Ω
+  document.querySelectorAll('.ql-custom-symbol').forEach(b => b.classList.remove('active'));
+
+  if (isOpen && symPickerBtnEl === btnEl) {
+    // Déjà ouvert sur ce bouton → fermer
+    fermerSymbolPicker();
+    return;
+  }
+
+  symPickerBtnEl = btnEl;
+  btnEl.classList.add('active');
+
+  // Rendre le contenu de l'onglet actif
+  renderSymTab(activeSymTab);
+
+  // Positionner le panneau sous le bouton
+  const rect = btnEl.getBoundingClientRect();
+  const pickerW = 300;
+  const pickerH = 380;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  let left = rect.left;
+  let top = rect.bottom + 4;
+
+  // Ajustement horizontal si débordement
+  if (left + pickerW > vw - 8) left = vw - pickerW - 8;
+  if (left < 8) left = 8;
+
+  // Ajustement vertical : si pas assez de place en bas, afficher au-dessus
+  if (top + pickerH > vh - 8) top = rect.top - pickerH - 4;
+  if (top < 8) top = 8;
+
+  picker.style.left = left + 'px';
+  picker.style.top = top + 'px';
+  picker.classList.add('show');
+
+  // Fermer si clic en dehors (avec un léger délai pour éviter l'auto-fermeture)
+  setTimeout(() => {
+    document.addEventListener('mousedown', fermerSymPickerSiExterieur);
+    document.addEventListener('touchstart', fermerSymPickerSiExterieur, { passive: true });
+  }, 100);
+}
+
+function fermerSymPickerSiExterieur(e) {
+  const picker = document.getElementById('symbol-picker');
+  if (!picker.contains(e.target) && e.target !== symPickerBtnEl) {
+    fermerSymbolPicker();
+  }
+}
+
+function fermerSymbolPicker() {
+  const picker = document.getElementById('symbol-picker');
+  picker.classList.remove('show');
+  if (symPickerBtnEl) symPickerBtnEl.classList.remove('active');
+  symPickerBtnEl = null;
+  document.removeEventListener('mousedown', fermerSymPickerSiExterieur);
+  document.removeEventListener('touchstart', fermerSymPickerSiExterieur);
+}
+
+function insererSymbole(encodedSym) {
+  const sym = decodeURIComponent(encodedSym);
+  const quill = quillInstances[activeQuillWrapper];
+  if (!quill) return;
+  const range = quill.getSelection(true);
+  const index = range ? range.index : quill.getLength();
+  quill.insertText(index, sym, Quill.sources.USER);
+  quill.setSelection(index + sym.length, Quill.sources.SILENT);
+  // Ne pas fermer → permet d'insérer plusieurs symboles à la suite
+}
+
+function insererTableauQuill() {
+  const cols  = Math.max(1, Math.min(10, parseInt(document.getElementById('tbl-cols').value) || 3));
+  const rows  = Math.max(1, Math.min(20, parseInt(document.getElementById('tbl-rows').value) || 3));
+  const header = document.getElementById('tbl-header').checked;
+
+  const quill = quillInstances[activeQuillWrapper];
+  if (!quill) { fermerModalTableau(); return; }
+
+  // Construire le HTML du tableau
+  let html = '<table><tbody>';
+  for (let r = 0; r < rows; r++) {
+    html += '<tr>';
+    for (let c = 0; c < cols; c++) {
+      if (r === 0 && header) {
+        html += `<th contenteditable="true">En-tête ${c+1}</th>`;
+      } else {
+        html += `<td contenteditable="true">&nbsp;</td>`;
+      }
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table><p><br></p>';
+
+  // Insérer à la position courante
+  const range = quill.getSelection(true);
+  const index = range ? range.index : quill.getLength();
+  // Utiliser clipboard.dangerouslyPasteHTML pour insérer du HTML complexe
+  quill.clipboard.dangerouslyPasteHTML(index, html, Quill.sources.USER);
+  quill.setSelection(index + 1, Quill.sources.SILENT);
+
+  fermerModalTableau();
+}
+
+// Fonction pour obtenir le HTML d'un éditeur Quill
+function getQuillHTML(wrapperId) {
+  const quill = quillInstances[wrapperId];
+  if (!quill) return '';
+  return quill.root.innerHTML;
+}
+
+// Fonction pour obtenir le texte brut d'un éditeur Quill
+function getQuillText(wrapperId) {
+  const quill = quillInstances[wrapperId];
+  if (!quill) return '';
+  return quill.getText().trim();
+}
+
+// Fonction pour définir le contenu HTML d'un éditeur Quill
+function setQuillHTML(wrapperId, html) {
+  const quill = quillInstances[wrapperId];
+  if (!quill) return;
+  if (html) {
+    quill.root.innerHTML = html;
+  }
+}
+
+// Initialiser l'éditeur Quill pour l'objectif au chargement
+document.addEventListener('DOMContentLoaded', function() {
+  initQuillEditor('objectif-wrapper', 'Objectif de la séance…');
+});
+
+
+function supprimerEtape(n) {
+  const el = document.getElementById('etape-' + n);
+  if (el) el.remove();
+}
+
+function collecterEtapes() {
+  const etapes = [];
+  document.querySelectorAll('.etape-card').forEach(card => {
+    const id = card.id.replace('etape-', '');
+    const nom = (document.getElementById('e'+id+'-nom')?.value || '').trim();
+    const enseignantHTML = getQuillHTML('e'+id+'-enseignant-wrapper');
+    const enseignant = getQuillText('e'+id+'-enseignant-wrapper');
+    const duree = (document.getElementById('e'+id+'-duree')?.value || '').trim();
+    if (nom || enseignant) {
+      etapes.push({ nom, enseignant: enseignantHTML || enseignant, duree });
+    }
+  });
+  return etapes;
+}
+
+// Étapes exemples par défaut
+ajouterEtape({ nom:'Mise en route', enseignant:'', duree:'5 min' });
+ajouterEtape({ nom:'Présentation', enseignant:'', duree:'15 min' });
+ajouterEtape({ nom:'Entraînement', enseignant:'', duree:'20 min' });
+ajouterEtape({ nom:'Production', enseignant:'', duree:'10 min' });
+ajouterEtape({ nom:'Clôture', enseignant:'', duree:'5 min' });
+
+// ═══════════════════════════════════════════════════
+// APERÇU
+// ═══════════════════════════════════════════════════
+function rafraichirApercu() {
+  const entete = collecterEntete();
+  const etapes = collecterEtapes();
+  const P = collecterParams();
+
+  // Résumé avec labels personnalisés
+  let summary = `<strong>📋 ${entete[entete.labelNiveau ? 'niveau' : 'niveau'] || '—'}</strong> | ${entete.module || '—'}<br>
+    ${entete.labelSequence||'Séquence'} : ${entete.sequence || '—'}<br>
+    ${entete.labelActivite||'Activité'} : ${entete.activite || '—'} | ${entete.labelSupport||'Support'} : ${entete.support || '—'}<br>`;
+  if (entete.lignesLibres && entete.lignesLibres.length > 0) {
+    entete.lignesLibres.forEach(ll => {
+      if (ll.type === 'simple') {
+        summary += `${ll.label} : ${ll.val1 || '—'}<br>`;
+      } else {
+        summary += `${ll.label1} : ${ll.val1 || '—'} | ${ll.label2} : ${ll.val2 || '—'}<br>`;
+      }
+    });
+  }
+  summary += `${entete.labelObjectif||'Objectif'} : <em>${(getQuillText('objectif-wrapper')||'—').substring(0,120)}${getQuillText('objectif-wrapper') && getQuillText('objectif-wrapper').length>120?'…':''}</em>`;
+  document.getElementById('preview-summary').innerHTML = summary;
+
+  if (!etapes.length) {
+    document.getElementById('preview-table-container').innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">Aucune étape saisie.</p>';
+    return;
+  }
+
+  let html = `<div style="overflow-x:auto;">
+    <table class="preview-table">
+      <thead>
+        <tr>
+          <th style="width:20%">${P.labelColEtapes || 'Étapes'}</th>
+          <th style="width:65%">${P.labelColDeroulement || 'Déroulement de la séance'}</th>
+          <th style="width:15%">${P.labelColDuree || 'Durée'}</th>
+        </tr>
+      </thead>
+      <tbody>`;
+  etapes.forEach((e, i) => {
+    html += `<tr class="${i>0?'etape-sep':''}">
+      <td class="etape-label">${e.nom}</td>
+      <td>${e.enseignant.replace(/\n/g,'<br>')}</td>
+      <td>${e.duree}</td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  document.getElementById('preview-table-container').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+// EN-TÊTE FLEXIBLE — GESTION DES LABELS ÉDITABLES
+// ═══════════════════════════════════════════════════
+
+function editLabel(labelEl) {
+  const span = labelEl.querySelector('.label-text');
+  if (!span) return;
+  const currentText = span.textContent.trim();
+  // Créer un input en ligne
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.className = 'label-edit-input';
+  inp.value = currentText;
+  labelEl.classList.add('editing-mode');
+  span.replaceWith(inp);
+  inp.focus(); inp.select();
+
+  function finishEdit() {
+    const newText = inp.value.trim() || currentText;
+    const newSpan = document.createElement('span');
+    newSpan.className = 'label-text';
+    newSpan.textContent = newText;
+    inp.replaceWith(newSpan);
+    labelEl.classList.remove('editing-mode');
+    updateLivePreview();
+  }
+  inp.addEventListener('blur', finishEdit);
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); finishEdit(); }
+    if (e.key === 'Escape') { inp.value = currentText; finishEdit(); }
+  });
+}
+
+// ═══════════════════════════════════════════════════
+// LIGNES LIBRES SUPPLÉMENTAIRES
+// ═══════════════════════════════════════════════════
+let ligneLibreCount = 0;
+
+function ajouterLigneLibre(type) {
+  ligneLibreCount++;
+  const n = ligneLibreCount;
+  const container = document.getElementById('lignes-libres-container');
+  const msg = document.getElementById('no-lignes-libres-msg');
+  if (msg) msg.style.display = 'none';
+
+  const div = document.createElement('div');
+  div.className = 'ligne-libre-card';
+  div.id = 'll-card-' + n;
+  div.dataset.type = type;
+
+  if (type === 'simple') {
+    div.innerHTML = `
+      <div class="ligne-libre-header">
+        <span class="ll-title">Ligne libre #${n} — Champ simple</span>
+        <div class="ll-actions">
+          <button class="btn-ll-move" onclick="moveLigneLibre(${n},-1)" title="Monter">↑</button>
+          <button class="btn-ll-move" onclick="moveLigneLibre(${n},1)" title="Descendre">↓</button>
+          <button class="btn-ll-del" onclick="supprimerLigneLibre(${n})">✕ Suppr.</button>
+        </div>
+      </div>
+      <div class="ligne-libre-body">
+        <div class="field editable-field-wrap">
+          <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier le label">
+            <span class="label-text">Champ ${n}</span>
+            <span class="label-edit-hint">✏️</span>
+          </label>
+          <input type="text" id="ll${n}-val1" placeholder="Contenu du champ…" oninput="updateLivePreview()">
+        </div>
+      </div>`;
+  } else {
+    div.innerHTML = `
+      <div class="ligne-libre-header">
+        <span class="ll-title">Ligne libre #${n} — 2 champs côte à côte</span>
+        <div class="ll-actions">
+          <button class="btn-ll-move" onclick="moveLigneLibre(${n},-1)" title="Monter">↑</button>
+          <button class="btn-ll-move" onclick="moveLigneLibre(${n},1)" title="Descendre">↓</button>
+          <button class="btn-ll-del" onclick="supprimerLigneLibre(${n})">✕ Suppr.</button>
+        </div>
+      </div>
+      <div class="ligne-libre-body">
+        <div class="ll-double">
+          <div class="field editable-field-wrap">
+            <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier le label">
+              <span class="label-text">Champ ${n}a</span>
+              <span class="label-edit-hint">✏️</span>
+            </label>
+            <input type="text" id="ll${n}-val1" placeholder="Contenu gauche…" oninput="updateLivePreview()">
+          </div>
+          <div class="field editable-field-wrap">
+            <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier le label">
+              <span class="label-text">Champ ${n}b</span>
+              <span class="label-edit-hint">✏️</span>
+            </label>
+            <input type="text" id="ll${n}-val2" placeholder="Contenu droit…" oninput="updateLivePreview()">
+          </div>
+        </div>
+      </div>`;
+  }
+  container.appendChild(div);
+  updateLivePreview();
+}
+
+function supprimerLigneLibre(n) {
+  const el = document.getElementById('ll-card-' + n);
+  if (el) el.remove();
+  const container = document.getElementById('lignes-libres-container');
+  if (!container.querySelector('.ligne-libre-card')) {
+    const msg = document.getElementById('no-lignes-libres-msg');
+    if (msg) msg.style.display = '';
+  }
+  updateLivePreview();
+}
+
+function moveLigneLibre(n, dir) {
+  const card = document.getElementById('ll-card-' + n);
+  if (!card) return;
+  const container = document.getElementById('lignes-libres-container');
+  const cards = [...container.querySelectorAll('.ligne-libre-card')];
+  const idx = cards.indexOf(card);
+  if (dir === -1 && idx > 0) {
+    container.insertBefore(card, cards[idx - 1]);
+  } else if (dir === 1 && idx < cards.length - 1) {
+    container.insertBefore(cards[idx + 1], card);
+  }
+  updateLivePreview();
+}
+
+function getLabelText(labelEl) {
+  const span = labelEl ? labelEl.querySelector('.label-text') : null;
+  return span ? span.textContent.trim() : '';
+}
+
+function collecterLignesLibres() {
+  const lines = [];
+  document.querySelectorAll('#lignes-libres-container .ligne-libre-card').forEach(card => {
+    const n = card.id.replace('ll-card-', '');
+    const type = card.dataset.type;
+    const labels = card.querySelectorAll('.editable-label');
+    const val1El = document.getElementById('ll'+n+'-val1');
+    const val2El = document.getElementById('ll'+n+'-val2');
+    if (type === 'simple') {
+      lines.push({
+        type: 'simple',
+        label: getLabelText(labels[0]),
+        val1: val1El ? val1El.value.trim() : ''
+      });
+    } else {
+      lines.push({
+        type: 'double',
+        label1: getLabelText(labels[0]),
+        val1: val1El ? val1El.value.trim() : '',
+        label2: getLabelText(labels[1]),
+        val2: val2El ? val2El.value.trim() : ''
+      });
+    }
+  });
+  return lines;
+}
+
+// ═══════════════════════════════════════════════════
+// APERÇU LIVE DE L'EN-TÊTE
+// ═══════════════════════════════════════════════════
+function updateLivePreview() {
+  const entete = collecterEntete();
+  const lignesLibres = collecterLignesLibres();
+  const container = document.getElementById('entete-live-preview');
+  if (!container) return;
+
+  const blue = getComputedStyle(document.documentElement).getPropertyValue('--blue').trim() || '#1565C0';
+  const gold = getComputedStyle(document.documentElement).getPropertyValue('--gold').trim() || '#C9A84C';
+
+  function lpCell(label, value, flex1, flex2) {
+    const val = value || '';
+    return `<div class="lp-half" style="flex:${flex1||1}">
+      <div class="lp-cell-label" style="background:${blue};">${label}</div>
+      <div class="lp-cell-value${!val?' empty':''}">${val || '—'}</div>
+    </div>`;
+  }
+
+  let html = `<div style="border:2px solid ${blue};border-radius:5px;overflow:hidden;">`;
+  // Ligne titre
+  html += `<div class="lp-title-row" style="background:${blue};border-bottom:2px solid ${gold};">
+    <span>📋 FICHE PÉDAGOGIQUE</span>
+    <span style="font-size:10px;opacity:0.8;">${entete.prof||'—'}</span>
+  </div>`;
+
+  // Ligne 1 : Prof + Niveau
+  html += `<div class="lp-row-outer" style="border-bottom:1px solid ${blue};">
+    ${lpCell(entete.labelProf||'PROF', entete.prof, 1.4)}
+    <div class="lp-half" style="flex:1; border-left:1.5px solid ${blue};">
+      <div class="lp-cell-label" style="background:${blue};">${entete.labelNiveau||'NIVEAU'}</div>
+      <div class="lp-cell-value${!entete.niveau?' empty':''}">${entete.niveau||'—'}</div>
+    </div>
+  </div>`;
+
+  // Ligne 2 : Module
+  html += `<div class="lp-row-outer" style="border-bottom:1px solid ${blue};">
+    <div class="lp-half" style="flex:1;">
+      <div class="lp-cell-label" style="background:${blue};">${entete.labelModule||'MODULE'}</div>
+      <div class="lp-cell-value${!entete.module?' empty':''}">${entete.module||'—'}</div>
+    </div>
+  </div>`;
+
+  // Ligne 3 : Séquence
+  html += `<div class="lp-row-outer" style="border-bottom:1px solid ${blue};">
+    <div class="lp-half" style="flex:1;">
+      <div class="lp-cell-label" style="background:${blue};">${entete.labelSequence||'SÉQUENCE'}</div>
+      <div class="lp-cell-value${!entete.sequence?' empty':''}">${entete.sequence||'—'}</div>
+    </div>
+  </div>`;
+
+  // Ligne 4 : Activité + Support
+  html += `<div class="lp-row-outer" style="border-bottom:1px solid ${blue};">
+    ${lpCell(entete.labelActivite||'ACTIVITÉ', entete.activite, 1.2)}
+    <div class="lp-half" style="flex:1; border-left:1.5px solid ${blue};">
+      <div class="lp-cell-label" style="background:${blue};">${entete.labelSupport||'SUPPORT'}</div>
+      <div class="lp-cell-value${!entete.support?' empty':''}">${entete.support||'—'}</div>
+    </div>
+  </div>`;
+
+  // Lignes libres supplémentaires
+  lignesLibres.forEach(ll => {
+    if (ll.type === 'simple') {
+      html += `<div class="lp-row-outer" style="border-bottom:1px solid ${blue};">
+        <div class="lp-half" style="flex:1;">
+          <div class="lp-cell-label" style="background:${blue};">${ll.label||'CHAMP'}</div>
+          <div class="lp-cell-value${!ll.val1?' empty':''}">${ll.val1||'—'}</div>
+        </div>
+      </div>`;
+    } else {
+      html += `<div class="lp-row-outer" style="border-bottom:1px solid ${blue};">
+        ${lpCell(ll.label1||'CHAMP A', ll.val1, 1)}
+        <div class="lp-half" style="flex:1; border-left:1.5px solid ${blue};">
+          <div class="lp-cell-label" style="background:${blue};">${ll.label2||'CHAMP B'}</div>
+          <div class="lp-cell-value${!ll.val2?' empty':''}">${ll.val2||'—'}</div>
+        </div>
+      </div>`;
+    }
+  });
+
+  // Ligne Objectif
+  const obj = getQuillText('objectif-wrapper') || '';
+  html += `<div style="display:flex; border-top:1px solid ${blue};">
+    <div class="lp-objectif-label" style="background:${blue};">${entete.labelObjectif||'OBJECTIF'}</div>
+    <div class="lp-objectif-value${!obj?' empty':''}">${obj.replace(/\n/g,'<br>')||'—'}</div>
+  </div>`;
+
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+// COLLECTE DES DONNÉES
+// ═══════════════════════════════════════════════════
+function getFixedLabel(groupId, index) {
+  const grp = document.getElementById(groupId);
+  if (!grp) return '';
+  const labels = grp.querySelectorAll('.editable-label .label-text');
+  return labels[index] ? labels[index].textContent.trim() : '';
+}
+
+function collecterEntete() {
+  const objectifHTML = getQuillHTML('objectif-wrapper');
+  const objectifText = getQuillText('objectif-wrapper');
+  
+  return {
+    // Valeurs
+    prof:       document.getElementById('prof')?.value.trim() || 'EZ-ZAKY AZIZ',
+    niveau:     document.getElementById('niveau')?.value.trim() || '',
+    module:     document.getElementById('module')?.value.trim() || '',
+    sequence:   document.getElementById('sequence')?.value.trim() || '',
+    activite:   document.getElementById('activite')?.value.trim() || '',
+    support:    document.getElementById('support')?.value.trim() || '',
+    objectif:   objectifHTML || objectifText || '',
+    // Labels personnalisés
+    labelProf:      getFixedLabel('fgrp-ligne1', 0)     || 'PROF',
+    labelNiveau:    getFixedLabel('fgrp-ligne1', 1)     || 'NIVEAU',
+    labelModule:    getFixedLabel('fgrp-module', 0)     || 'MODULE',
+    labelSequence:  getFixedLabel('fgrp-sequence', 0)   || 'SÉQUENCE',
+    labelActivite:  getFixedLabel('fgrp-ligne4', 0)     || 'ACTIVITÉ',
+    labelSupport:   getFixedLabel('fgrp-ligne4', 1)     || 'SUPPORT',
+    labelObjectif:  getFixedLabel('fgrp-objectif', 0)   || 'OBJECTIF(S)',
+    // Lignes libres
+    lignesLibres: collecterLignesLibres(),
+  };
+}
+
+// Initialiser l'aperçu live
+setTimeout(updateLivePreview, 100);
+
+function collecterParams() {
+  const col1 = parseInt(document.getElementById('p-col1').value) || 20;
+  const col2 = parseInt(document.getElementById('p-col2').value) || 65;
+  const col3 = 100 - col1 - col2; // Durée (reste)
+  return {
+    marge: parseFloat(document.getElementById('p-marge').value) || 8.5,
+    gap: parseFloat(document.getElementById('p-gap').value) || 5,
+    fontEnteteLabel: parseFloat(document.getElementById('p-font-entete-label').value) || 11,
+    fontEnteteContent: parseFloat(document.getElementById('p-font-entete-content').value) || 10,
+    fontTableHeader: parseFloat(document.getElementById('p-font-table-header').value) || 10,
+    fontTableContent: parseFloat(document.getElementById('p-font-table-content').value) || 9,
+    rowHeight: parseFloat(document.getElementById('p-row-height').value) || 8,
+    tableHeaderH: parseFloat(document.getElementById('p-table-header-h').value) || 18,
+    headerH: parseFloat(document.getElementById('p-header-h').value) || 100,
+    l1h: parseFloat(document.getElementById('p-l1h').value) || 22,
+    l234h: parseFloat(document.getElementById('p-l234h').value) || 18,
+    l5h: parseFloat(document.getElementById('p-l5h').value) || 40,
+    sep1Pct: parseFloat(document.getElementById('p-sep1').value) / 100 || 0.32,
+    sep2Pct: parseFloat(document.getElementById('p-sep2').value) / 100 || 0.60,
+    cols: [col1/100, col2/100, col3/100],
+    colorMain: document.getElementById('p-color-main').value || '#1565C0',
+    colorGrid: document.getElementById('p-color-grid').value || '#AAAAAA',
+    colorAccent: document.getElementById('p-color-accent').value || '#C9A84C',
+    colorEtapeText: document.getElementById('p-color-etape-text').value || '#1565C0',
+    // Labels personnalisés des colonnes d'étapes
+    labelColEtapes: document.getElementById('label-col-etapes')?.value || 'Étapes',
+    labelColDeroulement: document.getElementById('label-col-deroulement')?.value || 'Déroulement de la séance',
+    labelColDuree: document.getElementById('label-col-duree')?.value || 'Durée',
+  };
+}
+
+// ═══════════════════════════════════════════════════
+// UTILITAIRES COULEURS
+// ═══════════════════════════════════════════════════
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return [r,g,b];
+}
+
+// ═══════════════════════════════════════════════════
+// NORMALISATION DES SYMBOLES UNICODE POUR PDF
+// ═══════════════════════════════════════════════════
+// Convertit les symboles Unicode en alternatives compatibles PDF
+function normaliserTexte(text) {
+  if (!text) return text;
+  return text
+    // ── FLÈCHES SIMPLES ──
+    .replace(/→/g, '->').replace(/←/g, '<-').replace(/↑/g, '^').replace(/↓/g, 'v')
+    .replace(/↔/g, '<->').replace(/↕/g, '^v').replace(/↗/g, '/^').replace(/↘/g, '\\v')
+    .replace(/↙/g, '/v').replace(/↖/g, '\\^').replace(/↩/g, '<-,').replace(/↪/g, ',->') 
+    .replace(/↫/g, '<~').replace(/↬/g, '~>').replace(/↭/g, '<~>').replace(/↰/g, 'L^')
+    .replace(/↱/g, 'R^').replace(/↲/g, 'Lv').replace(/↳/g, 'Rv').replace(/↴/g, 'v|')
+    .replace(/↵/g, '<-|').replace(/↷/g, '~>').replace(/↶/g, '<~')
+    .replace(/↺/g, 'o<').replace(/↻/g, 'o>').replace(/⟳/g, 'o>').replace(/⟲/g, 'o<')
+    // ── FLÈCHES DOUBLES ──
+    .replace(/⇒/g, '=>').replace(/⇐/g, '<=').replace(/⇑/g, '^=').replace(/⇓/g, 'v=')
+    .replace(/⇔/g, '<=>').replace(/⇕/g, '^v=').replace(/⇗/g, '/^=').replace(/⇘/g, '\\v=')
+    // ── FLÈCHES LONGUES ──
+    .replace(/⟶/g, '-->').replace(/⟵/g, '<--').replace(/⟷/g, '<-->') 
+    .replace(/⟹/g, '=>>').replace(/⟸/g, '<<=' ).replace(/⟺/g, '<<=>>')
+    // ── FLÈCHES STYLISÉES ──
+    .replace(/➜/g, '->').replace(/➡/g, '->').replace(/➢/g, '->').replace(/➤/g, '->')
+    .replace(/➥/g, '->').replace(/➦/g, '<-').replace(/➧/g, '->').replace(/➨/g, '=>')
+    .replace(/➩/g, '->').replace(/➪/g, '->').replace(/➫/g, '->').replace(/➬/g, '->')
+    .replace(/➭/g, '<-').replace(/➮/g, '->').replace(/➯/g, '->').replace(/➱/g, '->')
+    // ── TRIANGLES / POINTEURS ──
+    .replace(/▶/g, '>').replace(/◀/g, '<').replace(/▲/g, '^').replace(/▼/g, 'v')
+    .replace(/►/g, '>').replace(/◄/g, '<').replace(/▸/g, '>').replace(/◂/g, '<')
+    .replace(/▴/g, '^').replace(/▾/g, 'v').replace(/⊳/g, '>').replace(/⊲/g, '<')
+    // ── PUCES / LISTES ──
+    .replace(/•/g, '*').replace(/◦/g, 'o').replace(/▪/g, '-').replace(/▫/g, '-')
+    .replace(/‣/g, '>').replace(/⁃/g, '-').replace(/⦾/g, 'O').replace(/⦿/g, '@')
+    // ── CARRÉS ──
+    .replace(/■/g, '[*]').replace(/□/g, '[ ]').replace(/▬/g, '[-]').replace(/▭/g, '[-]')
+    .replace(/▮/g, '[|]').replace(/▯/g, '[ ]').replace(/◼/g, '[*]').replace(/◻/g, '[ ]')
+    .replace(/◾/g, '[*]').replace(/◽/g, '[ ]')
+    // ── CERCLES ──
+    .replace(/●/g, '(*)').replace(/○/g, '( )').replace(/◉/g, '(.)').replace(/◎/g, '(o)')
+    .replace(/◌/g, '(-)').replace(/◍/g, '(+)').replace(/◔/g, '(1/4)').replace(/◕/g, '(3/4)')
+    .replace(/⬤/g, '(*)').replace(/⭕/g, '(O)')
+    // ── LOSANGES ──
+    .replace(/◆/g, '<>').replace(/◇/g, '<>').replace(/◈/g, '<.>').replace(/⬥/g, '<>')
+    .replace(/⬦/g, '<>').replace(/❖/g, '<+>')
+    // ── COCHES / CROIX ──
+    .replace(/✓/g, 'v').replace(/✔/g, 'V').replace(/✗/g, 'x').replace(/✘/g, 'X')
+    .replace(/☑/g, '[v]').replace(/☒/g, '[x]').replace(/✅/g, '[V]').replace(/❌/g, '[X]')
+    .replace(/❎/g, '[X]').replace(/☐/g, '[ ]')
+    // ── ÉTOILES ──
+    .replace(/★/g, '*').replace(/☆/g, '*').replace(/✩/g, '*').replace(/✪/g, '(*)') 
+    .replace(/✫/g, '*').replace(/✬/g, '*').replace(/✭/g, '*').replace(/✮/g, '*')
+    .replace(/✯/g, '*').replace(/✰/g, '*').replace(/⭐/g, '*').replace(/🌟/g, '*')
+    .replace(/✦/g, '*').replace(/✧/g, '*').replace(/✶/g, '*').replace(/✷/g, '*')
+    // ── COEURS ──
+    .replace(/♥/g, '<3').replace(/♡/g, '<3').replace(/❤/g, '<3').replace(/❥/g, '<3')
+    .replace(/❣/g, '<!').replace(/❦/g, '<3').replace(/❧/g, '<3')
+    .replace(/💙/g, '<3').replace(/💚/g, '<3').replace(/💛/g, '<3')
+    .replace(/💜/g, '<3').replace(/🖤/g, '<3')
+    // ── FLEURS / NATURE ──
+    .replace(/✿/g, '*').replace(/❀/g, '*').replace(/❁/g, '*').replace(/❂/g, '(*)') 
+    .replace(/❃/g, '*').replace(/✾/g, '*').replace(/⚘/g, '*').replace(/☘/g, '*')
+    .replace(/🌿/g, '*').replace(/🍀/g, '*')
+    // ── SYMBOLES MÉTÉO / DIVERS ──
+    .replace(/☀/g, 'O)').replace(/☁/g, '(~)').replace(/☂/g, '(u)').replace(/☃/g, '(8)')
+    .replace(/☄/g, '(*)').replace(/⚡/g, '/\\')
+    .replace(/☎/g, 'TEL').replace(/✉/g, '@').replace(/✂/g, '>|<')
+    .replace(/✏/g, '/').replace(/✒/g, '/')
+    // ── MATHÉMATIQUES ──
+    .replace(/±/g, '+/-').replace(/×/g, 'x').replace(/÷/g, '/').replace(/·/g, '.')
+    .replace(/∙/g, '.').replace(/√/g, 'sqrt').replace(/∛/g, 'cbrt').replace(/∜/g, '4rt')
+    .replace(/∞/g, 'inf').replace(/‰/g, '0/00').replace(/‱/g, '0/000')
+    // ── RELATIONS MATHÉMATIQUES ──
+    .replace(/≠/g, '!=').replace(/≡/g, '===').replace(/≢/g, '!==').replace(/≈/g, '~=')
+    .replace(/≉/g, '!~=').replace(/≤/g, '<=').replace(/≥/g, '>=').replace(/≪/g, '<<')
+    .replace(/≫/g, '>>').replace(/≺/g, '<').replace(/≻/g, '>') 
+    .replace(/⊂/g, 'C').replace(/⊃/g, ')').replace(/⊄/g, '!C').replace(/⊅/g, '!)')
+    .replace(/⊆/g, 'C=').replace(/⊇/g, ')=')
+    // ── LOGIQUE / ENSEMBLES ──
+    .replace(/∧/g, '/\\').replace(/∨/g, '\\/').replace(/¬/g, '!').replace(/∀/g, 'V')
+    .replace(/∃/g, 'E').replace(/∄/g, '!E').replace(/∅/g, '{}').replace(/∩/g, 'n')
+    .replace(/∪/g, 'U').replace(/∈/g, 'e').replace(/∉/g, '!e').replace(/∋/g, 'ni')
+    .replace(/∌/g, '!ni')
+    // ── LETTRES GRECQUES ──
+    .replace(/α/g, 'alpha').replace(/β/g, 'beta').replace(/γ/g, 'gamma')
+    .replace(/δ/g, 'delta').replace(/ε/g, 'epsilon').replace(/ζ/g, 'zeta')
+    .replace(/η/g, 'eta').replace(/θ/g, 'theta').replace(/ι/g, 'iota')
+    .replace(/κ/g, 'kappa').replace(/λ/g, 'lambda').replace(/μ/g, 'mu')
+    .replace(/ν/g, 'nu').replace(/ξ/g, 'xi').replace(/π/g, 'pi')
+    .replace(/ρ/g, 'rho').replace(/σ/g, 'sigma').replace(/τ/g, 'tau')
+    .replace(/υ/g, 'upsilon').replace(/φ/g, 'phi').replace(/χ/g, 'chi')
+    .replace(/ψ/g, 'psi').replace(/ω/g, 'omega')
+    .replace(/Δ/g, 'Delta').replace(/∆/g, 'Delta').replace(/Σ/g, 'Sigma')
+    .replace(/Π/g, 'Pi').replace(/Ω/g, 'Omega')
+    // ── CALCUL ──
+    .replace(/∂/g, 'd').replace(/∇/g, 'V').replace(/∫/g, 'int')
+    .replace(/∬/g, 'iint').replace(/∭/g, 'iiint').replace(/∮/g, 'oint')
+    .replace(/∑/g, 'sum').replace(/∏/g, 'prod').replace(/∐/g, 'coprod')
+    // ── EXPOSANTS (chiffres) ──
+    .replace(/⁰/g, '^0').replace(/¹/g, '^1').replace(/²/g, '^2').replace(/³/g, '^3')
+    .replace(/⁴/g, '^4').replace(/⁵/g, '^5').replace(/⁶/g, '^6').replace(/⁷/g, '^7')
+    .replace(/⁸/g, '^8').replace(/⁹/g, '^9')
+    // ── EXPOSANTS (lettres) ──
+    .replace(/ᵃ/g, '^a').replace(/ᵇ/g, '^b').replace(/ᶜ/g, '^c').replace(/ᵈ/g, '^d')
+    .replace(/ᵉ/g, '^e').replace(/ᶠ/g, '^f').replace(/ᵍ/g, '^g').replace(/ʰ/g, '^h')
+    .replace(/ⁱ/g, '^i').replace(/ʲ/g, '^j').replace(/ᵏ/g, '^k').replace(/ˡ/g, '^l')
+    .replace(/ᵐ/g, '^m').replace(/ⁿ/g, '^n').replace(/ᵒ/g, '^o').replace(/ᵖ/g, '^p')
+    .replace(/ʳ/g, '^r').replace(/ˢ/g, '^s').replace(/ᵗ/g, '^t').replace(/ᵘ/g, '^u')
+    .replace(/ᵛ/g, '^v').replace(/ʷ/g, '^w').replace(/ˣ/g, '^x').replace(/ʸ/g, '^y')
+    .replace(/ᶻ/g, '^z')
+    // ── INDICES (chiffres) ──
+    .replace(/₀/g, '_0').replace(/₁/g, '_1').replace(/₂/g, '_2').replace(/₃/g, '_3')
+    .replace(/₄/g, '_4').replace(/₅/g, '_5').replace(/₆/g, '_6').replace(/₇/g, '_7')
+    .replace(/₈/g, '_8').replace(/₉/g, '_9')
+    // ── INDICES (lettres) ──
+    .replace(/ₐ/g, '_a').replace(/ₑ/g, '_e').replace(/ₒ/g, '_o').replace(/ₓ/g, '_x')
+    .replace(/ₙ/g, '_n').replace(/ₘ/g, '_m').replace(/ₖ/g, '_k').replace(/ₜ/g, '_t')
+    .replace(/ₛ/g, '_s').replace(/ᵢ/g, '_i').replace(/ᵤ/g, '_u').replace(/ᵥ/g, '_v')
+    // ── FRACTIONS ──
+    .replace(/½/g, '1/2').replace(/⅓/g, '1/3').replace(/⅔/g, '2/3')
+    .replace(/¼/g, '1/4').replace(/¾/g, '3/4').replace(/⅕/g, '1/5')
+    .replace(/⅖/g, '2/5').replace(/⅗/g, '3/5').replace(/⅘/g, '4/5')
+    .replace(/⅙/g, '1/6').replace(/⅚/g, '5/6').replace(/⅛/g, '1/8')
+    .replace(/⅜/g, '3/8').replace(/⅝/g, '5/8').replace(/⅞/g, '7/8')
+    // ── GUILLEMETS ──
+    .replace(/«/g, '<<').replace(/»/g, '>>').replace(/‹/g, '<').replace(/›/g, '>')
+    .replace(/\u201C/g, '"').replace(/\u201D/g, '"').replace(/\u201E/g, '"').replace(/\u201F/g, '"')
+    .replace(/\u2018/g, "'").replace(/\u2019/g, "'").replace(/\u201A/g, "'").replace(/\u201B/g, "'")
+    .replace(/\u2032/g, "'").replace(/\u2035/g, "'")
+    // ── TIRETS ──
+    .replace(/[–—―‒‑‐]/g, '-')
+    // ── ELLIPSES / POINTS ──
+    .replace(/…/g, '...').replace(/‥/g, '..').replace(/⁀/g, '_').replace(/⁓/g, '~')
+    // ── SYMBOLES LÉGAUX / COMMERCE ──
+    .replace(/©/g, '(c)').replace(/®/g, '(R)').replace(/™/g, '(TM)')
+    .replace(/℃/g, 'degC').replace(/℉/g, 'degF').replace(/°/g, 'deg')
+    .replace(/№/g, 'No.').replace(/℗/g, '(P)').replace(/℠/g, 'SM').replace(/℡/g, 'TEL')
+    // ── MONNAIES ──
+    .replace(/€/g, 'EUR').replace(/£/g, 'GBP').replace(/¥/g, 'JPY').replace(/¢/g, 'c')
+    .replace(/₹/g, 'INR').replace(/₽/g, 'RUB').replace(/₿/g, 'BTC').replace(/₺/g, 'TRY')
+    .replace(/₩/g, 'KRW').replace(/₪/g, 'ILS')
+    // ── DIVERS RESTANTS ──
+    .replace(/⌀/g, 'diam').replace(/⁐/g, '.').replace(/⁑/g, '**')
+    // ── NETTOYAGE FINAL : tout ce qui reste hors Latin-1 → underscore lisible ──
+    .replace(/[^\x00-\xFF]/g, '_');
+}
+
+// ═══════════════════════════════════════════════════
+// CONVERSION HTML (QUILL) VERS TEXTE FORMATÉ POUR PDF
+// ═══════════════════════════════════════════════════
+
+// Retourne une liste de segments formatés :
+// { text, bold, italic, underline, fontSize (pt), prefix }
+// Utilisé pour le rendu riche dans le PDF.
+function htmlToFormattedText(html) {
+  if (!html || html.trim() === '') return '';
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+  let result = '';
+  function processNode(node, indent) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const t = node.textContent;
+      if (t) result += t;
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const tag = node.tagName.toLowerCase();
+      if (tag === 'ol') {
+        let idx = 1;
+        Array.from(node.children).forEach(li => {
+          result += indent + idx + '. ' + li.textContent.trim() + '\n';
+          idx++;
+        });
+      } else if (tag === 'ul') {
+        Array.from(node.children).forEach(li => {
+          result += indent + '- ' + li.textContent.trim() + '\n';
+        });
+      } else if (tag === 'br') {
+        result += '\n';
+      } else if (tag === 'p') {
+        Array.from(node.childNodes).forEach(c => processNode(c, indent));
+        result += '\n';
+      } else {
+        Array.from(node.childNodes).forEach(c => processNode(c, indent));
+      }
+    }
+  }
+  Array.from(temp.childNodes).forEach(c => processNode(c, ''));
+  return result.trim();
+}
+
+// Extrait des segments { text, bold, italic, underline, fontSize, prefix }
+// depuis le HTML Quill pour un rendu PDF fidèle au formatage.
+function htmlToRichSegments(html) {
+  if (!html || html.trim() === '') return [];
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+
+  const segments = [];
+
+  // Tailles Quill → points PDF (base 9 pt)
+  const quillSizeMap = {
+    'small': 7.5,
+    'large': 12,
+    'huge': 15
+  };
+
+  // Traversée récursive avec héritage de styles
+  function walk(node, ctx) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent;
+      if (text) {
+        segments.push({
+          text: text,
+          bold: ctx.bold,
+          italic: ctx.italic,
+          underline: ctx.underline,
+          fontSize: ctx.fontSize,
+          prefix: ctx.prefix || ''
+        });
+      }
+      return;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    const tag = node.tagName.toLowerCase();
+
+    // Copier le contexte et enrichir
+    let c = Object.assign({}, ctx);
+    c.prefix = '';
+
+    if (tag === 'strong' || tag === 'b') c.bold = true;
+    if (tag === 'em' || tag === 'i') c.italic = true;
+    if (tag === 'u') c.underline = true;
+
+    // Classes Quill pour taille
+    if (node.classList) {
+      if (node.classList.contains('ql-size-small'))  c.fontSize = quillSizeMap['small'];
+      if (node.classList.contains('ql-size-large'))  c.fontSize = quillSizeMap['large'];
+      if (node.classList.contains('ql-size-huge'))   c.fontSize = quillSizeMap['huge'];
+    }
+
+    // Style inline font-size
+    if (node.style && node.style.fontSize) {
+      const fs = parseFloat(node.style.fontSize);
+      if (!isNaN(fs)) c.fontSize = fs * 0.75; // px → pt approx
+    }
+
+    // Listes : ajouter préfixe sur chaque li
+    if (tag === 'ol') {
+      let idx = 1;
+      Array.from(node.children).forEach(li => {
+        let liCtx = Object.assign({}, c, { prefix: idx + '. ' });
+        idx++;
+        segments.push({ text: liCtx.prefix, bold: liCtx.bold, italic: liCtx.italic, underline: liCtx.underline, fontSize: liCtx.fontSize, prefix: '', listStart: true });
+        Array.from(li.childNodes).forEach(ch => walk(ch, Object.assign({}, liCtx, { prefix: '' })));
+        segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: liCtx.fontSize, prefix: '' });
+      });
+      return;
+    }
+    if (tag === 'ul') {
+      Array.from(node.children).forEach(li => {
+        let liCtx = Object.assign({}, c, { prefix: '- ' });
+        segments.push({ text: liCtx.prefix, bold: liCtx.bold, italic: liCtx.italic, underline: liCtx.underline, fontSize: liCtx.fontSize, prefix: '', listStart: true });
+        Array.from(li.childNodes).forEach(ch => walk(ch, Object.assign({}, liCtx, { prefix: '' })));
+        segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: liCtx.fontSize, prefix: '' });
+      });
+      return;
+    }
+    if (tag === 'br') {
+      segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize, prefix: '' });
+      return;
+    }
+    if (tag === 'p') {
+      Array.from(node.childNodes).forEach(ch => walk(ch, c));
+      segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize, prefix: '' });
+      return;
+    }
+    // ── Image base64 ──
+    if (tag === 'img') {
+      const src = node.getAttribute('src') || '';
+      if (src.startsWith('data:image')) {
+        segments.push({ type: 'image', src: src, prefix: '' });
+        segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize, prefix: '' });
+      }
+      return;
+    }
+    // ── Tableau HTML ──
+    if (tag === 'table') {
+      const tableData = [];
+      const rows = node.querySelectorAll('tr');
+      rows.forEach(tr => {
+        const rowData = [];
+        tr.querySelectorAll('td, th').forEach(cell => {
+          rowData.push({
+            text: cell.textContent.trim(),
+            isHeader: cell.tagName.toLowerCase() === 'th'
+          });
+        });
+        if (rowData.length > 0) tableData.push(rowData);
+      });
+      if (tableData.length > 0) {
+        segments.push({ type: 'table', tableData: tableData, prefix: '' });
+        segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize, prefix: '' });
+      }
+      return;
+    }
+
+    Array.from(node.childNodes).forEach(ch => walk(ch, c));
+  }
+
+  const baseCtx = { bold: false, italic: false, underline: false, fontSize: null, prefix: '' };
+  Array.from(temp.childNodes).forEach(n => walk(n, baseCtx));
+
+  // Nettoyer : supprimer les \n finaux
+  while (segments.length && segments[segments.length-1].text === '\n') segments.pop();
+
+  return segments;
+}
+
+// ═══════════════════════════════════════════════════
+// GÉNÉRATION PDF
+// ═══════════════════════════════════════════════════
+function genererPDF() {
+  // Vérifier que jsPDF est chargé
+  if (typeof window.jspdf === 'undefined') {
+    alert('⚠️ La bibliothèque PDF n\'est pas chargée.\n\nPour utiliser cette fonctionnalité :\n1. Assurez-vous d\'avoir une connexion internet\n2. Rechargez la page\n3. Attendez quelques secondes que les bibliothèques se chargent\n\nVous pouvez aussi utiliser l\'export Word (.docx) qui fonctionne avec les mêmes bibliothèques.');
+    return;
+  }
+
+  const entete = collecterEntete();
+  const etapes = collecterEtapes();
+  const P = collecterParams();
+
+  if (!entete.niveau || !entete.module || !entete.sequence || !entete.activite || !entete.objectif) {
+    alert('Veuillez remplir au minimum : ' + (entete.labelNiveau||'Niveau') + ', ' + (entete.labelModule||'Module') + ', ' + (entete.labelSequence||'Séquence') + ', ' + (entete.labelActivite||'Activité') + ' et ' + (entete.labelObjectif||'Objectif') + '.');
+    showTab('entete'); return;
+  }
+  if (!etapes.length) {
+    alert('Veuillez ajouter au moins une étape.');
+    showTab('etapes'); return;
+  }
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4', putOnlyUsedFonts: true });
+
+    const PW = doc.internal.pageSize.width;   // 595.28
+    const PH = doc.internal.pageSize.height;  // 841.89
+  const M = P.marge;
+  const UW = PW - 2 * M; // largeur utile
+
+  const [mr, mg, mb] = hexToRgb(P.colorMain);
+  const [gr, gg, gb] = hexToRgb(P.colorGrid);
+  const [er, eg, eb] = hexToRgb(P.colorEtapeText);
+
+  function setBlue() { doc.setFillColor(mr, mg, mb); doc.setDrawColor(mr, mg, mb); }
+  function setWhite() { doc.setFillColor(255,255,255); doc.setDrawColor(255,255,255); }
+  function setGray() { doc.setDrawColor(gr, gg, gb); }
+  function setBlueStroke(w) {
+    doc.setDrawColor(mr, mg, mb);
+    doc.setLineWidth(w);
+  }
+
+  function drawTextWhite(text, x, y, size, bold) {
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(size);
+    doc.setFont('times', bold ? 'bold' : 'normal');
+    doc.text(normaliserTexte(text), x, y);
+  }
+  function drawTextBlack(text, x, y, size, bold) {
+    doc.setTextColor(0,0,0);
+    doc.setFontSize(size);
+    doc.setFont('times', bold ? 'bold' : 'normal');
+    doc.text(normaliserTexte(text), x, y);
+  }
+  function drawTextBlue(text, x, y, size, bold) {
+    doc.setTextColor(mr, mg, mb);
+    doc.setFontSize(size);
+    doc.setFont('times', bold ? 'bold' : 'normal');
+    doc.text(normaliserTexte(text), x, y);
+  }
+
+  // Dessine un rect blanc avec bordure bleue (zone de saisie remplie ou vide)
+  function drawInputBox(x, y, w, h, text, fontSize) {
+    doc.setFillColor(255,255,255);
+    setBlueStroke(0.5);
+    doc.rect(x, y, w, h, 'FD');
+    if (text) {
+      const safeText = normaliserTexte(text);
+      doc.setTextColor(0,0,0);
+      doc.setFontSize(fontSize || P.fontEnteteContent);
+      doc.setFont('times','normal');
+      const lines = doc.splitTextToSize(safeText, w - 4);
+      doc.text(lines, x + 2, y + (fontSize || P.fontEnteteContent) * 0.85 + 1);
+    }
+  }
+
+  // ─────────────────────────────
+  // RENDU TEXTE RICHE DEPUIS SEGMENTS QUILL
+  // Dessine des segments formatés (gras/italique/souligné/taille)
+  // dans une zone de largeur maxW depuis (x, startY).
+  // Retourne la hauteur totale utilisée.
+  // ─────────────────────────────
+  function drawRichTextSegments(segments, x, startY, maxW, baseFontSize, defaultColor) {
+    if (!segments || segments.length === 0) return 0;
+    const lineH = baseFontSize * 1.35;
+    let curX = x;
+    let curY = startY;
+
+    // Découper les segments texte en lignes en respectant maxW
+    const lines = [];
+    let curLine = [];
+    let curLineW = 0;
+
+    // Accumulateur mixte : { type:'text-line', items } | { type:'image', src } | { type:'table', tableData }
+    const blocks = [];
+    let pendingLine = [];
+    let pendingLineW = 0;
+
+    function flushPendingLine() {
+      if (pendingLine.length > 0) {
+        blocks.push({ type: 'text-line', items: pendingLine });
+        pendingLine = [];
+        pendingLineW = 0;
+      }
+    }
+
+    segments.forEach(seg => {
+      // Segments spéciaux (image, table)
+      if (seg.type === 'image') {
+        flushPendingLine();
+        blocks.push({ type: 'image', src: seg.src });
+        return;
+      }
+      if (seg.type === 'table') {
+        flushPendingLine();
+        blocks.push({ type: 'table', tableData: seg.tableData });
+        return;
+      }
+      if (seg.text === '\n') {
+        flushPendingLine();
+        return;
+      }
+      const fs = seg.fontSize || baseFontSize;
+      const fontStyle = seg.bold && seg.italic ? 'bolditalic' : seg.bold ? 'bold' : seg.italic ? 'italic' : 'normal';
+      doc.setFontSize(fs);
+      doc.setFont('times', fontStyle);
+
+      const words = seg.text.split(/(\s+)/);
+      words.forEach(word => {
+        if (word === '') return;
+        const wW = doc.getTextWidth(normaliserTexte(word));
+        if (pendingLineW + wW > maxW && pendingLine.length > 0 && word.trim() !== '') {
+          flushPendingLine();
+        }
+        pendingLine.push({ word, bold: seg.bold, italic: seg.italic, underline: seg.underline, fontSize: fs });
+        pendingLineW += wW;
+      });
+    });
+    flushPendingLine();
+
+    // Dessiner les blocs
+    blocks.forEach(block => {
+      if (block.type === 'text-line') {
+        let lx = x;
+        block.items.forEach(item => {
+          const fs = item.fontSize || baseFontSize;
+          const fontStyle = item.bold && item.italic ? 'bolditalic' : item.bold ? 'bold' : item.italic ? 'italic' : 'normal';
+          doc.setFontSize(fs);
+          doc.setFont('times', fontStyle);
+          if (defaultColor) doc.setTextColor(...defaultColor);
+          else doc.setTextColor(0, 0, 0);
+          const safeWord = normaliserTexte(item.word);
+          doc.text(safeWord, lx, curY);
+          const w = doc.getTextWidth(safeWord);
+          if (item.underline) {
+            doc.setDrawColor(0,0,0); doc.setLineWidth(0.3);
+            doc.line(lx, curY + 0.8, lx + w, curY + 0.8);
+          }
+          lx += w;
+        });
+        curY += lineH;
+
+      } else if (block.type === 'image') {
+        // Dimensions : largeur max = maxW, hauteur proportionnelle
+        try {
+          const imgEl = new Image();
+          imgEl.src = block.src;
+          const natW = imgEl.naturalWidth || 200;
+          const natH = imgEl.naturalHeight || 150;
+          const ratio = natH / natW;
+          const imgW = Math.min(maxW, 160); // max 160pt de large
+          const imgH = imgW * ratio;
+          // Détecter le format
+          let fmt = 'JPEG';
+          if (block.src.includes('image/png')) fmt = 'PNG';
+          else if (block.src.includes('image/gif')) fmt = 'GIF';
+          else if (block.src.includes('image/webp')) fmt = 'WEBP';
+          doc.addImage(block.src, fmt, x, curY, imgW, imgH);
+          // Bordure légère autour de l'image
+          doc.setDrawColor(180,180,180); doc.setLineWidth(0.4);
+          doc.rect(x, curY, imgW, imgH, 'S');
+          curY += imgH + 3;
+        } catch(e) {
+          // Si l'image échoue, on laisse un espace
+          curY += lineH;
+        }
+
+      } else if (block.type === 'table') {
+        // Dessiner le tableau : répartir équitablement les colonnes
+        const tdata = block.tableData;
+        if (!tdata || tdata.length === 0) return;
+        const nCols = Math.max(...tdata.map(r => r.length));
+        const colW = maxW / nCols;
+        const cellPadTop = 2;
+        const cellPadLeft = 3;
+        const cellFontSize = baseFontSize * 0.88;
+
+        tdata.forEach(row => {
+          // Calculer la hauteur de la ligne (multi-wrap)
+          let maxLinesInRow = 1;
+          row.forEach(cell => {
+            doc.setFontSize(cellFontSize);
+            doc.setFont('times', cell.isHeader ? 'bold' : 'normal');
+            const wrapped = doc.splitTextToSize(normaliserTexte(cell.text || ''), colW - cellPadLeft*2);
+            maxLinesInRow = Math.max(maxLinesInRow, wrapped.length);
+          });
+          const rowH = maxLinesInRow * cellFontSize * 1.3 + cellPadTop * 2;
+
+          // Dessiner les cellules
+          let cx = x;
+          row.forEach((cell, ci) => {
+            const cw = colW;
+            // Fond header
+            if (cell.isHeader) {
+              doc.setFillColor(227, 242, 253); // bleu très pâle
+              doc.rect(cx, curY, cw, rowH, 'F');
+            } else {
+              doc.setFillColor(255,255,255);
+              doc.rect(cx, curY, cw, rowH, 'F');
+            }
+            // Bordure cellule
+            doc.setDrawColor(mr, mg, mb); doc.setLineWidth(0.5);
+            doc.rect(cx, curY, cw, rowH, 'S');
+            // Texte
+            doc.setFontSize(cellFontSize);
+            doc.setFont('times', cell.isHeader ? 'bold' : 'normal');
+            doc.setTextColor(0,0,0);
+            const wrapped = doc.splitTextToSize(normaliserTexte(cell.text || ''), cw - cellPadLeft*2);
+            doc.text(wrapped, cx + cellPadLeft, curY + cellPadTop + cellFontSize * 0.85);
+            cx += cw;
+          });
+          curY += rowH;
+        });
+        curY += 3; // espace après tableau
+      }
+    });
+
+    return curY - startY;
+  }
+
+  // Calcule la hauteur qu'occuperait drawRichTextSegments sans dessiner
+  function measureRichTextSegments(segments, maxW, baseFontSize) {
+    if (!segments || segments.length === 0) return baseFontSize * 1.35;
+    const lineH = baseFontSize * 1.35;
+    let totalH = 0;
+    let curLineW = 0;
+    let lineCount = 0;
+
+    function flushLines() {
+      if (lineCount > 0 || curLineW > 0) {
+        totalH += (lineCount + (curLineW > 0 ? 1 : 0)) * lineH;
+        lineCount = 0;
+        curLineW = 0;
+      }
+    }
+
+    segments.forEach(seg => {
+      if (seg.type === 'image') {
+        flushLines();
+        // Estimation : image de 120pt de haut max
+        totalH += 123;
+        return;
+      }
+      if (seg.type === 'table') {
+        flushLines();
+        // Estimer la hauteur du tableau
+        const tdata = seg.tableData || [];
+        const nCols = Math.max(1, ...tdata.map(r => r.length));
+        const colW = maxW / nCols;
+        const cellFontSize = baseFontSize * 0.88;
+        tdata.forEach(row => {
+          let maxLines = 1;
+          row.forEach(cell => {
+            doc.setFontSize(cellFontSize);
+            doc.setFont('times', cell.isHeader ? 'bold' : 'normal');
+            const wrapped = doc.splitTextToSize(normaliserTexte(cell.text || ''), colW - 6);
+            maxLines = Math.max(maxLines, wrapped.length);
+          });
+          totalH += maxLines * cellFontSize * 1.3 + 4;
+        });
+        totalH += 3;
+        return;
+      }
+      if (seg.text === '\n') {
+        lineCount++;
+        curLineW = 0;
+        return;
+      }
+      const fs = seg.fontSize || baseFontSize;
+      const fontStyle = seg.bold && seg.italic ? 'bolditalic' : seg.bold ? 'bold' : seg.italic ? 'italic' : 'normal';
+      doc.setFontSize(fs);
+      doc.setFont('times', fontStyle);
+      const words = seg.text.split(/(\s+)/);
+      words.forEach(word => {
+        if (word === '') return;
+        const wW = doc.getTextWidth(normaliserTexte(word));
+        if (curLineW + wW > maxW && curLineW > 0 && word.trim() !== '') {
+          lineCount++;
+          curLineW = 0;
+        }
+        curLineW += wW;
+      });
+    });
+    flushLines();
+
+    return Math.max(totalH, lineH);
+  }
+
+  // ─────────────────────────────
+  // PAGE 1 : EN-TÊTE
+  // ─────────────────────────────
+  const sep1 = M + UW * P.sep1Pct;
+  const sep2 = M + UW * P.sep2Pct;
+  const endX = M + UW;
+
+  let hy = M;
+
+  // ── Ligne 1 (h = l1h) — Prof + Niveau avec labels personnalisés
+  const L1H = P.l1h;
+  setBlue();
+  doc.rect(M, hy, UW, L1H, 'F');
+  doc.setDrawColor(255,255,255); doc.setLineWidth(0.5);
+  doc.line(sep1, hy, sep1, hy+L1H);
+  doc.line(sep2, hy, sep2, hy+L1H);
+  // Titre centré à gauche
+  drawTextWhite('FICHE PEDAGOGIQUE', M+5, hy + L1H*0.65, P.fontEnteteLabel, true);
+  // Prof label + valeur
+  const profLabel = normaliserTexte(entete.labelProf || 'PROF');
+  drawTextWhite(profLabel + ' : ' + entete.prof, sep1+5, hy + L1H*0.65, P.fontEnteteLabel, true);
+  // Niveau label
+  const niveauLabel = normaliserTexte(entete.labelNiveau || 'NIVEAU');
+  drawTextWhite(niveauLabel + ' :', sep2+5, hy + L1H*0.65, P.fontEnteteLabel, true);
+  const niveauLabelW = doc.getTextWidth(niveauLabel + ' :') + 4;
+  const niveauX = sep2 + niveauLabelW + 6;
+  drawInputBox(niveauX, hy+4, endX-niveauX-2, L1H-8, entete.niveau, P.fontEnteteContent);
+  hy += L1H;
+
+  // ── Ligne 2 (module)
+  const L234H = P.l234h;
+  const moduleLabel = normaliserTexte(entete.labelModule || 'Module');
+  setBlue();
+  doc.rect(M, hy, UW, L234H, 'F');
+  drawTextWhite(moduleLabel + ' :', M+5, hy + L234H*0.65, P.fontEnteteLabel, true);
+  const moduleLabelW = doc.getTextWidth(moduleLabel + ' :') + 4;
+  drawInputBox(M+moduleLabelW+8, hy+3, endX-(M+moduleLabelW+8)-4, L234H-6, entete.module, P.fontEnteteContent);
+  hy += L234H;
+
+  // ── Ligne 3 (séquence)
+  const sequenceLabel = normaliserTexte(entete.labelSequence || 'Sequence');
+  setBlue();
+  doc.rect(M, hy, UW, L234H, 'F');
+  drawTextWhite(sequenceLabel + ' :', M+5, hy + L234H*0.65, P.fontEnteteLabel, true);
+  const seqLabelW = doc.getTextWidth(sequenceLabel + ' :') + 4;
+  drawInputBox(M+seqLabelW+8, hy+3, endX-(M+seqLabelW+8)-4, L234H-6, entete.sequence, P.fontEnteteContent);
+  hy += L234H;
+
+  // ── Ligne 4 (activité + support) — hauteur dynamique
+  doc.setFontSize(P.fontEnteteContent);
+  doc.setFont('times','normal');
+  const supportSafe = normaliserTexte(entete.support || '');
+  const supportBoxW = endX - (sep2+50) - 4;
+  const supportLines = supportSafe ? doc.splitTextToSize(supportSafe, supportBoxW - 4) : [];
+  const supportLineH = P.fontEnteteContent * 1.4;
+  const supportNeededH = Math.max(L234H, supportLines.length * supportLineH + 8);
+  const hyL4 = hy;
+  setBlue();
+  doc.rect(M, hyL4, UW, supportNeededH, 'F');
+
+  const activiteLabel = normaliserTexte(entete.labelActivite || 'Activite');
+  const actLabelY = hyL4 + supportNeededH * 0.5 + P.fontEnteteLabel * 0.35;
+  drawTextWhite(activiteLabel + ' :', M+5, actLabelY, P.fontEnteteLabel, true);
+  const actLabelW = doc.getTextWidth(activiteLabel + ' :') + 4;
+  drawInputBox(M+actLabelW+8, hyL4+3, sep2-(M+actLabelW+8)-4, supportNeededH-6, entete.activite, P.fontEnteteContent);
+
+  const supportLabel = normaliserTexte(entete.labelSupport || 'Support');
+  const supLabelY = hyL4 + supportNeededH * 0.5 + P.fontEnteteLabel * 0.35;
+  drawTextWhite(supportLabel + ' :', sep2+5, supLabelY, P.fontEnteteLabel, true);
+  doc.setFillColor(255,255,255);
+  setBlueStroke(0.5);
+  doc.rect(sep2+50, hyL4+3, supportBoxW, supportNeededH-6, 'FD');
+  if (supportLines.length > 0) {
+    doc.setTextColor(0,0,0);
+    doc.setFontSize(P.fontEnteteContent);
+    doc.setFont('times','normal');
+    doc.text(supportLines, sep2+52, hyL4 + P.fontEnteteContent * 0.85 + 4);
+  }
+  hy += supportNeededH;
+
+  // ── LIGNES LIBRES SUPPLÉMENTAIRES (entre ligne 4 et objectif)
+  if (entete.lignesLibres && entete.lignesLibres.length > 0) {
+    entete.lignesLibres.forEach(ll => {
+      if (ll.type === 'simple') {
+        const llLabel = normaliserTexte(ll.label || 'Champ');
+        const llVal = ll.val1 || '';
+        setBlue();
+        doc.rect(M, hy, UW, L234H, 'F');
+        drawTextWhite(llLabel + ' :', M+5, hy + L234H*0.65, P.fontEnteteLabel, true);
+        const llLabelW = doc.getTextWidth(llLabel + ' :') + 4;
+        drawInputBox(M+llLabelW+8, hy+3, endX-(M+llLabelW+8)-4, L234H-6, llVal, P.fontEnteteContent);
+        hy += L234H;
+      } else {
+        // Double
+        const ll1 = normaliserTexte(ll.label1 || 'Champ A');
+        const ll2 = normaliserTexte(ll.label2 || 'Champ B');
+        setBlue();
+        doc.rect(M, hy, UW, L234H, 'F');
+        // Séparateur au milieu
+        const midX = M + UW/2;
+        doc.setDrawColor(255,255,255); doc.setLineWidth(0.5);
+        doc.line(midX, hy, midX, hy+L234H);
+        // Gauche
+        const ll1Y = hy + L234H * 0.65;
+        drawTextWhite(ll1 + ' :', M+5, ll1Y, P.fontEnteteLabel, true);
+        const ll1W = doc.getTextWidth(ll1 + ' :') + 4;
+        drawInputBox(M+ll1W+8, hy+3, midX-(M+ll1W+8)-2, L234H-6, ll.val1||'', P.fontEnteteContent);
+        // Droite
+        drawTextWhite(ll2 + ' :', midX+5, ll1Y, P.fontEnteteLabel, true);
+        const ll2W = doc.getTextWidth(ll2 + ' :') + 4;
+        drawInputBox(midX+ll2W+8, hy+3, endX-(midX+ll2W+8)-4, L234H-6, ll.val2||'', P.fontEnteteContent);
+        hy += L234H;
+      }
+    });
+  }
+
+  // ── Ligne Objectif — hauteur dynamique
+  const L5H = P.l5h;
+  // Convertir le HTML Quill en segments riches
+  const objectifSegments = htmlToRichSegments(entete.objectif);
+  const objectifBoxW = endX - (M+60) - 2;
+  const objectifNeededH = Math.max(L5H, measureRichTextSegments(objectifSegments, objectifBoxW - 6, P.fontEnteteContent) + 8);
+
+  const objectifLabel = normaliserTexte(entete.labelObjectif || 'Objectif');
+  setBlue();
+  doc.rect(M, hy, 60, objectifNeededH, 'F');
+  drawTextWhite(objectifLabel + ' :', M+3, hy + Math.min(20, objectifNeededH * 0.4), P.fontEnteteLabel, true);
+  doc.setFillColor(255,255,255);
+  setBlueStroke(0.5);
+  doc.rect(M+60, hy+2, objectifBoxW, objectifNeededH-4, 'FD');
+  if (objectifSegments.length > 0) {
+    drawRichTextSegments(objectifSegments, M+62, hy + P.fontEnteteContent * 0.85 + 3, objectifBoxW - 6, P.fontEnteteContent, [0,0,0]);
+  }
+  const dynamicHeaderH = (hy - M) + objectifNeededH;
+  hy += objectifNeededH;
+
+  setBlueStroke(1.5);
+  doc.setFillColor(0,0,0);
+  doc.rect(M, M, UW, dynamicHeaderH, 'S');
+
+  // ─────────────────────────────
+  // PAGE 1 : TABLEAU — EN-TÊTE
+  // ─────────────────────────────
+  let ty = M + dynamicHeaderH + P.gap; // top du tableau
+
+  const colHeaders = [P.labelColEtapes, P.labelColDeroulement, P.labelColDuree];
+  const colWidths = P.cols.map(c => c * UW);
+
+  const TH = P.tableHeaderH;
+  setBlue();
+  doc.rect(M, ty, UW, TH, 'F');
+  // séparateurs et textes en-tête colonnes
+  let cx = M;
+  colHeaders.forEach((hdr, i) => {
+    // séparateur vertical (sauf premier)
+    if (i > 0) {
+      doc.setDrawColor(255,255,255); doc.setLineWidth(0.5);
+      doc.line(cx, ty, cx, ty+TH);
+    }
+    const lines = hdr.split('\n');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(P.fontTableHeader);
+    doc.setFont('times','bold');
+    if (lines.length === 1) {
+      doc.text(lines[0], cx + colWidths[i]/2, ty + TH/2 + P.fontTableHeader*0.35, {align:'center'});
+    } else {
+      doc.text(lines[0], cx + colWidths[i]/2, ty + TH*0.38, {align:'center'});
+      doc.text(lines[1], cx + colWidths[i]/2, ty + TH*0.72, {align:'center'});
+    }
+    cx += colWidths[i];
+  });
+  // bordure tableau
+  setBlueStroke(0.8);
+  doc.rect(M, ty, UW, TH, 'S');
+  ty += TH;
+
+  // ─────────────────────────────
+  // LIGNES DE DONNÉES (multipages)
+  // ─────────────────────────────
+  const RH = P.rowHeight;
+  const bottomLimit = PH - M;
+  let currentPage = 1;
+
+  function newPage() {
+    // Remplir la page courante jusqu'en bas avant de tourner la page
+    while (ty + RH <= bottomLimit) {
+      doc.setFillColor(255,255,255);
+      doc.rect(M, ty, UW, RH, 'F');
+      doc.setLineWidth(0.8);
+      setBlueStroke(0.8);
+      doc.rect(M, ty, UW, RH, 'S');
+      ty += RH;
+    }
+    doc.addPage();
+    currentPage++;
+    ty = M;
+    // En-tête du tableau sur la nouvelle page
+    setBlue();
+    doc.rect(M, ty, UW, TH, 'F');
+    let cx2 = M;
+    colHeaders.forEach((hdr, i) => {
+      if (i > 0) {
+        doc.setDrawColor(255,255,255); doc.setLineWidth(0.5);
+        doc.line(cx2, ty, cx2, ty+TH);
+      }
+      const lines = hdr.split('\n');
+      doc.setTextColor(255,255,255);
+      doc.setFontSize(P.fontTableHeader);
+      doc.setFont('times','bold');
+      if (lines.length === 1) {
+        doc.text(lines[0], cx2 + colWidths[i]/2, ty + TH/2 + P.fontTableHeader*0.35, {align:'center'});
+      } else {
+        doc.text(lines[0], cx2 + colWidths[i]/2, ty + TH*0.38, {align:'center'});
+        doc.text(lines[1], cx2 + colWidths[i]/2, ty + TH*0.72, {align:'center'});
+      }
+      cx2 += colWidths[i];
+    });
+    setBlueStroke(0.8);
+    doc.rect(M, ty, UW, TH, 'S');
+    ty += TH;
+  }
+
+  // Préparer les lignes de données
+  // Chaque étape = bloc de lignes
+  // Calculer nb de lignes nécessaires par étape (wrap)
+  function wrapText(text, width, fontSize) {
+    if (!text) return [''];
+    doc.setFontSize(fontSize);
+    doc.setFont('times','normal');
+    return doc.splitTextToSize(normaliserTexte(text), width - 4);
+  }
+
+  etapes.forEach((etape, etapeIdx) => {
+    const w0 = colWidths[0], w1 = colWidths[1], w2 = colWidths[2];
+
+    // Convertir le HTML Quill en segments riches
+    const enseignantSegments = htmlToRichSegments(etape.enseignant);
+    const ensTextW = w1 - 6;
+    const blockHeight = Math.max(
+      measureRichTextSegments(enseignantSegments, ensTextW, P.fontTableContent) + 6,
+      P.fontTableContent * 1.35 + 6
+    );
+
+    // Separator bleu avant chaque étape (sauf la première)
+    if (etapeIdx > 0) {
+      if (ty + 2 > bottomLimit) newPage();
+      setBlueStroke(1.0);
+      doc.line(M, ty, M + UW, ty);
+    }
+
+    // Si bloc ne rentre pas, nouvelle page
+    if (ty + blockHeight > bottomLimit) newPage();
+
+    const blockStart = ty;
+
+    // Fond blanc
+    doc.setFillColor(255,255,255);
+    doc.rect(M, ty, UW, blockHeight, 'F');
+
+    // *** QUADRILLAGE SUPPRIMÉ - PAS DE GRILLE INTERNE ***
+
+    // Texte col 0 : étape (centré verticalement, gras)
+    doc.setFontSize(P.fontTableContent);
+    doc.setFont('times','bold');
+    doc.setTextColor(er, eg, eb);
+    const etapeY = blockStart + blockHeight/2 + P.fontTableContent*0.35;
+    const etapeNomLines = wrapText(etape.nom, w0, P.fontTableContent);
+    const lineHeight = P.fontTableContent * 1.3;
+    if (etapeNomLines.length === 1) {
+      doc.setFont('times','bold');
+      doc.text(normaliserTexte(etape.nom), M + w0/2, etapeY, {align:'center'});
+    } else {
+      const startY = blockStart + blockHeight/2 - (etapeNomLines.length * lineHeight)/2 + P.fontTableContent*0.85;
+      etapeNomLines.forEach((l, li) => {
+        doc.text(l, M + w0/2, startY + li*lineHeight, {align:'center'});
+      });
+    }
+
+    // Texte déroulement (col 1) — rendu riche avec formatage Quill
+    const ens_x = M + w0 + 3;
+    drawRichTextSegments(enseignantSegments, ens_x, blockStart + P.fontTableContent * 0.85 + 3, ensTextW, P.fontTableContent, [0,0,0]);
+
+    // Durée (col 2)
+    doc.setFont('times','normal');
+    doc.setTextColor(0,0,0);
+    doc.setFontSize(P.fontTableContent);
+    const dur_x = M + w0 + w1 + 2;
+    doc.text(normaliserTexte(etape.duree || ''), dur_x, blockStart + blockHeight/2 + P.fontTableContent*0.35);
+
+    // Bordure extérieure du bloc (bleu)
+    doc.setLineWidth(0.8);
+    setBlueStroke(0.8);
+    doc.rect(M, blockStart, UW, blockHeight, 'S');
+
+    ty += blockHeight;
+  });
+
+  // Remplissage lignes vides jusqu'en bas (page courante)
+  while (ty + RH <= bottomLimit) {
+    doc.setFillColor(255,255,255);
+    doc.rect(M, ty, UW, RH, 'F');
+    // Bordure extérieure seulement (pas de quadrillage interne)
+    doc.setLineWidth(0.8);
+    setBlueStroke(0.8);
+    doc.rect(M, ty, UW, RH, 'S');
+    ty += RH;
+  }
+
+  // Numéros de page
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let p = 1; p <= totalPages; p++) {
+    doc.setPage(p);
+    doc.setFontSize(8);
+    doc.setTextColor(150,150,150);
+    doc.setFont('times','normal');
+    doc.text(`Page ${p} / ${totalPages}`, PW/2, PH-4, {align:'center'});
+    doc.text(`${new Date().toLocaleDateString('fr-FR')}`, M, PH-4);
+    doc.text(normaliserTexte(entete.prof || ''), endX, PH-4, {align:'right'});
+  }
+
+  // Sauvegarde
+  const safeName = (entete.activite || 'fiche').replace(/[^a-zA-Z0-9\u00C0-\u024F]/gi,'_').slice(0,40);
+  doc.save(`FichePedagogique_${safeName}_${entete.niveau || 'N'}.pdf`);
+
+  showToast();
+  
+  } catch (error) {
+    console.error('Erreur PDF:', error);
+    alert('❌ Erreur lors de la génération du PDF.\n\nDétails: ' + error.message + '\n\nAssurez-vous que :\n1. Vous avez une connexion internet\n2. La bibliothèque jsPDF est chargée\n3. Tous les champs sont correctement remplis');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// THÈMES DE MISE EN PAGE
+// ═══════════════════════════════════════════════════
+const THEMES = [
+  { id:'bleu',      name:'Bleu classique', main:'#1565C0', accent:'#C9A84C', grid:'#AAAAAA', etape:'#1565C0' },
+  { id:'marine',    name:'Marine & or',    main:'#0D2B55', accent:'#D4AF37', grid:'#8899AA', etape:'#0D2B55' },
+  { id:'vert',      name:'Vert académique',main:'#1B5E20', accent:'#F9A825', grid:'#A5C8A0', etape:'#1B5E20' },
+  { id:'bordeaux',  name:'Bordeaux',       main:'#6D0C22', accent:'#C49A3C', grid:'#B07070', etape:'#6D0C22' },
+  { id:'violet',    name:'Violet royal',   main:'#4A148C', accent:'#FFB300', grid:'#9E7CC0', etape:'#4A148C' },
+  { id:'ardoise',   name:'Ardoise gris',   main:'#37474F', accent:'#78909C', grid:'#90A4AE', etape:'#37474F' },
+  { id:'noir',      name:'Noir & or',      main:'#1A1A1A', accent:'#C9A84C', grid:'#555555', etape:'#C9A84C' },
+  { id:'turquoise', name:'Turquoise',      main:'#00695C', accent:'#E65100', grid:'#80CBC4', etape:'#00695C' },
+  { id:'rouge',     name:'Rouge vif',      main:'#B71C1C', accent:'#FFD600', grid:'#EF9A9A', etape:'#B71C1C' },
+];
+
+let activeThemeId = 'bleu';
+
+function buildThemeGrid() {
+  const grid = document.getElementById('theme-grid');
+  grid.innerHTML = '';
+  THEMES.forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'theme-swatch' + (t.id === activeThemeId ? ' active' : '');
+    div.id = 'swatch-' + t.id;
+    div.onclick = () => applyTheme(t.id);
+    div.innerHTML = `
+      <div class="theme-swatch-bar" style="background:${t.main};">
+        <div class="theme-swatch-dot" style="background:${t.accent};"></div>
+        <div class="theme-swatch-dot"></div>
+        <div class="theme-swatch-dot"></div>
+      </div>
+      <div class="theme-swatch-body">
+        <div class="theme-swatch-line" style="background:${t.main};opacity:0.15;width:100%;"></div>
+        <div class="theme-swatch-row">
+          <div class="theme-swatch-line" style="background:${t.etape};width:35%;"></div>
+          <div class="theme-swatch-line" style="background:#e0e0e0;flex:1;"></div>
+        </div>
+        <div class="theme-swatch-line" style="background:#e0e0e0;width:80%;"></div>
+      </div>
+      <div class="theme-swatch-name">${t.name}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function applyTheme(id) {
+  const t = THEMES.find(x => x.id === id);
+  if (!t) return;
+  activeThemeId = id;
+  document.getElementById('p-color-main').value = t.main;
+  document.getElementById('p-color-accent').value = t.accent;
+  document.getElementById('p-color-grid').value = t.grid;
+  document.getElementById('p-color-etape-text').value = t.etape;
+  // Mettre à jour les swatches actifs
+  document.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active'));
+  const sw = document.getElementById('swatch-' + id);
+  if (sw) sw.classList.add('active');
+  applyThemePreview();
+  // Appliquer aussi à l'interface de l'app
+  applyThemeToApp(t.main, t.accent);
+}
+
+function applyThemePreview() {
+  const main = document.getElementById('p-color-main').value;
+  const accent = document.getElementById('p-color-accent').value;
+  const etape = document.getElementById('p-color-etape-text').value;
+  // Aperçu mini
+  document.getElementById('tp-header').style.background = main;
+  document.getElementById('tp-badge').style.background = accent;
+  document.getElementById('tp-table-header').style.background = main;
+  document.getElementById('tp-label1').style.color = main;
+  document.getElementById('tp-label2').style.color = main;
+  document.getElementById('tp-etape').style.color = etape;
+}
+
+function applyThemeToApp(main, accent) {
+  // Mettre à jour les variables CSS de l'interface
+  const r = document.documentElement.style;
+  r.setProperty('--blue', main);
+  r.setProperty('--blue-light', main);
+  r.setProperty('--blue-dark', main);
+  r.setProperty('--blue-pale', main + '18');
+  r.setProperty('--gold', accent);
+}
+
+// Initialisation
+buildThemeGrid();
+applyThemePreview();
+
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════════════
+// NOUVELLES FONCTIONNALITÉS
+// ═══════════════════════════════════════════════════
+
+// ────── PRÉVISUALISATION EN TEMPS RÉEL ──────
+function togglePreviewLive() {
+  const container = document.getElementById('preview-live-container');
+  const isActive = document.getElementById('toggle-preview-live').checked;
+  
+  if (isActive) {
+    container.style.display = 'block';
+    genererPreviewLive();
+  } else {
+    container.style.display = 'none';
+  }
+}
+
+// ────── COLLECTER DONNÉES ──────
+function collecterDonnees() {
+  const entete = collecterEntete();
+  const etapes = collecterEtapes();
+  
+  return {
+    entete: entete,
+    etapes: etapes,
+    objectifs: [entete.objectif], // L'objectif est dans l'en-tête
+    timestamp: Date.now()
+  };
+}
+
+function genererPreviewLive() {
+  const donnees = collecterDonnees();
+  const content = document.getElementById('preview-live-content');
+  
+  let html = '';
+  
+  // Section : Mise en situation (vert)
+  html += `
+    <div class="preview-section mise-situation">
+      <h3 class="titre-section-principal">🌱 I. MISE EN SITUATION</h3>
+      <p>${donnees.entete.support || 'Non défini'}</p>
+      <p style="margin-top: 8px; font-size: 13px; color: var(--muted);">
+        <span class="icone-duree"></span> Durée estimée : 5 min
+      </p>
+    </div>
+  `;
+  
+  // Section : Identification (bleu)
+  html += `
+    <div class="preview-section identification">
+      <h3 class="titre-section-principal">🔍 II. IDENTIFICATION</h3>
+      <p><span class="mot-cle">Module :</span> ${donnees.entete.module || 'Non défini'}</p>
+      <p><span class="mot-cle">Activité :</span> ${donnees.entete.activite || 'Non définie'}</p>
+      <p><span class="mot-cle">Niveau :</span> ${donnees.entete.niveau || 'Non défini'}</p>
+    </div>
+  `;
+  
+  // Section : Axes d'analyse (orange)
+  if (donnees.etapes && donnees.etapes.length > 0) {
+    html += `
+      <div class="preview-section axes">
+        <h3 class="titre-section-principal">📊 III. AXES D'ANALYSE</h3>
+    `;
+    
+    donnees.etapes.forEach((etape, index) => {
+      html += `
+        <div style="margin-bottom: 12px; padding-left: 15px; border-left: 3px solid #FF9800;">
+          <h4 class="titre-section-secondaire">Axe ${index + 1} : ${etape.titre || 'Sans titre'}</h4>
+          <p style="font-size: 13px; color: var(--muted);">
+            <span class="icone-duree"></span> ${etape.duree || '10'} minutes
+          </p>
+        </div>
+      `;
+    });
+    
+    html += `</div>`;
+  }
+  
+  // Section : Synthèse (violet)
+  html += `
+    <div class="preview-section synthese">
+      <h3 class="titre-section-principal">✨ IV. SYNTHÈSE</h3>
+      <p>Section de clôture et synthèse des apprentissages</p>
+      <p style="margin-top: 8px; font-size: 13px; color: var(--muted);">
+        <span class="icone-duree"></span> Durée estimée : 10 min
+      </p>
+    </div>
+  `;
+  
+  content.innerHTML = html;
+}
+
+// Mettre à jour la prévisualisation quand les données changent
+document.addEventListener('input', function() {
+  const isActive = document.getElementById('toggle-preview-live') && 
+                   document.getElementById('toggle-preview-live').checked;
+  if (isActive) {
+    // Debounce pour éviter trop d'appels
+    clearTimeout(window.previewTimeout);
+    window.previewTimeout = setTimeout(genererPreviewLive, 500);
+  }
+});
+
+// ────── EXPORT DOCX (OpenXML via JSZip) ──────
+function genererDOCX() {
+  if (typeof JSZip === 'undefined') {
+    alert('⚠️ La bibliothèque Word n\'est pas chargée.\n\nPour utiliser cette fonctionnalité :\n1. Assurez-vous d\'avoir une connexion internet\n2. Rechargez la page\n3. Attendez quelques secondes que les bibliothèques se chargent');
+    return;
+  }
+
+  const entete = collecterEntete();
+  const etapes = collecterEtapes();
+  const P = collecterParams();
+
+  const rawColor = ((document.getElementById('p-color-main') && document.getElementById('p-color-main').value) || '#1565C0').replace('#','');
+
+  // ── Helpers ──
+  function x(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+  }
+  function strip(html) {
+    if (!html) return '';
+    const d = document.createElement('div');
+    d.innerHTML = html;
+    return d.textContent || d.innerText || '';
+  }
+
+  // ── Dimensions en twips (1 cm = 567 twips) ──
+  // A4 : 11906 × 16838 twips  |  marges : 284 twips ≈ 5 mm chaque côté
+  const PG_W   = 11906;
+  const MARGIN = 284;          // 5 mm — collé aux bords
+  const TW     = PG_W - MARGIN * 2;  // 11338 twips = largeur utile
+
+  // En-tête : label court (2cm) + valeur large
+  const LBL_W  = Math.round(TW * 0.18);   // ~18% ≈ 2040 twips
+  const VAL_W  = TW - LBL_W;              // ~82%
+
+  // Ligne double (prof|niveau, activité|support) : 4 colonnes
+  const LBL2_W = Math.round(TW * 0.16);   // 16%
+  const VAL2_W = Math.round(TW * 0.34);   // 34%  → 2×(16+34)=100%
+
+  // Tableau étapes : 3 colonnes
+  const E0 = Math.round(TW * 0.18);       // 18% Étapes
+  const E1 = Math.round(TW * 0.64);       // 64% Déroulement
+  const E2 = TW - E0 - E1;               // 18% Durée
+
+  const BDR = (color) => `<w:tcBorders>
+      <w:top    w:val="single" w:sz="6" w:space="0" w:color="${color}"/>
+      <w:left   w:val="single" w:sz="6" w:space="0" w:color="${color}"/>
+      <w:bottom w:val="single" w:sz="6" w:space="0" w:color="${color}"/>
+      <w:right  w:val="single" w:sz="6" w:space="0" w:color="${color}"/>
+    </w:tcBorders>`;
+
+  const CELL_MAR = `<w:tcMar>
+      <w:top    w:w="60"  w:type="dxa"/>
+      <w:bottom w:w="60"  w:type="dxa"/>
+      <w:left   w:w="100" w:type="dxa"/>
+      <w:right  w:w="100" w:type="dxa"/>
+    </w:tcMar>`;
+
+  // Cellule générique : (texte, gras, fondColoré, largeurDxa, alignCenter, italique)
+  function cell(text, bold, colored, w, center, italic) {
+    const fill  = colored ? rawColor : 'FFFFFF';
+    const tClr  = colored ? 'FFFFFF' : '000000';
+    const jc    = center  ? '<w:jc w:val="center"/>' : '';
+    return `<w:tc>
+      <w:tcPr>
+        <w:tcW w:w="${w}" w:type="dxa"/>
+        <w:shd w:val="clear" w:color="auto" w:fill="${fill}"/>
+        ${BDR(rawColor)}
+        ${CELL_MAR}
+      </w:tcPr>
+      <w:p>
+        <w:pPr><w:spacing w:before="40" w:after="40"/>${jc}</w:pPr>
+        <w:r>
+          <w:rPr>
+            ${bold   ? '<w:b/>'   : ''}
+            ${italic ? '<w:i/>'   : ''}
+            <w:color w:val="${tClr}"/>
+            <w:sz w:val="18"/><w:szCs w:val="18"/>
+          </w:rPr>
+          <w:t xml:space="preserve">${x(text)}</w:t>
+        </w:r>
+      </w:p>
+    </w:tc>`;
+  }
+
+  // ── Convertit HTML Quill → paragraphes OpenXML ──
+  // CORRECTION COMPLÈTE: Parser le HTML Quill pour extraire texte, images ET tableaux
+  // Collecteur global d'images pour les ajouter au ZIP
+  let docxImages = [];
+  let docxImageCounter = 0;
+  
+  function htmlToWParagraphs(html, fontSize) {
+    if (!html) return `<w:p><w:pPr><w:spacing w:before="40" w:after="40"/></w:pPr></w:p>`;
+    const fs = fontSize || 18;
+    
+    // Utiliser la même fonction que le PDF pour parser le HTML
+    const segments = htmlToRichSegmentsForDocx(html);
+    
+    let output = '';
+    let currentParagraph = [];
+    
+    segments.forEach((seg, idx) => {
+      // IMAGE
+      if (seg.type === 'image') {
+        // Flush paragraph en cours
+        if (currentParagraph.length > 0) {
+          output += `<w:p><w:pPr><w:spacing w:before="0" w:after="30"/></w:pPr>${currentParagraph.join('')}</w:p>`;
+          currentParagraph = [];
+        }
+        
+        // ── Enregistrer l'image ──
+        docxImageCounter++;
+        const imageId  = docxImageCounter;
+        // rId1 = styles.xml  →  images démarrent à rId2
+        const imgRid   = `rId${imageId + 1}`;
+
+        // Extension / content-type
+        let imgExt = 'png';
+        if (/data:image\/jpe?g/i.test(seg.src)) imgExt = 'jpeg';
+        else if (/data:image\/gif/i.test(seg.src))  imgExt = 'gif';
+
+        // Dimensions : on lit naturalWidth/naturalHeight depuis le DOM
+        let natW = 0, natH = 0;
+        try {
+          document.querySelectorAll('.ql-editor img, #etapes-container img').forEach(im => {
+            if ((im.src || im.getAttribute('src')) === seg.src && im.naturalWidth) {
+              natW = im.naturalWidth; natH = im.naturalHeight;
+            }
+          });
+        } catch(e){}
+        if (!natW || !natH) { natW = 400; natH = 300; }   // fallback
+
+        // Max 14 cm de large (1 cm = 360000 EMU)
+        const MAX_EMU = 5040000;
+        let wEMU = natW * 9144;    // 1 px ≈ 9144 EMU à 96 dpi
+        if (wEMU > MAX_EMU) wEMU = MAX_EMU;
+        let hEMU = Math.round(wEMU * natH / natW);
+
+        docxImages.push({ id: imageId, rId: imgRid, src: seg.src, ext: imgExt });
+
+        // XML image — structure minimale validée OOXML, compatible Android Word
+        output += `<w:p>
+      <w:pPr><w:spacing w:before="0" w:after="80"/></w:pPr>
+      <w:r>
+        <w:drawing>
+          <wp:inline distT="0" distB="0" distL="0" distR="0">
+            <wp:extent cx="${wEMU}" cy="${hEMU}"/>
+            <wp:effectExtent l="0" t="0" r="0" b="0"/>
+            <wp:docPr id="${imageId}" name="Img${imageId}"/>
+            <wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1"/></wp:cNvGraphicFramePr>
+            <a:graphic>
+              <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+                <pic:pic>
+                  <pic:nvPicPr>
+                    <pic:cNvPr id="${imageId}" name="Img${imageId}"/>
+                    <pic:cNvPicPr/>
+                  </pic:nvPicPr>
+                  <pic:blipFill>
+                    <a:blip r:embed="${imgRid}"/>
+                    <a:stretch><a:fillRect/></a:stretch>
+                  </pic:blipFill>
+                  <pic:spPr>
+                    <a:xfrm><a:off x="0" y="0"/><a:ext cx="${wEMU}" cy="${hEMU}"/></a:xfrm>
+                    <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+                  </pic:spPr>
+                </pic:pic>
+              </a:graphicData>
+            </a:graphic>
+          </wp:inline>
+        </w:drawing>
+      </w:r>
+    </w:p>`;
+        return;
+      }
+      
+      // TABLEAU
+      if (seg.type === 'table') {
+        // Flush paragraph en cours
+        if (currentParagraph.length > 0) {
+          output += `<w:p><w:pPr><w:spacing w:before="0" w:after="30"/></w:pPr>${currentParagraph.join('')}</w:p>`;
+          currentParagraph = [];
+        }
+        
+        // Créer un vrai tableau Word
+        const tableData = seg.tableData;
+        if (tableData && tableData.length > 0) {
+          // Calculer le nombre de colonnes
+          const numCols = Math.max(...tableData.map(row => row.length));
+          const colWidth = Math.floor(9000 / numCols); // Largeur totale divisée par nb colonnes
+          
+          output += `<w:tbl>
+            <w:tblPr>
+              <w:tblW w:w="9000" w:type="dxa"/>
+              <w:tblBorders>
+                <w:top w:val="single" w:sz="4" w:space="0" w:color="CCCCCC"/>
+                <w:left w:val="single" w:sz="4" w:space="0" w:color="CCCCCC"/>
+                <w:bottom w:val="single" w:sz="4" w:space="0" w:color="CCCCCC"/>
+                <w:right w:val="single" w:sz="4" w:space="0" w:color="CCCCCC"/>
+                <w:insideH w:val="single" w:sz="4" w:space="0" w:color="CCCCCC"/>
+                <w:insideV w:val="single" w:sz="4" w:space="0" w:color="CCCCCC"/>
+              </w:tblBorders>
+            </w:tblPr>
+            <w:tblGrid>`;
+          
+          for (let i = 0; i < numCols; i++) {
+            output += `<w:gridCol w:w="${colWidth}"/>`;
+          }
+          output += `</w:tblGrid>`;
+          
+          // Lignes du tableau
+          tableData.forEach((row, rowIdx) => {
+            output += `<w:tr>`;
+            row.forEach((cell, cellIdx) => {
+              const isHeader = cell.isHeader || rowIdx === 0;
+              const bgColor = isHeader ? 'E3F2FD' : 'FFFFFF';
+              
+              output += `<w:tc>
+                <w:tcPr>
+                  <w:tcW w:w="${colWidth}" w:type="dxa"/>
+                  <w:shd w:val="clear" w:color="auto" w:fill="${bgColor}"/>
+                </w:tcPr>
+                <w:p>
+                  <w:r>
+                    <w:rPr>${isHeader ? '<w:b/>' : ''}<w:sz w:val="${fs}"/></w:rPr>
+                    <w:t>${x(cell.text || '')}</w:t>
+                  </w:r>
+                </w:p>
+              </w:tc>`;
+            });
+            output += `</w:tr>`;
+          });
+          
+          output += `</w:tbl>`;
+          output += `<w:p><w:pPr><w:spacing w:before="0" w:after="100"/></w:pPr></w:p>`;
+        }
+        return;
+      }
+      
+      // TEXTE
+      if (seg.text) {
+        if (seg.text === '\n') {
+          // Nouveau paragraphe
+          if (currentParagraph.length > 0) {
+            output += `<w:p><w:pPr><w:spacing w:before="0" w:after="30"/></w:pPr>${currentParagraph.join('')}</w:p>`;
+            currentParagraph = [];
+          }
+        } else {
+          // Ajouter le run au paragraphe courant
+          const txt = x(seg.text);
+          if (txt) {
+            const segFs = seg.fontSize || fs;
+            currentParagraph.push(`<w:r><w:rPr>${seg.bold?'<w:b/><w:bCs/>':''}${seg.italic?'<w:i/><w:iCs/>':''}${seg.underline?'<w:u w:val="single"/>':''}<w:sz w:val="${segFs}"/><w:szCs w:val="${segFs}"/></w:rPr><w:t xml:space="preserve">${txt}</w:t></w:r>`);
+          }
+        }
+      }
+    });
+    
+    // Flush dernier paragraphe
+    if (currentParagraph.length > 0) {
+      output += `<w:p><w:pPr><w:spacing w:before="0" w:after="30"/></w:pPr>${currentParagraph.join('')}</w:p>`;
+    }
+    
+    return output || `<w:p><w:pPr><w:spacing w:before="40" w:after="40"/></w:pPr></w:p>`;
+  }
+  
+  // Parser HTML Quill en segments (texte, images, tableaux)
+  function htmlToRichSegmentsForDocx(html) {
+    if (!html || html.trim() === '') return [];
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    const segments = [];
+    
+    function walk(node, ctx) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent;
+        if (text) {
+          segments.push({
+            text: text,
+            bold: ctx.bold,
+            italic: ctx.italic,
+            underline: ctx.underline,
+            fontSize: ctx.fontSize
+          });
+        }
+        return;
+      }
+      if (node.nodeType !== Node.ELEMENT_NODE) return;
+      const tag = node.tagName.toLowerCase();
+      
+      let c = Object.assign({}, ctx);
+      
+      if (tag === 'strong' || tag === 'b') c.bold = true;
+      if (tag === 'em' || tag === 'i') c.italic = true;
+      if (tag === 'u') c.underline = true;
+      
+      if (tag === 'br') {
+        segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize });
+        return;
+      }
+      if (tag === 'p') {
+        Array.from(node.childNodes).forEach(ch => walk(ch, c));
+        segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize });
+        return;
+      }
+      if (tag === 'li') {
+        segments.push({ text: '- ', bold: c.bold, italic: c.italic, underline: c.underline, fontSize: c.fontSize });
+        Array.from(node.childNodes).forEach(ch => walk(ch, c));
+        segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize });
+        return;
+      }
+      if (tag === 'img') {
+        const src = node.getAttribute('src') || '';
+        if (src.startsWith('data:image')) {
+          segments.push({ type: 'image', src: src });
+          segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize });
+        }
+        return;
+      }
+      if (tag === 'table') {
+        const tableData = [];
+        const rows = node.querySelectorAll('tr');
+        rows.forEach(tr => {
+          const rowData = [];
+          tr.querySelectorAll('td, th').forEach(cell => {
+            rowData.push({
+              text: cell.textContent.trim(),
+              isHeader: cell.tagName.toLowerCase() === 'th'
+            });
+          });
+          if (rowData.length > 0) tableData.push(rowData);
+        });
+        if (tableData.length > 0) {
+          segments.push({ type: 'table', tableData: tableData });
+          segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize });
+        }
+        return;
+      }
+      
+      Array.from(node.childNodes).forEach(ch => walk(ch, c));
+    }
+    
+    const baseCtx = { bold: false, italic: false, underline: false, fontSize: null };
+    Array.from(temp.childNodes).forEach(n => walk(n, baseCtx));
+    
+    // Nettoyer les \n finaux
+    while (segments.length && segments[segments.length-1].text === '\n') segments.pop();
+    
+    return segments;
+  }
+
+  // Ligne simple : [LABEL | valeur pleine largeur]
+  const rowFull = (lbl, val) => `<w:tr>${cell(lbl,true,true,LBL_W,false,false)}${cell(val,false,false,VAL_W,false,false)}</w:tr>`;
+
+  // Ligne simple avec valeur HTML riche (objectif)
+  const rowFullRich = (lbl, htmlVal) => `<w:tr>
+    ${cell(lbl,true,true,LBL_W,false,false)}
+    <w:tc>
+      <w:tcPr>
+        <w:tcW w:w="${VAL_W}" w:type="dxa"/>
+        <w:shd w:val="clear" w:color="auto" w:fill="FFFFFF"/>
+        ${BDR(rawColor)}${CELL_MAR}
+      </w:tcPr>
+      ${htmlToWParagraphs(htmlVal, 18)}
+    </w:tc>
+  </w:tr>`;
+
+  // Ligne double : [LABEL | val | LABEL | val]
+  const rowDbl  = (l1,v1,l2,v2) => `<w:tr>
+    ${cell(l1,true,true,LBL2_W,false,false)}
+    ${cell(v1,false,false,VAL2_W,false,false)}
+    ${cell(l2,true,true,LBL2_W,false,false)}
+    ${cell(v2,false,false,VAL2_W,false,false)}
+  </w:tr>`;
+
+  // Lignes libres
+  let llXML = '';
+  if (entete.lignesLibres && entete.lignesLibres.length > 0) {
+    entete.lignesLibres.forEach(ll => {
+      if (ll.type === 'simple') {
+        llXML += rowFull(ll.label || 'Champ', ll.val1 || '');
+      } else {
+        llXML += rowDbl(ll.label1||'A', ll.val1||'', ll.label2||'B', ll.val2||'');
+      }
+    });
+  }
+
+  const TBL_PR = (extraW) => `<w:tblPr>
+    <w:tblW w:w="${extraW || TW}" w:type="dxa"/>
+    <w:tblLayout w:type="fixed"/>
+    <w:tblBorders>
+      <w:top    w:val="single" w:sz="12" w:space="0" w:color="${rawColor}"/>
+      <w:left   w:val="single" w:sz="12" w:space="0" w:color="${rawColor}"/>
+      <w:bottom w:val="single" w:sz="12" w:space="0" w:color="${rawColor}"/>
+      <w:right  w:val="single" w:sz="12" w:space="0" w:color="${rawColor}"/>
+      <w:insideH w:val="single" w:sz="4" w:space="0" w:color="${rawColor}"/>
+      <w:insideV w:val="single" w:sz="4" w:space="0" w:color="${rawColor}"/>
+    </w:tblBorders>
+    <w:tblCellMar>
+      <w:top    w:w="0" w:type="dxa"/>
+      <w:bottom w:w="0" w:type="dxa"/>
+      <w:left   w:w="0" w:type="dxa"/>
+      <w:right  w:w="0" w:type="dxa"/>
+    </w:tblCellMar>
+  </w:tblPr>`;
+
+  // ── IMPORTANT : réinitialiser AVANT toute construction de tables ──
+  docxImages = [];
+  docxImageCounter = 0;
+
+  // Tableau en-tête  (peut contenir des images via htmlToWParagraphs → rowFullRich)
+  const enteteTable = `<w:tbl>
+    ${TBL_PR()}
+    ${rowDbl(x(entete.labelProf||'PROF'), x(entete.prof||''), x(entete.labelNiveau||'NIVEAU'), x(entete.niveau||''))}
+    ${rowFull(x(entete.labelModule||'MODULE'),   x(entete.module||''))}
+    ${rowFull(x(entete.labelSequence||'SÉQUENCE'), x(entete.sequence||''))}
+    ${rowDbl(x(entete.labelActivite||'ACTIVITÉ'), x(entete.activite||''), x(entete.labelSupport||'SUPPORT'), x(entete.support||''))}
+    ${llXML}
+    ${rowFullRich(x(entete.labelObjectif||'OBJECTIF(S)'), entete.objectif||'')}
+  </w:tbl>`;
+
+  // Tableau étapes
+  const headerEtapes = `<w:tr>
+    ${cell(x(P.labelColEtapes),       true,true,  E0, true,  false)}
+    ${cell(x(P.labelColDeroulement),  true,true,  E1, true,  false)}
+    ${cell(x(P.labelColDuree),        true,true,  E2, true,  false)}
+  </w:tr>`;
+
+  // ── Convertit HTML Quill → paragraphes OpenXML ──
+  // Gère : <p>, <br>, <strong>/<b>, <em>/<i>, <u>, <li>, texte brut
+  const etapesRows = (etapes||[]).map(e => `<w:tr>
+    <w:tc>
+      <w:tcPr>
+        <w:tcW w:w="${E0}" w:type="dxa"/>
+        <w:shd w:val="clear" w:color="auto" w:fill="FFFFFF"/>
+        ${BDR(rawColor)}${CELL_MAR}
+        <w:vAlign w:val="center"/>
+      </w:tcPr>
+      <w:p>
+        <w:pPr><w:jc w:val="center"/><w:spacing w:before="40" w:after="40"/></w:pPr>
+        <w:r>
+          <w:rPr><w:b/><w:color w:val="${rawColor}"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>
+          <w:t>${x(e.nom||'')}</w:t>
+        </w:r>
+      </w:p>
+    </w:tc>
+    <w:tc>
+      <w:tcPr>
+        <w:tcW w:w="${E1}" w:type="dxa"/>
+        <w:shd w:val="clear" w:color="auto" w:fill="FFFFFF"/>
+        ${BDR(rawColor)}${CELL_MAR}
+      </w:tcPr>
+      ${htmlToWParagraphs(e.enseignant||'', 18)}
+    </w:tc>
+    <w:tc>
+      <w:tcPr>
+        <w:tcW w:w="${E2}" w:type="dxa"/>
+        <w:shd w:val="clear" w:color="auto" w:fill="FFFFFF"/>
+        ${BDR(rawColor)}${CELL_MAR}
+        <w:vAlign w:val="center"/>
+      </w:tcPr>
+      <w:p>
+        <w:pPr><w:jc w:val="center"/><w:spacing w:before="40" w:after="40"/></w:pPr>
+        <w:r>
+          <w:rPr><w:i/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>
+          <w:t>${x(e.duree||'')}</w:t>
+        </w:r>
+      </w:p>
+    </w:tc>
+  </w:tr>`).join('');
+
+  const etapesTable = `<w:tbl>
+    ${TBL_PR()}
+    ${headerEtapes}
+    ${etapesRows}
+  </w:tbl>`;
+
+  // ── document.xml ── (enteteTable et etapesTable ont déjà collecté les images)
+  const documentXML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+            xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+            xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+            xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+  <w:body>
+    <w:p>
+      <w:pPr>
+        <w:jc w:val="center"/>
+        <w:spacing w:before="0" w:after="100"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:b/><w:color w:val="${rawColor}"/>
+          <w:sz w:val="24"/><w:szCs w:val="24"/>
+        </w:rPr>
+        <w:t>FICHE PÉDAGOGIQUE</w:t>
+      </w:r>
+    </w:p>
+    ${enteteTable}
+    <w:p><w:pPr><w:spacing w:before="0" w:after="60"/></w:pPr></w:p>
+    ${etapesTable}
+    <w:sectPr>
+      <w:pgSz w:w="${PG_W}" w:h="16838"/>
+      <w:pgMar w:top="${MARGIN}" w:right="${MARGIN}" w:bottom="${MARGIN}" w:left="${MARGIN}"
+               w:header="0" w:footer="0" w:gutter="0"/>
+    </w:sectPr>
+  </w:body>
+</w:document>`;
+
+  // ── Package DOCX ──
+  const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels"  ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml"   ContentType="application/xml"/>
+  <Default Extension="png"   ContentType="image/png"/>
+  <Default Extension="jpeg"  ContentType="image/jpeg"/>
+  <Default Extension="jpg"   ContentType="image/jpeg"/>
+  <Default Extension="gif"   ContentType="image/gif"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml"   ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+</Types>`;
+
+  const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+
+  // Générer les relationships pour les images
+  let wordRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>`;
+  
+  docxImages.forEach(img => {
+    wordRels += `\n  <Relationship Id="${img.rId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image${img.id}.${img.ext}"/>`;
+  });
+  
+  wordRels += `
+</Relationships>`;
+
+  const stylesXML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:docDefaults>
+    <w:rPrDefault>
+      <w:rPr>
+        <w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>
+        <w:sz w:val="18"/><w:szCs w:val="18"/>
+      </w:rPr>
+    </w:rPrDefault>
+    <w:pPrDefault>
+      <w:pPr><w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/></w:pPr>
+    </w:pPrDefault>
+  </w:docDefaults>
+</w:styles>`;
+
+  const zip = new JSZip();
+  zip.file('[Content_Types].xml',          contentTypes);
+  zip.file('_rels/.rels',                  rootRels);
+  zip.file('word/document.xml',            documentXML);
+  zip.file('word/styles.xml',              stylesXML);
+  zip.file('word/_rels/document.xml.rels', wordRels);
+  
+  // Ajouter les images au ZIP
+  docxImages.forEach(img => {
+    // Convertir base64 en binary
+    const base64Data = img.src.split(',')[1];
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    zip.file(`word/media/image${img.id}.${img.ext}`, bytes, {binary: true});
+  });
+
+  zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+    .then(function(blob) {
+      const safeName = (entete.activite || 'fiche').replace(/[^a-zA-Z0-9\u00C0-\u024F]/gi,'_').slice(0,40);
+      const url = URL.createObjectURL(blob);
+      const a   = document.createElement('a');
+      a.href    = url;
+      a.download = `FichePedagogique_${safeName}_${Date.now()}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      const toast = document.getElementById('toast');
+      toast.textContent = '📘 Fiche exportée en DOCX (Word)';
+      showToast();
+    })
+    .catch(function(err) {
+      console.error('Erreur DOCX:', err);
+      alert('Erreur lors de la génération DOCX : ' + err.message);
+    });
+}
+
+
+(function() {
+  const banner = document.getElementById('offline-banner');
+  let restoreTimer = null;
+
+  function showOffline() {
+    if (!banner) return;
+    banner.classList.remove('online-restored');
+    banner.textContent = '📵 Mode hors ligne — La génération PDF reste disponible';
+    banner.classList.add('show');
+    clearTimeout(restoreTimer);
+  }
+
+  function showOnline() {
+    if (!banner) return;
+    banner.classList.add('online-restored');
+    banner.textContent = '✅ Connexion rétablie';
+    banner.classList.add('show');
+    clearTimeout(restoreTimer);
+    restoreTimer = setTimeout(() => banner.classList.remove('show'), 3000);
+  }
+
+  window.addEventListener('offline', showOffline);
+  window.addEventListener('online',  showOnline);
+
+  // Vérification initiale
+  if (!navigator.onLine) showOffline();
+
+  // Chargement de jsPDF avec fallback inline si le script externe échoue
+  function injectJsPdfFallback() {
+    // Si jsPDF n'est pas chargé, afficher un avertissement clair
+    setTimeout(() => {
+      if (typeof window.jspdf === 'undefined' && typeof jsPDF === 'undefined') {
+        const warn = document.getElementById('jspdf-warn');
+        if (warn) warn.style.display = 'block';
+      }
+    }, 4000);
+  }
+
+  window.addEventListener('load', injectJsPdfFallback);
+})();
+</script>
+
+</body>
+</html>
