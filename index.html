@@ -1522,12 +1522,22 @@ if ('serviceWorker' in navigator) {
         <input type="text" id="label-col-duree" value="Durée" placeholder="Ex: Temps, Timing...">
       </div>
       
-      <div style="margin-top: 16px; padding: 12px; background: var(--blue-pale); border-radius: 6px;">
-        <p style="font-size: 12px; color: var(--blue-dark); margin-bottom: 8px;">
-          <strong>🔮 Fonctionnalité future :</strong>
+      <!-- ── COLONNES SUPPLÉMENTAIRES ── -->
+      <div style="margin-top:18px; border-top:1px dashed var(--border); padding-top:14px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+          <p style="font-size:12px; color:var(--blue-dark); font-weight:600; margin:0;">
+            ➕ Colonnes supplémentaires
+          </p>
+          <button onclick="ajouterColonneSup()" style="background:var(--blue);color:white;border:none;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:'Source Serif 4',serif;">
+            + Ajouter une colonne
+          </button>
+        </div>
+        <p style="font-size:11px; color:var(--muted); margin-bottom:10px;">
+          Les colonnes supplémentaires s'ajoutent après « Déroulement » et avant « Durée » dans le tableau PDF et Word. Max 3 colonnes ajoutées.
         </p>
-        <p style="font-size: 12px; color: var(--muted);">
-          L'ajout de colonnes supplémentaires sera disponible dans une prochaine version.
+        <div id="colonnes-sup-container"></div>
+        <p id="no-col-sup-msg" style="font-size:11px; color:var(--muted); text-align:center; padding:8px 0; font-style:italic;">
+          Aucune colonne supplémentaire. Cliquez sur « + Ajouter une colonne » pour en créer.
         </p>
       </div>
     </div>
@@ -1750,7 +1760,7 @@ function ajouterEtape(data) {
         <label>Déroulement de la séance <span class="required">*</span></label>
         <div id="e${n}-enseignant-wrapper" class="quill-wrapper tall"></div>
       </div>
-      <div class="field">
+      <div class="field field-duree">
         <label>Durée</label>
         <input type="text" id="e${n}-duree" placeholder="Ex : 10 min" value="${d.duree||''}">
       </div>
@@ -1765,6 +1775,8 @@ function ajouterEtape(data) {
     if (d.enseignant) {
       setQuillHTML(`e${n}-enseignant-wrapper`, d.enseignant);
     }
+    // Ajouter les champs colonnes supplémentaires si existantes
+    rafraichirChampsEtapes();
   }, 0);
 }
 
@@ -2134,6 +2146,7 @@ function supprimerEtape(n) {
 }
 
 function collecterEtapes() {
+  const colsSup = collecterColonnesSup();
   const etapes = [];
   document.querySelectorAll('.etape-card').forEach(card => {
     const id = card.id.replace('etape-', '');
@@ -2141,8 +2154,13 @@ function collecterEtapes() {
     const enseignantHTML = getQuillHTML('e'+id+'-enseignant-wrapper');
     const enseignant = getQuillText('e'+id+'-enseignant-wrapper');
     const duree = (document.getElementById('e'+id+'-duree')?.value || '').trim();
+    // Collecter les valeurs des colonnes supplémentaires
+    const supVals = {};
+    colsSup.forEach(col => {
+      supVals[col.n] = (document.getElementById('e'+id+'-colsup-'+col.n)?.value || '').trim();
+    });
     if (nom || enseignant) {
-      etapes.push({ nom, enseignant: enseignantHTML || enseignant, duree });
+      etapes.push({ nom, enseignant: enseignantHTML || enseignant, duree, supVals });
     }
   });
   return etapes;
@@ -2189,7 +2207,8 @@ function rafraichirApercu() {
       <thead>
         <tr>
           <th style="width:20%">${P.labelColEtapes || 'Étapes'}</th>
-          <th style="width:65%">${P.labelColDeroulement || 'Déroulement de la séance'}</th>
+          <th style="width:${Math.max(20, 65 - (P.colsSup||[]).reduce((s,c)=>s+c.width,0))}%">${P.labelColDeroulement || 'Déroulement de la séance'}</th>
+          ${(P.colsSup||[]).map(col => `<th style="width:${col.width}%">${col.label}</th>`).join('')}
           <th style="width:15%">${P.labelColDuree || 'Durée'}</th>
         </tr>
       </thead>
@@ -2198,6 +2217,7 @@ function rafraichirApercu() {
     html += `<tr class="${i>0?'etape-sep':''}">
       <td class="etape-label">${e.nom}</td>
       <td>${e.enseignant.replace(/\n/g,'<br>')}</td>
+      ${(P.colsSup||[]).map(col => `<td>${(e.supVals && e.supVals[col.n]) ? e.supVals[col.n] : ''}</td>`).join('')}
       <td>${e.duree}</td>
     </tr>`;
   });
@@ -2495,10 +2515,104 @@ function collecterEntete() {
 // Initialiser l'aperçu live
 setTimeout(updateLivePreview, 100);
 
+// ═══════════════════════════════════════════════════
+// COLONNES SUPPLÉMENTAIRES DU TABLEAU
+// ═══════════════════════════════════════════════════
+let colSupCount = 0;
+const MAX_COL_SUP = 3;
+
+function ajouterColonneSup() {
+  const container = document.getElementById('colonnes-sup-container');
+  const current = container ? container.querySelectorAll('.col-sup-card').length : 0;
+  if (current >= MAX_COL_SUP) {
+    alert('Maximum ' + MAX_COL_SUP + ' colonnes supplémentaires autorisées.');
+    return;
+  }
+  colSupCount++;
+  const n = colSupCount;
+  const msg = document.getElementById('no-col-sup-msg');
+  if (msg) msg.style.display = 'none';
+
+  const div = document.createElement('div');
+  div.className = 'col-sup-card';
+  div.id = 'col-sup-' + n;
+  div.style.cssText = 'border:1.5px solid var(--border);border-radius:8px;margin-bottom:10px;overflow:hidden;';
+  div.innerHTML = `
+    <div style="background:var(--blue-pale);padding:7px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
+      <span style="font-size:12px;font-weight:600;color:var(--blue-dark);">Colonne sup. #${n}</span>
+      <button onclick="supprimerColonneSup(${n})" style="background:none;border:1px solid #FFCDD2;color:#C62828;border-radius:5px;padding:2px 8px;font-size:11px;cursor:pointer;">✕ Suppr.</button>
+    </div>
+    <div style="padding:10px;">
+      <div class="field" style="margin-bottom:8px;">
+        <label style="font-size:11px;font-weight:600;color:var(--blue-dark);letter-spacing:0.04em;text-transform:uppercase;display:block;margin-bottom:4px;">Nom de la colonne</label>
+        <input type="text" id="col-sup-${n}-label" value="Colonne ${n}" placeholder="Ex : Supports, Outils, Matériel...">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label style="font-size:11px;font-weight:600;color:var(--blue-dark);letter-spacing:0.04em;text-transform:uppercase;display:block;margin-bottom:4px;">Largeur (%)</label>
+        <input type="number" id="col-sup-${n}-width" value="10" min="5" max="25" step="1">
+        <p class="field-hint">La largeur sera déduite de la colonne « Déroulement ».</p>
+      </div>
+    </div>
+  `;
+  container.appendChild(div);
+  rafraichirChampsEtapes();
+}
+
+function supprimerColonneSup(n) {
+  const el = document.getElementById('col-sup-' + n);
+  if (el) el.remove();
+  const container = document.getElementById('colonnes-sup-container');
+  if (container && !container.querySelector('.col-sup-card')) {
+    const msg = document.getElementById('no-col-sup-msg');
+    if (msg) msg.style.display = '';
+  }
+  rafraichirChampsEtapes();
+}
+
+function collecterColonnesSup() {
+  const cols = [];
+  const container = document.getElementById('colonnes-sup-container');
+  if (!container) return cols;
+  container.querySelectorAll('.col-sup-card').forEach(card => {
+    const n = card.id.replace('col-sup-', '');
+    const label = document.getElementById('col-sup-' + n + '-label')?.value.trim() || ('Colonne ' + n);
+    const width = parseFloat(document.getElementById('col-sup-' + n + '-width')?.value) || 10;
+    cols.push({ n, label, width });
+  });
+  return cols;
+}
+
+function rafraichirChampsEtapes() {
+  const colsSup = collecterColonnesSup();
+  document.querySelectorAll('.etape-card').forEach(card => {
+    const id = card.id.replace('etape-', '');
+    card.querySelectorAll('.col-sup-field').forEach(f => f.remove());
+    const body = card.querySelector('.etape-body');
+    if (!body) return;
+    const dureeField = body.querySelector('.field-duree');
+    colsSup.forEach(col => {
+      const div = document.createElement('div');
+      div.className = 'field col-sup-field';
+      div.innerHTML = `
+        <label>${col.label}</label>
+        <input type="text" id="e${id}-colsup-${col.n}" placeholder="Contenu pour « ${col.label} »…">
+      `;
+      if (dureeField) {
+        body.insertBefore(div, dureeField);
+      } else {
+        body.appendChild(div);
+      }
+    });
+  });
+}
+
 function collecterParams() {
+  const colsSup = collecterColonnesSup();
+  const totalSupPct = colsSup.reduce((s, c) => s + c.width, 0);
   const col1 = parseInt(document.getElementById('p-col1').value) || 20;
-  const col2 = parseInt(document.getElementById('p-col2').value) || 65;
-  const col3 = 100 - col1 - col2; // Durée (reste)
+  const col2Raw = parseInt(document.getElementById('p-col2').value) || 65;
+  const col2 = Math.max(10, col2Raw - totalSupPct);
+  const col3 = 100 - col1 - col2Raw; // Durée (reste)
   return {
     marge: parseFloat(document.getElementById('p-marge').value) || 8.5,
     gap: parseFloat(document.getElementById('p-gap').value) || 5,
@@ -2523,6 +2637,9 @@ function collecterParams() {
     labelColEtapes: document.getElementById('label-col-etapes')?.value || 'Étapes',
     labelColDeroulement: document.getElementById('label-col-deroulement')?.value || 'Déroulement de la séance',
     labelColDuree: document.getElementById('label-col-duree')?.value || 'Durée',
+    // Colonnes supplémentaires
+    colsSup: colsSup,
+    colsSupPct: colsSup.map(c => c.width / 100),
   };
 }
 
@@ -3307,8 +3424,10 @@ function genererPDF() {
   // ─────────────────────────────
   let ty = M + dynamicHeaderH + P.gap; // top du tableau
 
-  const colHeaders = [P.labelColEtapes, P.labelColDeroulement, P.labelColDuree];
-  const colWidths = P.cols.map(c => c * UW);
+  const colsSup = P.colsSup || [];
+  // Construire les en-têtes et largeurs : [Étapes, Déroulement, ...SupCols, Durée]
+  const colHeaders = [P.labelColEtapes, P.labelColDeroulement, ...colsSup.map(c => c.label), P.labelColDuree];
+  const colWidths  = [P.cols[0] * UW, P.cols[1] * UW, ...colsSup.map(c => (c.width/100) * UW), P.cols[2] * UW];
 
   const TH = P.tableHeaderH;
   setBlue();
@@ -3358,7 +3477,7 @@ function genererPDF() {
     doc.addPage();
     currentPage++;
     ty = M;
-    // En-tête du tableau sur la nouvelle page
+    // En-tête du tableau sur la nouvelle page (identique à la première)
     setBlue();
     doc.rect(M, ty, UW, TH, 'F');
     let cx2 = M;
@@ -3395,7 +3514,9 @@ function genererPDF() {
   }
 
   etapes.forEach((etape, etapeIdx) => {
-    const w0 = colWidths[0], w1 = colWidths[1], w2 = colWidths[2];
+    const w0 = colWidths[0];  // Étapes
+    const w1 = colWidths[1];  // Déroulement
+    const wLast = colWidths[colWidths.length - 1]; // Durée
 
     // Convertir le HTML Quill en segments riches
     const enseignantSegments = htmlToRichSegments(etape.enseignant);
@@ -3421,8 +3542,6 @@ function genererPDF() {
     doc.setFillColor(255,255,255);
     doc.rect(M, ty, UW, blockHeight, 'F');
 
-    // *** QUADRILLAGE SUPPRIMÉ - PAS DE GRILLE INTERNE ***
-
     // Texte col 0 : étape (centré verticalement, gras)
     doc.setFontSize(P.fontTableContent);
     doc.setFont('times','bold');
@@ -3440,21 +3559,45 @@ function genererPDF() {
       });
     }
 
-    // Texte déroulement (col 1) — rendu riche avec formatage Quill
+    // Texte déroulement (col 1)
     const ens_x = M + w0 + 3;
     drawRichTextSegments(enseignantSegments, ens_x, blockStart + P.fontTableContent * 0.85 + 3, ensTextW, P.fontTableContent, [0,0,0]);
 
-    // Durée (col 2)
+    // Colonnes supplémentaires
+    let supX = M + w0 + w1;
+    colsSup.forEach((col, ci) => {
+      const wSup = colWidths[2 + ci];
+      const supVal = (etape.supVals && etape.supVals[col.n]) ? normaliserTexte(etape.supVals[col.n]) : '';
+      doc.setFont('times','normal');
+      doc.setTextColor(0,0,0);
+      doc.setFontSize(P.fontTableContent);
+      const supLines = wrapText(supVal, wSup, P.fontTableContent);
+      supLines.forEach((line, li) => {
+        doc.text(line, supX + 2, blockStart + P.fontTableContent * (0.85 + li * 1.3) + 3);
+      });
+      supX += wSup;
+    });
+
+    // Durée (dernière colonne)
     doc.setFont('times','normal');
     doc.setTextColor(0,0,0);
     doc.setFontSize(P.fontTableContent);
-    const dur_x = M + w0 + w1 + 2;
+    const dur_x = M + UW - wLast + 2;
     doc.text(normaliserTexte(etape.duree || ''), dur_x, blockStart + blockHeight/2 + P.fontTableContent*0.35);
 
     // Bordure extérieure du bloc (bleu)
     doc.setLineWidth(0.8);
     setBlueStroke(0.8);
     doc.rect(M, blockStart, UW, blockHeight, 'S');
+
+    // Séparateurs verticaux entre colonnes
+    doc.setDrawColor(gr, gg, gb); doc.setLineWidth(0.4);
+    let sepX = M + w0;
+    for (let i = 1; i < colWidths.length - 1; i++) {
+      doc.line(sepX, blockStart, sepX, blockStart + blockHeight);
+      sepX += colWidths[i];
+    }
+    doc.line(sepX, blockStart, sepX, blockStart + blockHeight); // avant Durée
 
     ty += blockHeight;
   });
@@ -3732,10 +3875,12 @@ function genererDOCX() {
   const LBL2_W = Math.round(TW * 0.16);   // 16%
   const VAL2_W = Math.round(TW * 0.34);   // 34%  → 2×(16+34)=100%
 
-  // Tableau étapes : 3 colonnes
-  const E0 = Math.round(TW * 0.18);       // 18% Étapes
-  const E1 = Math.round(TW * 0.64);       // 64% Déroulement
-  const E2 = TW - E0 - E1;               // 18% Durée
+  // Tableau étapes : colonnes dynamiques
+  const colsSup = P.colsSup || [];
+  const E0 = Math.round(TW * (P.cols[0]));   // Étapes
+  const E1 = Math.round(TW * (P.cols[1]));   // Déroulement
+  const E2 = TW - E0 - E1 - colsSup.reduce((s, c) => s + Math.round(TW * c.width/100), 0); // Durée
+  const ESup = colsSup.map(c => Math.round(TW * c.width / 100)); // Colonnes sup
 
   const BDR = (color) => `<w:tcBorders>
       <w:top    w:val="single" w:sz="6" w:space="0" w:color="${color}"/>
@@ -3803,60 +3948,58 @@ function genererDOCX() {
           currentParagraph = [];
         }
         
-        // ── Enregistrer l'image ──
+        // Ajouter l'image à la collection globale
         docxImageCounter++;
-        const imageId  = docxImageCounter;
-        // rId1 = styles.xml  →  images démarrent à rId2
-        const imgRid   = `rId${imageId + 1}`;
-
-        // Extension / content-type
-        let imgExt = 'png';
-        if (/data:image\/jpe?g/i.test(seg.src)) imgExt = 'jpeg';
-        else if (/data:image\/gif/i.test(seg.src))  imgExt = 'gif';
-
-        // Dimensions : on lit naturalWidth/naturalHeight depuis le DOM
-        let natW = 0, natH = 0;
-        try {
-          document.querySelectorAll('.ql-editor img, #etapes-container img').forEach(im => {
-            if ((im.src || im.getAttribute('src')) === seg.src && im.naturalWidth) {
-              natW = im.naturalWidth; natH = im.naturalHeight;
-            }
-          });
-        } catch(e){}
-        if (!natW || !natH) { natW = 400; natH = 300; }   // fallback
-
-        // Max 14 cm de large (1 cm = 360000 EMU)
-        const MAX_EMU = 5040000;
-        let wEMU = natW * 9144;    // 1 px ≈ 9144 EMU à 96 dpi
-        if (wEMU > MAX_EMU) wEMU = MAX_EMU;
-        let hEMU = Math.round(wEMU * natH / natW);
-
-        docxImages.push({ id: imageId, rId: imgRid, src: seg.src, ext: imgExt });
-
-        // XML image — structure minimale validée OOXML, compatible Android Word
+        const imageId = docxImageCounter;
+        const rId = `rId${imageId + 1}`;  // +1 car rId1 est réservé pour styles.xml
+        
+        // Déterminer l'extension
+        let ext = 'png';
+        if (seg.src.startsWith('data:image/jpeg') || seg.src.startsWith('data:image/jpg')) {
+          ext = 'jpeg';
+        } else if (seg.src.startsWith('data:image/gif')) {
+          ext = 'gif';
+        }
+        
+        docxImages.push({
+          id: imageId,
+          rId: rId,
+          src: seg.src,
+          ext: ext
+        });
+        
+        // Dimensions en EMU - comme le test qui fonctionne
+        const widthEMU = 914400;   // 1 inch
+        const heightEMU = 914400;  // 1 inch (carré)
+        
+        // Structure XML EXACTEMENT comme le test qui fonctionne
         output += `<w:p>
-      <w:pPr><w:spacing w:before="0" w:after="80"/></w:pPr>
       <w:r>
         <w:drawing>
-          <wp:inline distT="0" distB="0" distL="0" distR="0">
-            <wp:extent cx="${wEMU}" cy="${hEMU}"/>
-            <wp:effectExtent l="0" t="0" r="0" b="0"/>
-            <wp:docPr id="${imageId}" name="Img${imageId}"/>
-            <wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1"/></wp:cNvGraphicFramePr>
+          <wp:inline>
+            <wp:extent cx="${widthEMU}" cy="${heightEMU}"/>
+            <wp:docPr id="${imageId}" name="Picture ${imageId}"/>
             <a:graphic>
               <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
                 <pic:pic>
                   <pic:nvPicPr>
-                    <pic:cNvPr id="${imageId}" name="Img${imageId}"/>
+                    <pic:cNvPr id="${imageId}" name="Picture ${imageId}"/>
                     <pic:cNvPicPr/>
                   </pic:nvPicPr>
                   <pic:blipFill>
-                    <a:blip r:embed="${imgRid}"/>
-                    <a:stretch><a:fillRect/></a:stretch>
+                    <a:blip r:embed="${rId}"/>
+                    <a:stretch>
+                      <a:fillRect/>
+                    </a:stretch>
                   </pic:blipFill>
                   <pic:spPr>
-                    <a:xfrm><a:off x="0" y="0"/><a:ext cx="${wEMU}" cy="${hEMU}"/></a:xfrm>
-                    <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+                    <a:xfrm>
+                      <a:off x="0" y="0"/>
+                      <a:ext cx="${widthEMU}" cy="${heightEMU}"/>
+                    </a:xfrm>
+                    <a:prstGeom prst="rect">
+                      <a:avLst/>
+                    </a:prstGeom>
                   </pic:spPr>
                 </pic:pic>
               </a:graphicData>
@@ -4098,11 +4241,7 @@ function genererDOCX() {
     </w:tblCellMar>
   </w:tblPr>`;
 
-  // ── IMPORTANT : réinitialiser AVANT toute construction de tables ──
-  docxImages = [];
-  docxImageCounter = 0;
-
-  // Tableau en-tête  (peut contenir des images via htmlToWParagraphs → rowFullRich)
+  // Tableau en-tête
   const enteteTable = `<w:tbl>
     ${TBL_PR()}
     ${rowDbl(x(entete.labelProf||'PROF'), x(entete.prof||''), x(entete.labelNiveau||'NIVEAU'), x(entete.niveau||''))}
@@ -4113,16 +4252,35 @@ function genererDOCX() {
     ${rowFullRich(x(entete.labelObjectif||'OBJECTIF(S)'), entete.objectif||'')}
   </w:tbl>`;
 
-  // Tableau étapes
+  // Tableau étapes — en-tête dynamique
   const headerEtapes = `<w:tr>
     ${cell(x(P.labelColEtapes),       true,true,  E0, true,  false)}
     ${cell(x(P.labelColDeroulement),  true,true,  E1, true,  false)}
+    ${colsSup.map((col, i) => cell(x(col.label), true, true, ESup[i], true, false)).join('')}
     ${cell(x(P.labelColDuree),        true,true,  E2, true,  false)}
   </w:tr>`;
 
   // ── Convertit HTML Quill → paragraphes OpenXML ──
   // Gère : <p>, <br>, <strong>/<b>, <em>/<i>, <u>, <li>, texte brut
-  const etapesRows = (etapes||[]).map(e => `<w:tr>
+  const etapesRows = (etapes||[]).map(e => {
+    // Colonnes supplémentaires
+    const supCells = colsSup.map((col, i) => `<w:tc>
+      <w:tcPr>
+        <w:tcW w:w="${ESup[i]}" w:type="dxa"/>
+        <w:shd w:val="clear" w:color="auto" w:fill="FFFFFF"/>
+        ${BDR(rawColor)}${CELL_MAR}
+        <w:vAlign w:val="top"/>
+      </w:tcPr>
+      <w:p>
+        <w:pPr><w:spacing w:before="40" w:after="40"/></w:pPr>
+        <w:r>
+          <w:rPr><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>
+          <w:t xml:space="preserve">${x((e.supVals && e.supVals[col.n]) || '')}</w:t>
+        </w:r>
+      </w:p>
+    </w:tc>`).join('');
+
+    return `<w:tr>
     <w:tc>
       <w:tcPr>
         <w:tcW w:w="${E0}" w:type="dxa"/>
@@ -4146,6 +4304,7 @@ function genererDOCX() {
       </w:tcPr>
       ${htmlToWParagraphs(e.enseignant||'', 18)}
     </w:tc>
+    ${supCells}
     <w:tc>
       <w:tcPr>
         <w:tcW w:w="${E2}" w:type="dxa"/>
@@ -4161,7 +4320,8 @@ function genererDOCX() {
         </w:r>
       </w:p>
     </w:tc>
-  </w:tr>`).join('');
+  </w:tr>`;
+  }).join('');
 
   const etapesTable = `<w:tbl>
     ${TBL_PR()}
@@ -4169,13 +4329,13 @@ function genererDOCX() {
     ${etapesRows}
   </w:tbl>`;
 
-  // ── document.xml ── (enteteTable et etapesTable ont déjà collecté les images)
+  // Réinitialiser le compteur d'images AVANT de générer le document
+  docxImages = [];
+  docxImageCounter = 0;
+  
+  // ── document.xml ── (ceci collectera les images via htmlToWParagraphs)
   const documentXML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-            xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
-            xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
-            xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
   <w:body>
     <w:p>
       <w:pPr>
@@ -4202,14 +4362,28 @@ function genererDOCX() {
 </w:document>`;
 
   // ── Package DOCX ──
-  const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  // Ajouter les types MIME des images si nécessaire
+  let contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels"  ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml"   ContentType="application/xml"/>
-  <Default Extension="png"   ContentType="image/png"/>
-  <Default Extension="jpeg"  ContentType="image/jpeg"/>
-  <Default Extension="jpg"   ContentType="image/jpeg"/>
-  <Default Extension="gif"   ContentType="image/gif"/>
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml"  ContentType="application/xml"/>`;
+  
+  // Ajouter les extensions d'images
+  const imageExtensions = new Set(docxImages.map(img => img.ext));
+  if (imageExtensions.has('png')) {
+    contentTypes += `\n  <Default Extension="png" ContentType="image/png"/>`;
+  }
+  if (imageExtensions.has('jpeg')) {
+    contentTypes += `\n  <Default Extension="jpeg" ContentType="image/jpeg"/>`;
+  }
+  if (imageExtensions.has('jpg')) {
+    contentTypes += `\n  <Default Extension="jpg" ContentType="image/jpeg"/>`;
+  }
+  if (imageExtensions.has('gif')) {
+    contentTypes += `\n  <Default Extension="gif" ContentType="image/gif"/>`;
+  }
+  
+  contentTypes += `
   <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
   <Override PartName="/word/styles.xml"   ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
 </Types>`;
