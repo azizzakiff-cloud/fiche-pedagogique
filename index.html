@@ -3625,28 +3625,54 @@ function genererPDF() {
     doc.text(normaliserTexte(entete.prof || ''), endX, PH-4, {align:'right'});
   }
 
-  // Sauvegarde — compatible Android PWA
+  // Sauvegarde — compatible AppsGeyser WebView Android
   const safeName = (entete.activite || 'fiche').replace(/[^a-zA-Z0-9\u00C0-\u024F]/gi,'_').slice(0,40);
   const pdfFileName = `FichePedagogique_${safeName}_${entete.niveau || 'N'}.pdf`;
   try {
-    // Méthode 1 : window.open (meilleure compatibilité Android)
-    const pdfBlob = doc.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const pdfLink = document.createElement('a');
-    pdfLink.href = pdfUrl;
-    pdfLink.download = pdfFileName;
-    pdfLink.target = '_blank';
-    pdfLink.rel = 'noopener';
-    document.body.appendChild(pdfLink);
-    pdfLink.click();
-    setTimeout(() => {
-      document.body.removeChild(pdfLink);
-      URL.revokeObjectURL(pdfUrl);
-    }, 3000);
-  } catch(e) {
-    // Méthode 2 : fallback ouverture dans nouvel onglet
+    // Convertir en base64 data URI et ouvrir dans Chrome via intent
     const pdfDataUri = doc.output('datauristring');
-    window.open(pdfDataUri, '_blank');
+    // Essayer d'ouvrir dans Chrome externe (contourne la WebView AppsGeyser)
+    const intentUrl = 'intent://view#Intent;scheme=https;package=com.android.chrome;end';
+    // Méthode principale : afficher le PDF dans une nouvelle page interne
+    const w = window.open('', '_blank');
+    if (w) {
+      w.document.write(`<!DOCTYPE html><html><head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>${pdfFileName}</title>
+        <style>body{margin:0;background:#222;display:flex;flex-direction:column;align-items:center;min-height:100vh;}
+        .bar{width:100%;background:#1565C0;color:white;padding:12px;text-align:center;font-family:sans-serif;font-size:14px;}
+        .btn{margin:16px auto;display:block;background:#C9A84C;color:white;border:none;padding:14px 28px;border-radius:8px;font-size:16px;cursor:pointer;}
+        iframe{width:100%;flex:1;border:none;min-height:90vh;}</style>
+        </head><body>
+        <div class="bar">📄 ${pdfFileName}</div>
+        <a href="${pdfDataUri}" download="${pdfFileName}">
+          <button class="btn">💾 Télécharger le PDF</button>
+        </a>
+        <iframe src="${pdfDataUri}"></iframe>
+        </body></html>`);
+      w.document.close();
+    } else {
+      // Fallback si window.open bloqué : lien direct
+      const a = document.createElement('a');
+      a.href = pdfDataUri;
+      a.download = pdfFileName;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => document.body.removeChild(a), 2000);
+    }
+  } catch(e) {
+    // Dernier recours : afficher le PDF dans un iframe dans la page
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:99999;display:flex;flex-direction:column;';
+    const pdfDataUri2 = doc.output('datauristring');
+    modal.innerHTML = `<div style="background:#1565C0;color:white;padding:12px;text-align:center;font-family:sans-serif;">
+      📄 ${pdfFileName} &nbsp;
+      <button onclick="this.closest('div[style]').remove()" style="background:#C9A84C;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;">✕ Fermer</button>
+    </div>
+    <iframe src="${pdfDataUri2}" style="flex:1;border:none;width:100%;"></iframe>`;
+    document.body.appendChild(modal);
   }
 
   showToast();
@@ -4463,35 +4489,60 @@ function genererDOCX() {
     .then(function(blob) {
       const safeName = (entete.activite || 'fiche').replace(/[^a-zA-Z0-9\u00C0-\u024F]/gi,'_').slice(0,40);
       const docxFileName = `FichePedagogique_${safeName}_${Date.now()}.docx`;
-      try {
-        // Méthode compatible Android PWA
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = docxFileName;
-        a.target = '_blank';
-        a.rel = 'noopener';
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }, 3000);
-      } catch(e) {
-        // Fallback : FileReader pour base64
-        const reader = new FileReader();
-        reader.onload = function() {
-          const a = document.createElement('a');
-          a.href = reader.result;
-          a.download = docxFileName;
-          a.target = '_blank';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        };
-        reader.readAsDataURL(blob);
-      }
+      // Convertir en base64 via FileReader — compatible WebView AppsGeyser
+      const reader = new FileReader();
+      reader.onload = function() {
+        const base64 = reader.result;
+        try {
+          // Essayer d'ouvrir dans nouvelle fenêtre avec bouton télécharger
+          const w = window.open('', '_blank');
+          if (w) {
+            w.document.write(`<!DOCTYPE html><html><head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width,initial-scale=1">
+              <title>${docxFileName}</title>
+              <style>
+                body{margin:0;font-family:sans-serif;background:#f0f4ff;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;}
+                .card{background:white;border-radius:16px;padding:32px;margin:24px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.1);max-width:320px;}
+                .icon{font-size:64px;margin-bottom:16px;}
+                h2{color:#1565C0;margin:0 0 8px;}
+                p{color:#666;font-size:14px;margin:0 0 24px;}
+                .btn{display:block;background:#1565C0;color:white;text-decoration:none;padding:14px 28px;border-radius:10px;font-size:16px;font-weight:bold;margin:8px auto;}
+                .btn2{display:block;background:#C9A84C;color:white;text-decoration:none;padding:14px 28px;border-radius:10px;font-size:16px;font-weight:bold;margin:8px auto;}
+              </style></head><body>
+              <div class="card">
+                <div class="icon">📘</div>
+                <h2>Fiche Pédagogique</h2>
+                <p>${docxFileName}</p>
+                <a href="${base64}" download="${docxFileName}" class="btn">💾 Télécharger Word (.docx)</a>
+                <a href="${base64}" class="btn2" target="_blank">📂 Ouvrir le fichier</a>
+              </div></body></html>`);
+            w.document.close();
+          } else {
+            // Fallback direct
+            const a = document.createElement('a');
+            a.href = base64;
+            a.download = docxFileName;
+            a.target = '_blank';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => document.body.removeChild(a), 2000);
+          }
+        } catch(e2) {
+          // Dernier recours : modal dans la page
+          const modal = document.createElement('div');
+          modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;';
+          modal.innerHTML = `<div style="background:white;border-radius:16px;padding:32px;margin:24px;text-align:center;max-width:300px;">
+            <div style="font-size:56px;">📘</div>
+            <h3 style="color:#1565C0;">Fiche prête !</h3>
+            <p style="color:#666;font-size:13px;">${docxFileName}</p>
+            <a href="${base64}" download="${docxFileName}" style="display:block;background:#1565C0;color:white;padding:12px;border-radius:8px;text-decoration:none;margin:8px 0;">💾 Télécharger</a>
+            <button onclick="this.closest('div[style]').remove()" style="background:#eee;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;margin-top:8px;">✕ Fermer</button>
+          </div>`;
+          document.body.appendChild(modal);
+        }
+      };
+      reader.readAsDataURL(blob);
       const toast = document.getElementById('toast');
       toast.textContent = '📘 Fiche exportée en DOCX (Word)';
       showToast();
