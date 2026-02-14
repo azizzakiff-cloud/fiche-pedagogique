@@ -187,6 +187,7 @@ if ('serviceWorker' in navigator) {
     font-size: 17px;
     font-weight: 700;
     line-height: 1.2;
+    flex: 1;
   }
   .app-header h1 span {
     display: block;
@@ -352,6 +353,25 @@ if ('serviceWorker' in navigator) {
     font-size: 11px;
     cursor: pointer;
     font-family: 'Source Serif 4', serif;
+  }
+  .btn-move-etape {
+    background: none;
+    border: 1px solid #BBDEFB;
+    color: #1565C0;
+    border-radius: 6px;
+    padding: 3px 7px;
+    font-size: 11px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .btn-move-etape:active { background: #E3F2FD; }
+  /* Badge durée totale */
+  #duree-totale-badge {
+    display:inline-flex;align-items:center;gap:6px;
+    background:linear-gradient(90deg,#1565C0,#1976D2);
+    color:#fff;border-radius:20px;padding:5px 14px;
+    font-size:13px;font-weight:700;margin-bottom:12px;
+    box-shadow:0 2px 8px rgba(21,101,192,0.25);
   }
   .btn-add-etape {
     width: 100%;
@@ -1083,6 +1103,74 @@ if ('serviceWorker' in navigator) {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
   }
+  .btn-export-save {
+    background: #2E7D32;
+    color: white;
+    box-shadow: 0 2px 8px rgba(46,125,50,0.3);
+  }
+  .btn-export-save:hover {
+    background: #1B5E20;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46,125,50,0.4);
+  }
+  /* Répertoire des fiches */
+  .repertoire-card {
+    background: #fff;
+    border: 1.5px solid #E3EAF6;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .repertoire-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: #F5F8FF;
+    border-bottom: 1px solid #E3EAF6;
+  }
+  .repertoire-card-title {
+    font-weight: 700;
+    color: #1565C0;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 55%;
+  }
+  .repertoire-card-date {
+    font-size: 11px;
+    color: #999;
+  }
+  .repertoire-card-body {
+    padding: 8px 14px 10px;
+    font-size: 12px;
+    color: #555;
+    line-height: 1.5;
+  }
+  .repertoire-card-actions {
+    display: flex;
+    gap: 6px;
+    padding: 0 14px 10px;
+    flex-wrap: wrap;
+  }
+  .btn-rep {
+    border: none;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-rep-ouvrir  { background: #1565C0; color: #fff; }
+  .btn-rep-suppr   { background: #FFEBEE; color: #C62828; border: 1px solid #FFCDD2; }
+  .repertoire-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #aaa;
+    font-size: 14px;
+  }
 
 
   /* Prévisualisation temps réel */
@@ -1159,7 +1247,9 @@ if ('serviceWorker' in navigator) {
   <h1>Fiche Pédagogique
     <span>EZ-ZAKY AZIZ — Générateur PDF</span>
   </h1>
-
+  <button onclick="nouvelleFiche()" title="Effacer et recommencer une nouvelle fiche" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.5);color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;">
+    🔄 Nouvelle fiche
+  </button>
 </div>
 
 <!-- ═══════════════════════════════════════════════════ -->
@@ -1178,9 +1268,18 @@ if ('serviceWorker' in navigator) {
   <button class="tab-btn" onclick="showTab('apercu')" id="tab-apercu">
     <span class="tab-icon">👁️</span>Aperçu
   </button>
+  <button class="tab-btn" onclick="showTab('repertoire')" id="tab-repertoire">
+    <span class="tab-icon">📁</span>Répertoire
+  </button>
+  <button class="tab-btn" onclick="showTab('guide')" id="tab-guide">
+    <span class="tab-icon">📖</span>Guide
+  </button>
 </div>
 
 <div id="offline-banner">📵 Mode hors ligne — La génération PDF reste disponible</div>
+<div id="save-bar" style="display:none;background:#E8F5E9;border-bottom:1px solid #A5D6A7;padding:5px 14px;font-size:11px;color:#2E7D32;text-align:center;">
+  <span id="save-status">✅ Fiche sauvegardée automatiquement</span>
+</div>
 
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- PANEL 1 : EN-TÊTE FLEXIBLE -->
@@ -1333,12 +1432,20 @@ if ('serviceWorker' in navigator) {
 
   <div id="etapes-container"></div>
 
+  <!-- Badge durée totale -->
+  <div style="text-align:center;margin:10px 0 4px;">
+    <span id="duree-totale-badge">⏱️ Durée totale : <span id="duree-totale-val">—</span></span>
+  </div>
+
   <button class="btn-add-etape" onclick="ajouterEtape()">
     + Ajouter une étape
   </button>
 
   <!-- Boutons export multiples -->
   <div class="btn-export-group">
+    <button class="btn-export btn-export-save" onclick="enregistrerDansRepertoire()">
+      💾 Enregistrer la fiche
+    </button>
     <button class="btn-export btn-export-pdf" onclick="genererPDF()">
       📄 Exporter en PDF
     </button>
@@ -1347,11 +1454,15 @@ if ('serviceWorker' in navigator) {
     </button>
   </div>
 </div>
-
-<!-- ═══════════════════════════════════════════════════ -->
-<!-- PANEL 3 : PARAMÈTRES -->
 <!-- ═══════════════════════════════════════════════════ -->
 <div class="panel" id="panel-params">
+
+  <!-- Bouton réinitialisation -->
+  <div style="text-align:right;margin-bottom:10px;">
+    <button onclick="reinitialiserParams()" style="background:#fff;border:1.5px solid #1565C0;color:#1565C0;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+      🔄 Paramètres par défaut
+    </button>
+  </div>
 
   <div class="card">
     <div class="card-header"><h2>MISE EN PAGE — MARGES</h2></div>
@@ -1591,6 +1702,9 @@ if ('serviceWorker' in navigator) {
 
   <!-- Boutons export multiples (mis à jour) -->
   <div class="btn-export-group">
+    <button class="btn-export btn-export-save" onclick="enregistrerDansRepertoire()">
+      💾 Enregistrer la fiche
+    </button>
     <button class="btn-export btn-export-pdf" onclick="genererPDF()">
       📄 Exporter en PDF
     </button>
@@ -1601,7 +1715,290 @@ if ('serviceWorker' in navigator) {
 </div>
 
 <!-- ═══════════════════════════════════════════════════ -->
-<!-- PANNEAU SÉLECTEUR DE SYMBOLES                      -->
+<!-- PANEL 6 : RÉPERTOIRE DES FICHES                    -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="panel" id="panel-repertoire">
+  <div style="background:linear-gradient(90deg,#1565C0,#1976D2);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <div style="color:#fff;font-weight:700;font-size:15px;">📁 Répertoire des fiches</div>
+      <div style="color:rgba(255,255,255,0.8);font-size:11px;margin-top:2px;">Fiches enregistrées manuellement sur cet appareil</div>
+    </div>
+    <span id="rep-compteur" style="background:rgba(255,255,255,0.2);color:#fff;border-radius:20px;padding:3px 12px;font-size:12px;font-weight:700;">0 fiche</span>
+  </div>
+  <div id="repertoire-liste">
+    <div class="repertoire-empty">
+      <div style="font-size:40px;margin-bottom:8px;">📂</div>
+      <div>Aucune fiche enregistrée.</div>
+      <div style="font-size:12px;margin-top:6px;color:#bbb;">Utilisez le bouton <strong>💾 Enregistrer la fiche</strong><br>depuis l'onglet Étapes ou Aperçu.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- PANEL 5 : GUIDE D'UTILISATION                      -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="panel" id="panel-guide">
+<div id="guide-content">
+
+  <!-- ── HERO ── -->
+  <div style="background:linear-gradient(135deg,#1565C0 0%,#0D47A1 60%,#1565C0 100%);border-radius:16px;padding:28px 20px 22px;margin-bottom:18px;text-align:center;box-shadow:0 6px 24px rgba(21,101,192,0.35);">
+    <div style="font-size:52px;margin-bottom:8px;">📋</div>
+    <h1 style="color:#fff;font-size:20px;font-weight:800;margin:0 0 6px;letter-spacing:0.02em;">Générateur de Fiches Pédagogiques</h1>
+    <p style="color:rgba(255,255,255,0.85);font-size:13px;margin:0 0 14px;">par <strong>EZ-ZAKY AZIZ</strong></p>
+    <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+      <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;">📄 Export PDF</span>
+      <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;">📘 Export Word</span>
+      <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;">✒️ Texte riche</span>
+      <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;">🖼️ Images</span>
+      <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;">🎨 9 Thèmes</span>
+    </div>
+  </div>
+
+  <!-- ── CARACTÉRISTIQUES ── -->
+  <div style="background:#fff;border-radius:14px;border:1.5px solid #E3EAF6;margin-bottom:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+    <div style="background:linear-gradient(90deg,#1565C0,#1976D2);padding:12px 16px;display:flex;align-items:center;gap:8px;">
+      <span style="font-size:18px;">⭐</span>
+      <span style="color:#fff;font-weight:700;font-size:14px;letter-spacing:0.04em;">CARACTÉRISTIQUES</span>
+    </div>
+    <div style="padding:14px 16px;display:grid;gap:10px;">
+
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div style="width:36px;height:36px;min-width:36px;background:#E3F2FD;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">📝</div>
+        <div>
+          <div style="font-weight:700;color:#1565C0;font-size:13px;margin-bottom:2px;">En-tête entièrement personnalisable</div>
+          <div style="color:#555;font-size:12px;line-height:1.5;">Labels modifiables par double-clic (Professeur, Niveau, Module, Séquence, Activité, Support, Objectif). Possibilité d'ajouter des lignes libres simples ou doubles.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div style="width:36px;height:36px;min-width:36px;background:#E8F5E9;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">📚</div>
+        <div>
+          <div style="font-weight:700;color:#1565C0;font-size:13px;margin-bottom:2px;">Tableau d'étapes dynamique</div>
+          <div style="color:#555;font-size:12px;line-height:1.5;">Ajoutez, supprimez et réordonnez vos étapes. Chaque étape dispose d'un éditeur de texte riche (gras, italique, souligné, listes, tableaux, images, symboles).</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div style="width:36px;height:36px;min-width:36px;background:#FFF3E0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">➕</div>
+        <div>
+          <div style="font-weight:700;color:#1565C0;font-size:13px;margin-bottom:2px;">Colonnes supplémentaires (jusqu'à 3)</div>
+          <div style="color:#555;font-size:12px;line-height:1.5;">Ajoutez des colonnes personnalisées dans le tableau des étapes : Matériel, Supports, Outils pédagogiques, etc. Largeur réglable de 5 à 25 %.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div style="width:36px;height:36px;min-width:36px;background:#F3E5F5;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">🎨</div>
+        <div>
+          <div style="font-weight:700;color:#1565C0;font-size:13px;margin-bottom:2px;">9 thèmes de couleurs professionnels</div>
+          <div style="color:#555;font-size:12px;line-height:1.5;">Bleu classique, Marine & or, Vert académique, Bordeaux, Violet royal, Ardoise, Noir & or, Turquoise, Rouge vif. Couleurs personnalisables manuellement.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div style="width:36px;height:36px;min-width:36px;background:#E8F5E9;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">📐</div>
+        <div>
+          <div style="font-weight:700;color:#1565C0;font-size:13px;margin-bottom:2px;">Mise en page paramétrable</div>
+          <div style="color:#555;font-size:12px;line-height:1.5;">Orientation (portrait/paysage), taille de police, largeurs des colonnes, marges, numérotation des pages. Format A4 standard.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div style="width:36px;height:36px;min-width:36px;background:#E3F2FD;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">💾</div>
+        <div>
+          <div style="font-weight:700;color:#1565C0;font-size:13px;margin-bottom:2px;">Export double format</div>
+          <div style="color:#555;font-size:12px;line-height:1.5;">Génération PDF fidèle en un clic pour impression et partage. Export Word (.docx) éditable avec images intégrées, compatible Microsoft Word et LibreOffice.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div style="width:36px;height:36px;min-width:36px;background:#FFF8E1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">📵</div>
+        <div>
+          <div style="font-weight:700;color:#1565C0;font-size:13px;margin-bottom:2px;">Mode hors ligne</div>
+          <div style="color:#555;font-size:12px;line-height:1.5;">La génération PDF fonctionne même sans connexion internet. L'export Word nécessite le chargement initial des bibliothèques.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── GUIDE ÉTAPE PAR ÉTAPE ── -->
+  <div style="background:#fff;border-radius:14px;border:1.5px solid #E3EAF6;margin-bottom:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+    <div style="background:linear-gradient(90deg,#1565C0,#1976D2);padding:12px 16px;display:flex;align-items:center;gap:8px;">
+      <span style="font-size:18px;">🗺️</span>
+      <span style="color:#fff;font-weight:700;font-size:14px;letter-spacing:0.04em;">GUIDE D'UTILISATION — ÉTAPE PAR ÉTAPE</span>
+    </div>
+    <div style="padding:14px 16px;display:grid;gap:0;">
+
+      <!-- Étape 1 -->
+      <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #F0F4FA;">
+        <div style="min-width:34px;height:34px;background:#1565C0;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;">1</div>
+        <div>
+          <div style="font-weight:700;color:#1565C0;font-size:13px;margin-bottom:4px;">📝 Remplir l'en-tête (onglet En-tête)</div>
+          <div style="color:#444;font-size:12px;line-height:1.6;">
+            Saisissez les informations de la fiche : Professeur, Niveau, Module, Séquence, Activité, Support et Objectif(s).<br>
+            <strong>💡 Astuce :</strong> double-cliquez sur un label (ex : « Professeur ») pour le renommer selon votre établissement.<br>
+            <strong>➕</strong> Utilisez « Ajouter une ligne » pour des champs supplémentaires (Établissement, Date, Groupe…).
+          </div>
+        </div>
+      </div>
+
+      <!-- Étape 2 -->
+      <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #F0F4FA;">
+        <div style="min-width:34px;height:34px;background:#1565C0;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;">2</div>
+        <div>
+          <div style="font-weight:700;color:#1565C0;font-size:13px;margin-bottom:4px;">📚 Créer les étapes (onglet Étapes)</div>
+          <div style="color:#444;font-size:12px;line-height:1.6;">
+            Cliquez sur <strong>« + Ajouter une étape »</strong> pour créer chaque étape du déroulement.<br>
+            Pour chaque étape, renseignez :<br>
+            &nbsp;&nbsp;• <strong>Nom</strong> de l'étape (Mise en route, Présentation, Production…)<br>
+            &nbsp;&nbsp;• <strong>Déroulement</strong> : décrivez l'activité avec l'éditeur riche<br>
+            &nbsp;&nbsp;• <strong>Durée</strong> : temps alloué (ex : 15 min)<br>
+            <strong>🖼️</strong> Insérez des images dans le déroulement via le bouton image de la barre d'outils.<br>
+            <strong>Ω</strong> Utilisez le sélecteur de symboles pour enrichir le texte.
+          </div>
+        </div>
+      </div>
+
+      <!-- Étape 3 -->
+      <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #F0F4FA;">
+        <div style="min-width:34px;height:34px;background:#1565C0;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;">3</div>
+        <div>
+          <div style="font-weight:700;color:#1565C0;font-size:13px;margin-bottom:4px;">⚙️ Configurer les paramètres (onglet Paramètres)</div>
+          <div style="color:#444;font-size:12px;line-height:1.6;">
+            <strong>Thème :</strong> choisissez parmi les 9 thèmes ou personnalisez les couleurs manuellement.<br>
+            <strong>Mise en page :</strong> orientation, taille de police, largeurs des colonnes, marges.<br>
+            <strong>Labels du tableau :</strong> renommez les en-têtes des colonnes (Étapes, Déroulement, Durée).<br>
+            <strong>Colonnes sup. :</strong> ajoutez jusqu'à 3 colonnes personnalisées avec leur nom et leur largeur.
+          </div>
+        </div>
+      </div>
+
+      <!-- Étape 4 -->
+      <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #F0F4FA;">
+        <div style="min-width:34px;height:34px;background:#1565C0;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;">4</div>
+        <div>
+          <div style="font-weight:700;color:#1565C0;font-size:13px;margin-bottom:4px;">👁️ Vérifier l'aperçu (onglet Aperçu)</div>
+          <div style="color:#444;font-size:12px;line-height:1.6;">
+            Consultez le rendu complet de votre fiche avant export : en-tête et tableau des étapes avec les couleurs du thème choisi.<br>
+            L'aperçu se met à jour automatiquement à chaque modification.
+          </div>
+        </div>
+      </div>
+
+      <!-- Étape 5 -->
+      <div style="display:flex;gap:12px;padding:12px 0;">
+        <div style="min-width:34px;height:34px;background:#C9A84C;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;">5</div>
+        <div>
+          <div style="font-weight:700;color:#C9A84C;font-size:13px;margin-bottom:4px;">💾 Exporter la fiche</div>
+          <div style="color:#444;font-size:12px;line-height:1.6;">
+            Depuis l'onglet <strong>Aperçu</strong>, cliquez sur :<br>
+            &nbsp;&nbsp;• <strong>📄 Exporter en PDF</strong> — pour impression ou partage immédiat<br>
+            &nbsp;&nbsp;• <strong>📘 Exporter en Word (.docx)</strong> — pour modifier et réutiliser la fiche<br>
+            Le fichier se télécharge directement en un seul clic.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── CONSEILS PRO ── -->
+  <div style="background:#fff;border-radius:14px;border:1.5px solid #E3EAF6;margin-bottom:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+    <div style="background:linear-gradient(90deg,#C9A84C,#E6B84C);padding:12px 16px;display:flex;align-items:center;gap:8px;">
+      <span style="font-size:18px;">🏆</span>
+      <span style="color:#fff;font-weight:700;font-size:14px;letter-spacing:0.04em;">CONSEILS D'UTILISATION PROFESSIONNELLE</span>
+    </div>
+    <div style="padding:14px 16px;display:grid;gap:10px;">
+
+      <div style="background:#FFFDE7;border-left:4px solid #C9A84C;border-radius:0 8px 8px 0;padding:10px 12px;">
+        <div style="font-weight:700;color:#795548;font-size:12px;margin-bottom:3px;">📌 Standardisation institutionnelle</div>
+        <div style="color:#555;font-size:12px;line-height:1.5;">Renommez tous les labels une fois pour toutes selon les normes de votre établissement. Ainsi chaque fiche produite sera conforme au même standard.</div>
+      </div>
+
+      <div style="background:#E8F5E9;border-left:4px solid #2E7D32;border-radius:0 8px 8px 0;padding:10px 12px;">
+        <div style="font-weight:700;color:#2E7D32;font-size:12px;margin-bottom:3px;">🔄 Réutilisation des fiches</div>
+        <div style="color:#555;font-size:12px;line-height:1.5;">Exportez en Word (.docx) pour archiver vos fiches et les modifier facilement d'une séquence à l'autre sans repartir de zéro.</div>
+      </div>
+
+      <div style="background:#E3F2FD;border-left:4px solid #1565C0;border-radius:0 8px 8px 0;padding:10px 12px;">
+        <div style="font-weight:700;color:#1565C0;font-size:12px;margin-bottom:3px;">🎨 Cohérence visuelle</div>
+        <div style="color:#555;font-size:12px;line-height:1.5;">Utilisez le même thème de couleurs pour toutes vos fiches afin de créer une identité visuelle professionnelle et reconnaissable.</div>
+      </div>
+
+      <div style="background:#F3E5F5;border-left:4px solid #7B1FA2;border-radius:0 8px 8px 0;padding:10px 12px;">
+        <div style="font-weight:700;color:#7B1FA2;font-size:12px;margin-bottom:3px;">📸 Images dans le déroulement</div>
+        <div style="color:#555;font-size:12px;line-height:1.5;">Intégrez des captures d'écrans, schémas ou illustrations directement dans le déroulement de la séance. Elles apparaissent dans le PDF et le Word.</div>
+      </div>
+
+      <div style="background:#FFF3E0;border-left:4px solid #E65100;border-radius:0 8px 8px 0;padding:10px 12px;">
+        <div style="font-weight:700;color:#E65100;font-size:12px;margin-bottom:3px;">➕ Colonnes personnalisées</div>
+        <div style="color:#555;font-size:12px;line-height:1.5;">Ajoutez une colonne « Matériel » ou « Compétences » dans l'onglet Paramètres → Colonnes supplémentaires pour enrichir le tableau sans surcharger la mise en page.</div>
+      </div>
+
+      <div style="background:#E8F5E9;border-left:4px solid #1B5E20;border-radius:0 8px 8px 0;padding:10px 12px;">
+        <div style="font-weight:700;color:#1B5E20;font-size:12px;margin-bottom:3px;">🖨️ Impression optimale</div>
+        <div style="color:#555;font-size:12px;line-height:1.5;">Utilisez l'orientation <strong>Paysage</strong> si votre tableau comporte beaucoup de colonnes. Le format PDF A4 est prêt à imprimer directement.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── RACCOURCIS ÉDITEUR ── -->
+  <div style="background:#fff;border-radius:14px;border:1.5px solid #E3EAF6;margin-bottom:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+    <div style="background:linear-gradient(90deg,#37474F,#546E7A);padding:12px 16px;display:flex;align-items:center;gap:8px;">
+      <span style="font-size:18px;">⌨️</span>
+      <span style="color:#fff;font-weight:700;font-size:14px;letter-spacing:0.04em;">RACCOURCIS DE L'ÉDITEUR DE TEXTE</span>
+    </div>
+    <div style="padding:14px 16px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="background:#F5F7FA;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;">
+          <kbd style="background:#1565C0;color:#fff;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700;">G</kbd>
+          <span style="font-size:12px;color:#444;">Gras</span>
+        </div>
+        <div style="background:#F5F7FA;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;">
+          <kbd style="background:#1565C0;color:#fff;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700;font-style:italic;">I</kbd>
+          <span style="font-size:12px;color:#444;">Italique</span>
+        </div>
+        <div style="background:#F5F7FA;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;">
+          <kbd style="background:#1565C0;color:#fff;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700;text-decoration:underline;">S</kbd>
+          <span style="font-size:12px;color:#444;">Souligné</span>
+        </div>
+        <div style="background:#F5F7FA;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;">
+          <span style="background:#37474F;color:#fff;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700;">≡</span>
+          <span style="font-size:12px;color:#444;">Liste à puces</span>
+        </div>
+        <div style="background:#F5F7FA;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;">
+          <span style="background:#37474F;color:#fff;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700;">⊞</span>
+          <span style="font-size:12px;color:#444;">Tableau</span>
+        </div>
+        <div style="background:#F5F7FA;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;">
+          <span style="background:#37474F;color:#fff;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700;">🖼</span>
+          <span style="font-size:12px;color:#444;">Image</span>
+        </div>
+        <div style="background:#F5F7FA;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;">
+          <span style="background:#37474F;color:#fff;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700;">Ω</span>
+          <span style="font-size:12px;color:#444;">Symboles</span>
+        </div>
+        <div style="background:#F5F7FA;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;">
+          <span style="background:#37474F;color:#fff;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700;">A²</span>
+          <span style="font-size:12px;color:#444;">Exposant</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PIED ── -->
+  <div style="text-align:center;padding:16px 12px 24px;color:#999;font-size:11px;">
+    <div style="font-size:28px;margin-bottom:6px;">📋</div>
+    <div style="font-weight:700;color:#1565C0;font-size:13px;margin-bottom:4px;">Générateur de Fiches Pédagogiques</div>
+    <div>Développé par <strong style="color:#1565C0;">EZ-ZAKY AZIZ</strong></div>
+    <div style="margin-top:4px;">Application 100 % locale — vos données restent sur votre appareil</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
 <!-- ═══════════════════════════════════════════════════ -->
 <div class="symbol-picker" id="symbol-picker">
   <div class="symbol-picker-header">
@@ -1669,6 +2066,7 @@ function showTab(name) {
   document.getElementById('panel-' + name).classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
   if (name === 'apercu') { rafraichirApercu(); genererPreviewLive(); }
+  if (name === 'repertoire') afficherRepertoire();
 }
 
 // ═══════════════════════════════════════════════════
@@ -1688,10 +2086,14 @@ function ajouterEtape(data) {
   div.innerHTML = `
     <div class="etape-header">
       <div style="display:flex;align-items:center;gap:8px;">
-        <div class="etape-num">${n}</div>
-        <h3>Étape ${n}</h3>
+        <div class="etape-num etape-num-${n}">${n}</div>
+        <h3 class="etape-titre-${n}">Étape ${n}</h3>
       </div>
-      <button class="btn-remove-etape" onclick="supprimerEtape(${n})">✕ Supprimer</button>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <button class="btn-move-etape" onclick="monterEtape('etape-${n}')" title="Monter">▲</button>
+        <button class="btn-move-etape" onclick="descendreEtape('etape-${n}')" title="Descendre">▼</button>
+        <button class="btn-remove-etape" onclick="supprimerEtape(${n})">✕ Supprimer</button>
+      </div>
     </div>
     <div class="etape-body">
       <div class="field">
@@ -2085,7 +2487,390 @@ document.addEventListener('DOMContentLoaded', function() {
 function supprimerEtape(n) {
   const el = document.getElementById('etape-' + n);
   if (el) el.remove();
+  mettreAJourNumeros();
+  calculerDureeTotale();
+  sauvegarderAutomatique();
 }
+
+// ── MONTER / DESCENDRE UNE ÉTAPE ──
+function monterEtape(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const prev = el.previousElementSibling;
+  if (prev && prev.classList.contains('etape-card')) {
+    el.parentNode.insertBefore(el, prev);
+    mettreAJourNumeros();
+    sauvegarderAutomatique();
+  }
+}
+function descendreEtape(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const next = el.nextElementSibling;
+  if (next && next.classList.contains('etape-card')) {
+    el.parentNode.insertBefore(next, el);
+    mettreAJourNumeros();
+    sauvegarderAutomatique();
+  }
+}
+// Recalculer les numéros affichés après déplacement
+function mettreAJourNumeros() {
+  document.querySelectorAll('.etape-card').forEach((card, i) => {
+    const num = card.querySelector('.etape-num');
+    if (num) num.textContent = i + 1;
+  });
+}
+
+// ── CALCUL DURÉE TOTALE ──
+function calculerDureeTotale() {
+  let totalMin = 0;
+  let hasVal = false;
+  document.querySelectorAll('.etape-card').forEach(card => {
+    const id = card.id.replace('etape-', '');
+    const dureeStr = (document.getElementById('e' + id + '-duree')?.value || '').trim();
+    if (!dureeStr) return;
+    const match = dureeStr.match(/(\d+[\.,]?\d*)/);
+    if (match) {
+      totalMin += parseFloat(match[1].replace(',', '.'));
+      hasVal = true;
+    }
+  });
+  const el = document.getElementById('duree-totale-val');
+  if (!el) return;
+  if (!hasVal) { el.textContent = '—'; return; }
+  if (totalMin >= 60) {
+    const h = Math.floor(totalMin / 60);
+    const m = Math.round(totalMin % 60);
+    el.textContent = m > 0 ? `${h}h${String(m).padStart(2,'0')} (${Math.round(totalMin)} min)` : `${h}h00 (${Math.round(totalMin)} min)`;
+  } else {
+    el.textContent = `${Math.round(totalMin)} min`;
+  }
+}
+
+// ── SAUVEGARDE AUTOMATIQUE (localStorage) ──
+const SAVE_KEY = 'fiche_ped_autosave';
+
+function sauvegarderAutomatique() {
+  try {
+    const data = collecterTout();
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    afficherStatutSauvegarde('✅ Sauvegardé automatiquement', '#2E7D32');
+  } catch(e) { /* silencieux */ }
+}
+
+function afficherStatutSauvegarde(msg, color) {
+  const bar = document.getElementById('save-bar');
+  const st  = document.getElementById('save-status');
+  if (!bar || !st) return;
+  bar.style.display = 'flex';
+  st.textContent = msg;
+  st.style.color = color;
+}
+
+function collecterTout() {
+  const etapes = [];
+  document.querySelectorAll('.etape-card').forEach(card => {
+    const id = card.id.replace('etape-', '');
+    etapes.push({
+      nom:       document.getElementById('e' + id + '-nom')?.value || '',
+      enseignant: getQuillHTML('e' + id + '-enseignant-wrapper') || '',
+      duree:     document.getElementById('e' + id + '-duree')?.value || ''
+    });
+  });
+  return {
+    v: 2,
+    entete: {
+      prof:     document.getElementById('prof')?.value || '',
+      niveau:   document.getElementById('niveau')?.value || '',
+      module:   document.getElementById('module')?.value || '',
+      sequence: document.getElementById('sequence')?.value || '',
+      activite: document.getElementById('activite')?.value || '',
+      support:  document.getElementById('support')?.value || '',
+      objectif: getQuillHTML('objectif-wrapper') || ''
+    },
+    etapes,
+    params: {
+      marge:           document.getElementById('p-marge')?.value || '8.5',
+      gap:             document.getElementById('p-gap')?.value || '5',
+      fontEnteteLabel: document.getElementById('p-font-entete-label')?.value || '11',
+      fontEnteteContent:document.getElementById('p-font-entete-content')?.value || '10',
+      fontTableHeader: document.getElementById('p-font-table-header')?.value || '10',
+      fontTableContent:document.getElementById('p-font-table-content')?.value || '9',
+      rowHeight:       document.getElementById('p-row-height')?.value || '8',
+      tableHeaderH:    document.getElementById('p-table-header-h')?.value || '18',
+      headerH:         document.getElementById('p-header-h')?.value || '100',
+      l1h:             document.getElementById('p-l1h')?.value || '22',
+      l234h:           document.getElementById('p-l234h')?.value || '18',
+      l5h:             document.getElementById('p-l5h')?.value || '40',
+      sep1:            document.getElementById('p-sep1')?.value || '32',
+      sep2:            document.getElementById('p-sep2')?.value || '60',
+      col1:            document.getElementById('p-col1')?.value || '20',
+      col2:            document.getElementById('p-col2')?.value || '65',
+      colorMain:       document.getElementById('p-color-main')?.value || '#1565C0',
+      colorAccent:     document.getElementById('p-color-accent')?.value || '#C9A84C',
+      colorGrid:       document.getElementById('p-color-grid')?.value || '#AAAAAA',
+      colorEtapeText:  document.getElementById('p-color-etape-text')?.value || '#1565C0',
+      labelColEtapes:  document.getElementById('label-col-etapes')?.value || 'Étapes',
+      labelColDerou:   document.getElementById('label-col-deroulement')?.value || 'Déroulement de la séance',
+      labelColDuree:   document.getElementById('label-col-duree')?.value || 'Durée'
+    },
+    savedAt: new Date().toLocaleString('fr-FR')
+  };
+}
+
+function restaurerFiche(data) {
+  if (!data) return;
+  // En-tête
+  const e = data.entete || {};
+  if (e.prof     !== undefined) document.getElementById('prof').value     = e.prof;
+  if (e.niveau   !== undefined) document.getElementById('niveau').value   = e.niveau;
+  if (e.module   !== undefined) document.getElementById('module').value   = e.module;
+  if (e.sequence !== undefined) document.getElementById('sequence').value = e.sequence;
+  if (e.activite !== undefined) document.getElementById('activite').value = e.activite;
+  if (e.support  !== undefined) document.getElementById('support').value  = e.support;
+  if (e.objectif) setTimeout(() => setQuillHTML('objectif-wrapper', e.objectif), 200);
+  // Étapes
+  if (data.etapes && data.etapes.length > 0) {
+    document.getElementById('etapes-container').innerHTML = '';
+    etapeCount = 0;
+    data.etapes.forEach(et => ajouterEtape(et));
+  }
+  // Paramètres
+  const p = data.params || {};
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
+  setVal('p-marge', p.marge); setVal('p-gap', p.gap);
+  setVal('p-font-entete-label', p.fontEnteteLabel); setVal('p-font-entete-content', p.fontEnteteContent);
+  setVal('p-font-table-header', p.fontTableHeader); setVal('p-font-table-content', p.fontTableContent);
+  setVal('p-row-height', p.rowHeight); setVal('p-table-header-h', p.tableHeaderH);
+  setVal('p-header-h', p.headerH); setVal('p-l1h', p.l1h); setVal('p-l234h', p.l234h); setVal('p-l5h', p.l5h);
+  setVal('p-sep1', p.sep1); setVal('p-sep2', p.sep2);
+  setVal('p-col1', p.col1); setVal('p-col2', p.col2);
+  setVal('p-color-main', p.colorMain); setVal('p-color-accent', p.colorAccent);
+  setVal('p-color-grid', p.colorGrid); setVal('p-color-etape-text', p.colorEtapeText);
+  setVal('label-col-etapes', p.labelColEtapes); setVal('label-col-deroulement', p.labelColDerou);
+  setVal('label-col-duree', p.labelColDuree);
+  if (p.colorMain) applyThemePreview();
+  updateLivePreview();
+  calculerDureeTotale();
+}
+
+// ══════════════════════════════════════════════════════
+// RÉPERTOIRE DES FICHES
+// ══════════════════════════════════════════════════════
+const REP_KEY = 'fiche_ped_repertoire';
+
+function lireRepertoire() {
+  try {
+    return JSON.parse(localStorage.getItem(REP_KEY) || '[]');
+  } catch(e) { return []; }
+}
+
+function ecrireRepertoire(fiches) {
+  localStorage.setItem(REP_KEY, JSON.stringify(fiches));
+}
+
+function enregistrerDansRepertoire() {
+  const entete   = collecterEntete();
+  const etapes   = collecterEtapes();
+  const activite = entete.activite || entete.module || 'Sans titre';
+  const niveau   = entete.niveau   || '';
+
+  // Demander un nom pour la fiche
+  const nomSuggere = [activite, niveau].filter(Boolean).join(' — ');
+  const nom = prompt('💾 Nom de la fiche à enregistrer :', nomSuggere);
+  if (nom === null) return; // annulé
+  const nomFinal = nom.trim() || nomSuggere || 'Fiche sans titre';
+
+  const fiches = lireRepertoire();
+
+  // Vérifier si une fiche avec ce nom existe déjà
+  const existant = fiches.findIndex(f => f.nom === nomFinal);
+  if (existant !== -1) {
+    if (!confirm(`⚠️ Une fiche nommée "${nomFinal}" existe déjà.\nVoulez-vous la remplacer ?`)) return;
+    fiches.splice(existant, 1);
+  }
+
+  const data = collecterTout();
+  data.nom     = nomFinal;
+  data.savedAt = new Date().toLocaleString('fr-FR');
+
+  // Résumé lisible
+  const totalMin = etapes.reduce((s, e) => {
+    const m = (e.duree || '').match(/(\d+[\.,]?\d*)/);
+    return s + (m ? parseFloat(m[1].replace(',','.')) : 0);
+  }, 0);
+  data.resume = `${etapes.length} étape${etapes.length>1?'s':''} · ${totalMin>0?totalMin+' min':'durée non définie'}`;
+  data.niveau  = niveau;
+  data.module  = entete.module || '';
+
+  fiches.unshift(data); // plus récent en premier
+  ecrireRepertoire(fiches);
+
+  // Feedback
+  afficherStatutSauvegarde(`✅ Fiche "${nomFinal}" enregistrée dans le répertoire !`, '#2E7D32');
+  // Badge onglet
+  mettreAJourBadgeRepertoire();
+}
+
+function afficherRepertoire() {
+  const fiches  = lireRepertoire();
+  const liste   = document.getElementById('repertoire-liste');
+  const compteur = document.getElementById('rep-compteur');
+  if (!liste) return;
+
+  if (compteur) compteur.textContent = fiches.length + ' fiche' + (fiches.length > 1 ? 's' : '');
+
+  if (fiches.length === 0) {
+    liste.innerHTML = `<div class="repertoire-empty">
+      <div style="font-size:40px;margin-bottom:8px;">📂</div>
+      <div>Aucune fiche enregistrée.</div>
+      <div style="font-size:12px;margin-top:6px;color:#bbb;">Utilisez le bouton <strong>💾 Enregistrer la fiche</strong><br>depuis l'onglet Étapes ou Aperçu.</div>
+    </div>`;
+    return;
+  }
+
+  liste.innerHTML = fiches.map((f, i) => `
+    <div class="repertoire-card">
+      <div class="repertoire-card-header">
+        <div class="repertoire-card-title">📋 ${f.nom || 'Fiche ' + (i+1)}</div>
+        <div class="repertoire-card-date">🕐 ${f.savedAt || '—'}</div>
+      </div>
+      <div class="repertoire-card-body">
+        ${f.niveau ? `<span style="background:#E3F2FD;color:#1565C0;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:600;margin-right:6px;">${f.niveau}</span>` : ''}
+        ${f.module ? `<span style="color:#555;">${f.module}</span>` : ''}
+        <br><span style="color:#888;font-size:11px;">${f.resume || ''}</span>
+      </div>
+      <div class="repertoire-card-actions">
+        <button class="btn-rep btn-rep-ouvrir" onclick="ouvrirFicheRepertoire(${i})">📂 Ouvrir</button>
+        <button class="btn-rep" onclick="dupliquerFicheRepertoire(${i})" style="background:#E8F5E9;color:#2E7D32;border:1px solid #C8E6C9;">📋 Dupliquer</button>
+        <button class="btn-rep btn-rep-suppr" onclick="supprimerFicheRepertoire(${i})">🗑️ Supprimer</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function ouvrirFicheRepertoire(index) {
+  const fiches = lireRepertoire();
+  const f = fiches[index];
+  if (!f) return;
+  if (!confirm(`📂 Ouvrir la fiche "${f.nom}" ?\nLe contenu actuel sera remplacé.`)) return;
+  restaurerFiche(f);
+  showTab('etapes');
+  afficherStatutSauvegarde(`📂 Fiche "${f.nom}" ouverte`, '#1565C0');
+}
+
+function dupliquerFicheRepertoire(index) {
+  const fiches = lireRepertoire();
+  const f = JSON.parse(JSON.stringify(fiches[index])); // copie profonde
+  f.nom     = f.nom + ' (copie)';
+  f.savedAt = new Date().toLocaleString('fr-FR');
+  fiches.splice(index + 1, 0, f);
+  ecrireRepertoire(fiches);
+  afficherRepertoire();
+  mettreAJourBadgeRepertoire();
+}
+
+function supprimerFicheRepertoire(index) {
+  const fiches = lireRepertoire();
+  const f = fiches[index];
+  if (!confirm(`🗑️ Supprimer la fiche "${f.nom}" ?\nCette action est irréversible.`)) return;
+  fiches.splice(index, 1);
+  ecrireRepertoire(fiches);
+  afficherRepertoire();
+  mettreAJourBadgeRepertoire();
+}
+
+function mettreAJourBadgeRepertoire() {
+  const n = lireRepertoire().length;
+  const btn = document.getElementById('tab-repertoire');
+  if (!btn) return;
+  // Afficher un badge numérique sur l'onglet si des fiches existent
+  const existing = btn.querySelector('.rep-badge');
+  if (existing) existing.remove();
+  if (n > 0) {
+    const badge = document.createElement('span');
+    badge.className = 'rep-badge';
+    badge.style.cssText = 'background:#C9A84C;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:4px;';
+    badge.textContent = n;
+    btn.appendChild(badge);
+  }
+}
+
+// ── NOUVELLE FICHE (remise à zéro complète) ──
+function nouvelleFiche() {
+  if (!confirm('🔄 Commencer une nouvelle fiche ?\n\nLe contenu actuel sera effacé.\n⚠️ Pensez à l\'enregistrer dans le répertoire si vous voulez le conserver.')) return;
+
+  // Réinitialiser les champs de l'en-tête (sauf le prof)
+  ['niveau','module','sequence','activite','support'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  // Vider l'objectif
+  setQuillHTML('objectif-wrapper', '');
+
+  // Supprimer toutes les étapes et repartir sur les étapes par défaut
+  document.getElementById('etapes-container').innerHTML = '';
+  etapeCount = 0;
+  ajouterEtape({ nom:'Mise en route', enseignant:'', duree:'5 min' });
+  ajouterEtape({ nom:'Présentation',  enseignant:'', duree:'15 min' });
+  ajouterEtape({ nom:'Entraînement',  enseignant:'', duree:'20 min' });
+  ajouterEtape({ nom:'Production',    enseignant:'', duree:'10 min' });
+  ajouterEtape({ nom:'Clôture',       enseignant:'', duree:'5 min' });
+  setTimeout(calculerDureeTotale, 300);
+
+  // Effacer la sauvegarde automatique
+  try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
+
+  // Mettre à jour l'aperçu live de l'en-tête
+  updateLivePreview();
+
+  // Retourner sur l'onglet En-tête
+  showTab('entete');
+
+  afficherStatutSauvegarde('🔄 Nouvelle fiche — contenu réinitialisé', '#1565C0');
+}
+
+// ── PARAMÈTRES PAR DÉFAUT ──
+function reinitialiserParams() {
+  if (!confirm('🔄 Remettre tous les paramètres à leurs valeurs par défaut ?\nLes couleurs et les labels seront aussi réinitialisés.')) return;
+  const defs = {
+    'p-marge':'8.5','p-gap':'5',
+    'p-font-entete-label':'11','p-font-entete-content':'10',
+    'p-font-table-header':'10','p-font-table-content':'9',
+    'p-row-height':'8','p-table-header-h':'18',
+    'p-header-h':'100','p-l1h':'22','p-l234h':'18','p-l5h':'40',
+    'p-sep1':'32','p-sep2':'60',
+    'p-col1':'20','p-col2':'65',
+    'p-color-main':'#1565C0','p-color-accent':'#C9A84C',
+    'p-color-grid':'#AAAAAA','p-color-etape-text':'#1565C0',
+    'label-col-etapes':'Étapes',
+    'label-col-deroulement':'Déroulement de la séance',
+    'label-col-duree':'Durée'
+  };
+  Object.entries(defs).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  });
+  applyThemePreview();
+  // Feedback visuel
+  const btn = event?.target?.closest('button');
+  if (btn) { btn.textContent = '✅ Réinitialisé !'; setTimeout(() => { btn.innerHTML = '🔄 Paramètres par défaut'; }, 1500); }
+}
+
+// ── RESTAURATION AU DÉMARRAGE ──
+(function chargerSauvegardeAuDemarrage() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (!data || !data.v) return;
+    setTimeout(() => {
+      restaurerFiche(data);
+      afficherStatutSauvegarde(`✅ Fiche restaurée (sauvegardée le ${data.savedAt || '?'})`, '#2E7D32');
+      mettreAJourBadgeRepertoire();
+    }, 400);
+  } catch(e) { /* silencieux */ }
+})();
 
 function collecterEtapes() {
   const colsSup = collecterColonnesSup();
@@ -2114,6 +2899,7 @@ ajouterEtape({ nom:'Présentation', enseignant:'', duree:'15 min' });
 ajouterEtape({ nom:'Entraînement', enseignant:'', duree:'20 min' });
 ajouterEtape({ nom:'Production', enseignant:'', duree:'10 min' });
 ajouterEtape({ nom:'Clôture', enseignant:'', duree:'5 min' });
+setTimeout(calculerDureeTotale, 300);
 
 // ═══════════════════════════════════════════════════
 // APERÇU
@@ -3811,9 +4597,16 @@ function genererPreviewLive() {
 }
 
 // Mettre à jour la prévisualisation quand les données changent
-document.addEventListener('input', function() {
+document.addEventListener('input', function(e) {
   clearTimeout(window.previewTimeout);
   window.previewTimeout = setTimeout(genererPreviewLive, 500);
+  // Recalculer durée si champ durée modifié
+  if (e.target && e.target.id && e.target.id.includes('-duree')) {
+    calculerDureeTotale();
+  }
+  // Sauvegarde auto avec debounce
+  clearTimeout(window.saveTimeout);
+  window.saveTimeout = setTimeout(sauvegarderAutomatique, 1500);
 });
 
 // ────── EXPORT DOCX (OpenXML via JSZip) ──────
