@@ -3625,9 +3625,29 @@ function genererPDF() {
     doc.text(normaliserTexte(entete.prof || ''), endX, PH-4, {align:'right'});
   }
 
-  // Sauvegarde
+  // Sauvegarde — compatible Android PWA
   const safeName = (entete.activite || 'fiche').replace(/[^a-zA-Z0-9\u00C0-\u024F]/gi,'_').slice(0,40);
-  doc.save(`FichePedagogique_${safeName}_${entete.niveau || 'N'}.pdf`);
+  const pdfFileName = `FichePedagogique_${safeName}_${entete.niveau || 'N'}.pdf`;
+  try {
+    // Méthode 1 : window.open (meilleure compatibilité Android)
+    const pdfBlob = doc.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const pdfLink = document.createElement('a');
+    pdfLink.href = pdfUrl;
+    pdfLink.download = pdfFileName;
+    pdfLink.target = '_blank';
+    pdfLink.rel = 'noopener';
+    document.body.appendChild(pdfLink);
+    pdfLink.click();
+    setTimeout(() => {
+      document.body.removeChild(pdfLink);
+      URL.revokeObjectURL(pdfUrl);
+    }, 3000);
+  } catch(e) {
+    // Méthode 2 : fallback ouverture dans nouvel onglet
+    const pdfDataUri = doc.output('datauristring');
+    window.open(pdfDataUri, '_blank');
+  }
 
   showToast();
   
@@ -4442,14 +4462,36 @@ function genererDOCX() {
   zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
     .then(function(blob) {
       const safeName = (entete.activite || 'fiche').replace(/[^a-zA-Z0-9\u00C0-\u024F]/gi,'_').slice(0,40);
-      const url = URL.createObjectURL(blob);
-      const a   = document.createElement('a');
-      a.href    = url;
-      a.download = `FichePedagogique_${safeName}_${Date.now()}.docx`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const docxFileName = `FichePedagogique_${safeName}_${Date.now()}.docx`;
+      try {
+        // Méthode compatible Android PWA
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = docxFileName;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 3000);
+      } catch(e) {
+        // Fallback : FileReader pour base64
+        const reader = new FileReader();
+        reader.onload = function() {
+          const a = document.createElement('a');
+          a.href = reader.result;
+          a.download = docxFileName;
+          a.target = '_blank';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        };
+        reader.readAsDataURL(blob);
+      }
       const toast = document.getElementById('toast');
       toast.textContent = '📘 Fiche exportée en DOCX (Word)';
       showToast();
