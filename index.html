@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fiche Péda">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%231565C0'/%3E%3Crect x='28' y='36' width='136' height='10' rx='5' fill='%23C9A84C'/%3E%3Crect x='28' y='56' width='136' height='8' rx='4' fill='white' opacity='.9'/%3E%3Crect x='28' y='74' width='136' height='8' rx='4' fill='white' opacity='.7'/%3E%3Crect x='28' y='92' width='90' height='8' rx='4' fill='white' opacity='.7'/%3E%3Crect x='28' y='112' width='136' height='60' rx='6' fill='white' opacity='.15'/%3E%3Ctext x='96' y='152' font-family='serif' font-size='28' font-weight='bold' fill='%23C9A84C' text-anchor='middle'%3EPDF%3C/text%3E%3C/svg%3E">
-<link rel="manifest" id="pwa-manifest">
+<link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
@@ -3625,90 +3625,18 @@ function genererPDF() {
     doc.text(normaliserTexte(entete.prof || ''), endX, PH-4, {align:'right'});
   }
 
-  // Sauvegarde — méthode spéciale AppsGeyser WebView
+  // Sauvegarde — téléchargement direct (compatible PWA Android)
   const safeName = (entete.activite || 'fiche').replace(/[^a-zA-Z0-9\u00C0-\u024F]/gi,'_').slice(0,40);
   const pdfFileName = `FichePedagogique_${safeName}_${entete.niveau || 'N'}.pdf`;
-  
-  // Convertir en base64
-  const pdfBase64 = doc.output('datauristring');
   const pdfBlob = doc.output('blob');
-  
-  // Créer modal de téléchargement dans la page
-  const oldModal = document.getElementById('dl-modal-pdf');
-  if (oldModal) oldModal.remove();
-  
-  const modal = document.createElement('div');
-  modal.id = 'dl-modal-pdf';
-  modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:999999;display:flex;align-items:center;justify-content:center;font-family:sans-serif;';
-  
-  modal.innerHTML = `
-    <div style="background:white;border-radius:20px;padding:28px 20px;margin:20px;text-align:center;max-width:340px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
-      <div style="font-size:56px;margin-bottom:8px;">📄</div>
-      <h3 style="color:#1565C0;margin:0 0 6px;font-size:18px;">PDF généré !</h3>
-      <p style="color:#555;font-size:13px;margin:0 0 20px;">${pdfFileName}</p>
-      <div id="pdf-upload-status" style="margin-bottom:12px;">
-        <div style="color:#888;font-size:14px;">⏳ Préparation du lien de téléchargement...</div>
-      </div>
-      <button id="btn-close-pdf" style="width:100%;background:#eee;color:#333;border:none;padding:12px;border-radius:12px;font-size:15px;cursor:pointer;">
-        ✕ Fermer
-      </button>
-      <p style="color:#999;font-size:11px;margin:12px 0 0;">⏱️ Le lien expire après 24h</p>
-    </div>
-  `;
-  document.body.appendChild(modal);
-
-  document.getElementById('btn-close-pdf').addEventListener('click', function() {
-    modal.remove();
-  });
-
-  // Upload vers filebin.net pour obtenir un vrai lien téléchargeable
-  const binId = 'fiche-' + Date.now();
-  const uploadUrl = `https://filebin.net/${binId}/${pdfFileName}`;
-  const statusDiv = document.getElementById('pdf-upload-status');
-
-  fetch(uploadUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/pdf',
-      'filename': pdfFileName
-    },
-    body: pdfBlob
-  })
-  .then(res => res.ok ? res.json() : Promise.reject('Erreur upload'))
-  .then(data => {
-    const dlLink = `https://filebin.net/${binId}/${pdfFileName}`;
-    statusDiv.innerHTML = `
-      <a href="${dlLink}" target="_blank" style="display:block;width:100%;background:#1565C0;color:white;text-decoration:none;padding:14px;border-radius:12px;font-size:16px;font-weight:bold;margin-bottom:8px;box-sizing:border-box;">
-        📥 Télécharger le PDF
-      </a>
-      <div style="background:#f0f7ff;border-radius:8px;padding:10px;margin-top:8px;">
-        <p style="color:#555;font-size:11px;margin:0 0 6px;">Ou copiez ce lien dans Chrome :</p>
-        <p style="color:#1565C0;font-size:11px;word-break:break-all;margin:0;font-weight:bold;">${dlLink}</p>
-      </div>
-    `;
-  })
-  .catch(() => {
-    // Fallback : Upload vers 0x0.st
-    const fd = new FormData();
-    fd.append('file', pdfBlob, pdfFileName);
-    fetch('https://0x0.st', { method: 'POST', body: fd })
-    .then(r => r.text())
-    .then(url => {
-      url = url.trim();
-      statusDiv.innerHTML = `
-        <a href="${url}" target="_blank" style="display:block;width:100%;background:#1565C0;color:white;text-decoration:none;padding:14px;border-radius:12px;font-size:16px;font-weight:bold;margin-bottom:8px;box-sizing:border-box;">
-          📥 Télécharger le PDF
-        </a>
-        <div style="background:#f0f7ff;border-radius:8px;padding:10px;margin-top:8px;">
-          <p style="color:#555;font-size:11px;margin:0 0 6px;">Ou copiez ce lien dans Chrome :</p>
-          <p style="color:#1565C0;font-size:11px;word-break:break-all;margin:0;font-weight:bold;">${url}</p>
-        </div>
-      `;
-    })
-    .catch(() => {
-      statusDiv.innerHTML = `<p style="color:red;font-size:13px;">❌ Impossible de générer un lien.<br>Vérifiez votre connexion internet.</p>`;
-    });
-  });
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  const a = document.createElement('a');
+  a.href = pdfUrl;
+  a.download = pdfFileName;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(pdfUrl); }, 3000);
 
   showToast();
   
@@ -4524,84 +4452,14 @@ function genererDOCX() {
     .then(function(blob) {
       const safeName = (entete.activite || 'fiche').replace(/[^a-zA-Z0-9\u00C0-\u024F]/gi,'_').slice(0,40);
       const docxFileName = `FichePedagogique_${safeName}_${Date.now()}.docx`;
-      
-      // Créer modal dans la page
-      const oldModal = document.getElementById('dl-modal-docx');
-      if (oldModal) oldModal.remove();
-      
-      const modal = document.createElement('div');
-      modal.id = 'dl-modal-docx';
-      modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:999999;display:flex;align-items:center;justify-content:center;font-family:sans-serif;';
-      
-      modal.innerHTML = `
-        <div style="background:white;border-radius:20px;padding:28px 20px;margin:20px;text-align:center;max-width:340px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.3);">
-          <div style="font-size:56px;margin-bottom:8px;">📘</div>
-          <h3 style="color:#1565C0;margin:0 0 6px;font-size:18px;">Word généré !</h3>
-          <p style="color:#555;font-size:13px;margin:0 0 20px;">${docxFileName}</p>
-          <div id="docx-upload-status" style="margin-bottom:12px;">
-            <div style="color:#888;font-size:14px;">⏳ Préparation du lien de téléchargement...</div>
-          </div>
-          <button id="btn-close-docx" style="width:100%;background:#eee;color:#333;border:none;padding:12px;border-radius:12px;font-size:15px;cursor:pointer;">
-            ✕ Fermer
-          </button>
-          <p style="color:#999;font-size:11px;margin:12px 0 0;">⏱️ Le lien expire après 24h</p>
-        </div>
-      `;
-      document.body.appendChild(modal);
-
-      document.getElementById('btn-close-docx').addEventListener('click', function() {
-        modal.remove();
-      });
-
-      // Upload vers filebin.net
-      const binIdDocx = 'fiche-' + Date.now();
-      const uploadUrlDocx = `https://filebin.net/${binIdDocx}/${docxFileName}`;
-      const statusDocx = document.getElementById('docx-upload-status');
-
-      fetch(uploadUrlDocx, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          'filename': docxFileName
-        },
-        body: blob
-      })
-      .then(res => res.ok ? res.json() : Promise.reject('Erreur'))
-      .then(() => {
-        const dlLink = `https://filebin.net/${binIdDocx}/${docxFileName}`;
-        statusDocx.innerHTML = `
-          <a href="${dlLink}" target="_blank" style="display:block;width:100%;background:#1565C0;color:white;text-decoration:none;padding:14px;border-radius:12px;font-size:16px;font-weight:bold;margin-bottom:8px;box-sizing:border-box;">
-            📥 Télécharger le Word (.docx)
-          </a>
-          <div style="background:#f0f7ff;border-radius:8px;padding:10px;margin-top:8px;">
-            <p style="color:#555;font-size:11px;margin:0 0 6px;">Ou copiez ce lien dans Chrome :</p>
-            <p style="color:#1565C0;font-size:11px;word-break:break-all;margin:0;font-weight:bold;">${dlLink}</p>
-          </div>
-        `;
-      })
-      .catch(() => {
-        // Fallback 0x0.st
-        const fd = new FormData();
-        fd.append('file', blob, docxFileName);
-        fetch('https://0x0.st', { method: 'POST', body: fd })
-        .then(r => r.text())
-        .then(url => {
-          url = url.trim();
-          statusDocx.innerHTML = `
-            <a href="${url}" target="_blank" style="display:block;width:100%;background:#1565C0;color:white;text-decoration:none;padding:14px;border-radius:12px;font-size:16px;font-weight:bold;margin-bottom:8px;box-sizing:border-box;">
-              📥 Télécharger le Word (.docx)
-            </a>
-            <div style="background:#f0f7ff;border-radius:8px;padding:10px;margin-top:8px;">
-              <p style="color:#555;font-size:11px;margin:0 0 6px;">Ou copiez ce lien dans Chrome :</p>
-              <p style="color:#1565C0;font-size:11px;word-break:break-all;margin:0;font-weight:bold;">${url}</p>
-            </div>
-          `;
-        })
-        .catch(() => {
-          statusDocx.innerHTML = `<p style="color:red;font-size:13px;">❌ Impossible de générer un lien.<br>Vérifiez votre connexion internet.</p>`;
-        });
-      });
-
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = docxFileName;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 3000);
       const toast = document.getElementById('toast');
       toast.textContent = '📘 Fiche exportée en DOCX (Word)';
       showToast();
