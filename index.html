@@ -14,7 +14,7 @@
 <link rel="manifest" id="pwa-manifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=Georgia:wght@400;700&family=Lato:ital,wght@0,400;0,700;1,400&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Roboto:ital,wght@0,400;0,700;1,400&family=Open+Sans:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <!-- Quill.js pour l'édition de texte riche -->
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
@@ -667,7 +667,78 @@ if ('serviceWorker' in navigator) {
   .theme-swatch-row { display:flex; gap:4px; }
   .theme-swatch-name { font-size:10px; font-weight:700; color:var(--ink); text-align:center; padding:4px 2px 2px; background:white; }
 
+  /* ─── BOUTONS DE FORMATAGE (B et I) ─── */
+  .format-btn {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    min-width: 32px;
+    height: 28px;
+    transition: all 0.2s;
+  }
+  .format-btn:hover {
+    background: var(--blue-pale);
+    border-color: var(--blue);
+  }
+  .format-btn:active {
+    background: var(--blue);
+    color: white;
+  }
+
+  /* ─── CHAMPS ÉDITABLES (contenteditable) ─── */
+  .editable-input {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 42px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .editable-input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+  }
+  .editable-input:empty:before {
+    content: attr(data-placeholder);
+    color: #999;
+    font-style: italic;
+  }
+
   /* ─── STYLES QUILL.JS POUR TEXTE RICHE ─── */
+
+  /* Polices dans l'éditeur Quill */
+  .ql-font-times      { font-family: 'Times New Roman', Times, serif; }
+  .ql-font-georgia    { font-family: Georgia, 'Times New Roman', serif; }
+  .ql-font-merriweather { font-family: 'Merriweather', Georgia, serif; }
+  .ql-font-roboto     { font-family: 'Roboto', Arial, sans-serif; }
+  .ql-font-lato       { font-family: 'Lato', Arial, sans-serif; }
+  .ql-font-opensans   { font-family: 'Open Sans', Arial, sans-serif; }
+  .ql-font-courier    { font-family: 'Courier New', Courier, monospace; }
+  /* Affichage des options dans le select */
+  .ql-picker.ql-font .ql-picker-label::before,
+  .ql-picker.ql-font .ql-picker-item::before { content: 'Sans-sérif'; }
+  .ql-picker.ql-font .ql-picker-label[data-value=times]::before,
+  .ql-picker.ql-font .ql-picker-item[data-value=times]::before { content: 'Times Roman'; font-family:'Times New Roman',serif; }
+  .ql-picker.ql-font .ql-picker-label[data-value=georgia]::before,
+  .ql-picker.ql-font .ql-picker-item[data-value=georgia]::before { content: 'Georgia'; font-family:Georgia,serif; }
+  .ql-picker.ql-font .ql-picker-label[data-value=merriweather]::before,
+  .ql-picker.ql-font .ql-picker-item[data-value=merriweather]::before { content: 'Merriweather'; font-family:'Merriweather',serif; }
+  .ql-picker.ql-font .ql-picker-label[data-value=roboto]::before,
+  .ql-picker.ql-font .ql-picker-item[data-value=roboto]::before { content: 'Roboto'; font-family:'Roboto',sans-serif; }
+  .ql-picker.ql-font .ql-picker-label[data-value=lato]::before,
+  .ql-picker.ql-font .ql-picker-item[data-value=lato]::before { content: 'Lato'; font-family:'Lato',sans-serif; }
+  .ql-picker.ql-font .ql-picker-label[data-value=opensans]::before,
+  .ql-picker.ql-font .ql-picker-item[data-value=opensans]::before { content: 'Open Sans'; font-family:'Open Sans',sans-serif; }
+  .ql-picker.ql-font .ql-picker-label[data-value=courier]::before,
+  .ql-picker.ql-font .ql-picker-item[data-value=courier]::before { content: 'Courier'; font-family:'Courier New',monospace; }
   .quill-wrapper {
     border: 1.5px solid var(--border);
     border-radius: 8px;
@@ -748,7 +819,8 @@ if ('serviceWorker' in navigator) {
   /* ─── BOUTONS PERSONNALISÉS DANS LA TOOLBAR QUILL ─── */
   .ql-toolbar .ql-custom-table,
   .ql-toolbar .ql-custom-image,
-  .ql-toolbar .ql-custom-symbol {
+  .ql-toolbar .ql-custom-symbol,
+  .ql-toolbar .ql-custom-size {
     background: none;
     border: 1px solid var(--border) !important;
     cursor: pointer;
@@ -769,9 +841,11 @@ if ('serviceWorker' in navigator) {
   .ql-toolbar .ql-custom-table:hover,
   .ql-toolbar .ql-custom-image:hover,
   .ql-toolbar .ql-custom-symbol:hover,
+  .ql-toolbar .ql-custom-size:hover,
   .ql-toolbar .ql-custom-table:active,
   .ql-toolbar .ql-custom-image:active,
-  .ql-toolbar .ql-custom-symbol:active {
+  .ql-toolbar .ql-custom-symbol:active,
+  .ql-toolbar .ql-custom-size:active {
     background: #e8f0fe !important;
     border-color: var(--blue) !important;
     color: var(--blue);
@@ -1320,14 +1394,18 @@ if ('serviceWorker' in navigator) {
               <span class="label-text">Professeur</span>
               <span class="label-edit-hint">✏️</span>
             </label>
-            <input type="text" id="prof" value="EZ-ZAKY AZIZ" oninput="updateLivePreview()">
+            <div style="display:flex;gap:4px;margin-bottom:4px;">
+              <button type="button" class="format-btn" onclick="toggleFormat('prof', 'bold')" title="Gras"><b>B</b></button>
+              <button type="button" class="format-btn" onclick="toggleFormat('prof', 'italic')" title="Italique"><i>I</i></button>
+            </div>
+            <div id="prof" contenteditable="true" class="editable-input" oninput="updateLivePreview()">EZ-ZAKY AZIZ</div>
           </div>
           <div class="field editable-field-wrap">
             <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier">
               <span class="label-text">Niveau</span>
               <span class="label-edit-hint">✏️</span>
             </label>
-            <input type="text" id="niveau" placeholder="Ex : 1BAC, 2BAC, TC…" oninput="updateLivePreview()">
+            <div style="display:flex;gap:4px;margin-bottom:4px;"><button type="button" class="format-btn" onclick="toggleFormat('niveau', 'bold')" title="Gras"><b>B</b></button><button type="button" class="format-btn" onclick="toggleFormat('niveau', 'italic')" title="Italique"><i>I</i></button></div><div id="niveau" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Ex : 1BAC, 2BAC, TC…"></div>
           </div>
         </div>
       </div>
@@ -1340,7 +1418,7 @@ if ('serviceWorker' in navigator) {
             <span class="label-text">Module</span>
             <span class="label-edit-hint">✏️</span>
           </label>
-          <input type="text" id="module" placeholder="Intitulé exact du module" oninput="updateLivePreview()">
+          <div style="display:flex;gap:4px;margin-bottom:4px;"><button type="button" class="format-btn" onclick="toggleFormat('module', 'bold')" title="Gras"><b>B</b></button><button type="button" class="format-btn" onclick="toggleFormat('module', 'italic')" title="Italique"><i>I</i></button></div><div id="module" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Intitulé exact du module"></div>
         </div>
       </div>
 
@@ -1352,7 +1430,7 @@ if ('serviceWorker' in navigator) {
             <span class="label-text">Séquence</span>
             <span class="label-edit-hint">✏️</span>
           </label>
-          <input type="text" id="sequence" placeholder="Intitulé exact de la séquence" oninput="updateLivePreview()">
+          <div style="display:flex;gap:4px;margin-bottom:4px;"><button type="button" class="format-btn" onclick="toggleFormat('sequence', 'bold')" title="Gras"><b>B</b></button><button type="button" class="format-btn" onclick="toggleFormat('sequence', 'italic')" title="Italique"><i>I</i></button></div><div id="sequence" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Intitulé exact de la séquence"></div>
         </div>
       </div>
 
@@ -1365,14 +1443,14 @@ if ('serviceWorker' in navigator) {
               <span class="label-text">Activité</span>
               <span class="label-edit-hint">✏️</span>
             </label>
-            <input type="text" id="activite" placeholder="Intitulé de l'activité" oninput="updateLivePreview()">
+            <div style="display:flex;gap:4px;margin-bottom:4px;"><button type="button" class="format-btn" onclick="toggleFormat('activite', 'bold')" title="Gras"><b>B</b></button><button type="button" class="format-btn" onclick="toggleFormat('activite', 'italic')" title="Italique"><i>I</i></button></div><div id="activite" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Intitulé de l'activité"></div>
           </div>
           <div class="field editable-field-wrap">
             <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier">
               <span class="label-text">Support</span>
               <span class="label-edit-hint">✏️</span>
             </label>
-            <input type="text" id="support" placeholder="Titre / référence support" oninput="updateLivePreview()">
+            <div style="display:flex;gap:4px;margin-bottom:4px;"><button type="button" class="format-btn" onclick="toggleFormat('support', 'bold')" title="Gras"><b>B</b></button><button type="button" class="format-btn" onclick="toggleFormat('support', 'italic')" title="Italique"><i>I</i></button></div><div id="support" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Titre / référence support"></div>
           </div>
         </div>
       </div>
@@ -2098,7 +2176,11 @@ function ajouterEtape(data) {
     <div class="etape-body">
       <div class="field">
         <label>Nom de l'étape <span class="required">*</span></label>
-        <input type="text" id="e${n}-nom" placeholder="Ex : Mise en route, Présentation…" value="${d.nom||''}">
+        <div style="display:flex;gap:4px;margin-bottom:4px;">
+          <button type="button" class="format-btn" onclick="toggleFormat('e${n}-nom', 'bold')" title="Gras"><b>B</b></button>
+          <button type="button" class="format-btn" onclick="toggleFormat('e${n}-nom', 'italic')" title="Italique"><i>I</i></button>
+        </div>
+        <div id="e${n}-nom" contenteditable="true" class="editable-input" data-placeholder="Ex : Mise en route, Présentation…">${d.nom||''}</div>
       </div>
       <div class="field">
         <label>Déroulement de la séance <span class="required">*</span></label>
@@ -2129,10 +2211,12 @@ function ajouterEtape(data) {
 // ═══════════════════════════════════════════════════
 let quillInstances = {};
 
-// Éditeur Quill actif (pour les actions image/tableau)
-let activeQuillWrapper = null;
+// ── Enregistrer les polices personnalisées dans Quill ──
+const QuillFont = Quill.import('formats/font');
+QuillFont.whitelist = ['times','georgia','merriweather','roboto','lato','opensans','courier'];
+Quill.register(QuillFont, true);
 
-// Compteur pour IDs de toolbar uniques
+let activeQuillWrapper = null;
 let toolbarCount = 0;
 
 function initQuillEditor(wrapperId, placeholder = '') {
@@ -2149,26 +2233,44 @@ function initQuillEditor(wrapperId, placeholder = '') {
   wrapper.innerHTML = `
     <div id="${tbId}" class="ql-custom-toolbar-wrap">
       <span class="ql-formats">
-        <select class="ql-size" title="Taille">
-          <option value="small">Petit</option>
-          <option selected>Normal</option>
-          <option value="large">Grand</option>
-          <option value="huge">Très grand</option>
+        <select class="ql-font" title="Police">
+          <option selected value="">Sans-sérif</option>
+          <option value="times">Times Roman</option>
+          <option value="georgia">Georgia</option>
+          <option value="merriweather">Merriweather</option>
+          <option value="roboto">Roboto</option>
+          <option value="lato">Lato</option>
+          <option value="opensans">Open Sans</option>
+          <option value="courier">Courier</option>
         </select>
       </span>
       <span class="ql-formats">
-        <button class="ql-bold" title="Gras"></button>
-        <button class="ql-italic" title="Italique"></button>
+        <select class="ql-header" title="Style d'écriture">
+          <option value="1">Titre 1</option>
+          <option value="2">Titre 2</option>
+          <option value="3">Titre 3</option>
+          <option selected value="">Normal</option>
+        </select>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-custom-size" data-size="small"  title="Petit"     type="button" onclick="appliquerTaille('${wrapperId}','small');  return false;"><span style="font-size:9px;font-weight:700;">A</span></button>
+        <button class="ql-custom-size" data-size=""        title="Normal"    type="button" onclick="appliquerTaille('${wrapperId}','');       return false;"><span style="font-size:12px;font-weight:700;">A</span></button>
+        <button class="ql-custom-size" data-size="large"  title="Grand"     type="button" onclick="appliquerTaille('${wrapperId}','large');  return false;"><span style="font-size:15px;font-weight:700;">A</span></button>
+        <button class="ql-custom-size" data-size="huge"   title="Très grand" type="button" onclick="appliquerTaille('${wrapperId}','huge');   return false;"><span style="font-size:18px;font-weight:700;">A</span></button>
+      </span>
+      <span class="ql-formats">
+        <button class="ql-bold"      title="Gras"></button>
+        <button class="ql-italic"    title="Italique"></button>
         <button class="ql-underline" title="Souligné"></button>
       </span>
       <span class="ql-formats">
         <button class="ql-list" value="ordered" title="Liste numérotée"></button>
-        <button class="ql-list" value="bullet" title="Liste à puces"></button>
+        <button class="ql-list" value="bullet"  title="Liste à puces"></button>
       </span>
       <span class="ql-formats">
-        <button class="ql-custom-image" title="Insérer une image" type="button" onclick="(function(){ activeQuillWrapper='${wrapperId}'; ouvrirSelecteurImage('${wrapperId}'); })(); return false;">🖼</button>
-        <button class="ql-custom-table" title="Insérer un tableau" type="button" onclick="(function(){ activeQuillWrapper='${wrapperId}'; ouvrirModalTableau(); })(); return false;">⊞</button>
-        <button class="ql-custom-symbol" title="Insérer un symbole" type="button" id="sym-btn-${wrapperId}" onclick="(function(btn){ activeQuillWrapper='${wrapperId}'; ouvrirSymbolPicker(btn); })(this); return false;">Ω</button>
+        <button class="ql-custom-image"  title="Insérer une image"   type="button" onclick="(function(){ activeQuillWrapper='${wrapperId}'; ouvrirSelecteurImage('${wrapperId}'); })(); return false;">🖼</button>
+        <button class="ql-custom-table"  title="Insérer un tableau"  type="button" onclick="(function(){ activeQuillWrapper='${wrapperId}'; ouvrirModalTableau(); })(); return false;">⊞</button>
+        <button class="ql-custom-symbol" title="Insérer un symbole"  type="button" id="sym-btn-${wrapperId}" onclick="(function(btn){ activeQuillWrapper='${wrapperId}'; ouvrirSymbolPicker(btn); })(this); return false;">Ω</button>
       </span>
       <span class="ql-formats">
         <button class="ql-clean" title="Effacer le formatage"></button>
@@ -2347,6 +2449,26 @@ function renderSymTab(tabId) {
   body.innerHTML = html;
 }
 
+// ── TAILLE DE POLICE VIA BOUTONS A ──
+function appliquerTaille(wrapperId, size) {
+  const quill = quillInstances[wrapperId];
+  if (!quill) return;
+  const selection = quill.getSelection(true);
+  if (selection && selection.length > 0) {
+    quill.format('size', size || false);
+  } else {
+    quill.format('size', size || false);
+  }
+  // Feedback visuel : marquer le bouton actif
+  const wrapper = document.getElementById(wrapperId);
+  if (wrapper) {
+    wrapper.querySelectorAll('.ql-custom-size').forEach(btn => {
+      btn.style.background = btn.dataset.size === size ? '#E3F2FD' : '';
+      btn.style.borderColor = btn.dataset.size === size ? '#1565C0' : '';
+    });
+  }
+}
+
 function ouvrirSymbolPicker(btnEl) {
   const picker = document.getElementById('symbol-picker');
   const isOpen = picker.classList.contains('show');
@@ -2423,8 +2545,8 @@ function insererSymbole(encodedSym) {
 }
 
 function insererTableauQuill() {
-  const cols  = Math.max(1, Math.min(10, parseInt(document.getElementById('tbl-cols').value) || 3));
-  const rows  = Math.max(1, Math.min(20, parseInt(document.getElementById('tbl-rows').value) || 3));
+  const cols   = Math.max(1, Math.min(10, parseInt(document.getElementById('tbl-cols').value)  || 3));
+  const rows   = Math.max(1, Math.min(20, parseInt(document.getElementById('tbl-rows').value)  || 3));
   const header = document.getElementById('tbl-header').checked;
 
   const quill = quillInstances[activeQuillWrapper];
@@ -2436,9 +2558,9 @@ function insererTableauQuill() {
     html += '<tr>';
     for (let c = 0; c < cols; c++) {
       if (r === 0 && header) {
-        html += `<th contenteditable="true">En-tête ${c+1}</th>`;
+        html += '<th style="border:1.5px solid #1565C0;padding:5px 8px;background:#E3F2FD;font-weight:700;text-align:center;">En-tête ' + (c+1) + '</th>';
       } else {
-        html += `<td contenteditable="true">&nbsp;</td>`;
+        html += '<td style="border:1.5px solid #1565C0;padding:5px 8px;min-width:50px;">&nbsp;</td>';
       }
     }
     html += '</tr>';
@@ -2448,7 +2570,6 @@ function insererTableauQuill() {
   // Insérer à la position courante
   const range = quill.getSelection(true);
   const index = range ? range.index : quill.getLength();
-  // Utiliser clipboard.dangerouslyPasteHTML pour insérer du HTML complexe
   quill.clipboard.dangerouslyPasteHTML(index, html, Quill.sources.USER);
   quill.setSelection(index + 1, Quill.sources.SILENT);
 
@@ -2877,7 +2998,7 @@ function collecterEtapes() {
   const etapes = [];
   document.querySelectorAll('.etape-card').forEach(card => {
     const id = card.id.replace('etape-', '');
-    const nom = (document.getElementById('e'+id+'-nom')?.value || '').trim();
+    const nom = (document.getElementById('e'+id+'-nom')?.innerHTML || '').trim();
     const enseignantHTML = getQuillHTML('e'+id+'-enseignant-wrapper');
     const enseignant = getQuillText('e'+id+'-enseignant-wrapper');
     const duree = (document.getElementById('e'+id+'-duree')?.value || '').trim();
@@ -3214,18 +3335,40 @@ function getFixedLabel(groupId, index) {
   return labels[index] ? labels[index].textContent.trim() : '';
 }
 
+// ═══════════════════════════════════════════════════
+// FORMATAGE GRAS ET ITALIQUE POUR LES CHAMPS CONTENTEDITABLE
+// ═══════════════════════════════════════════════════
+function toggleFormat(fieldId, format) {
+  const field = document.getElementById(fieldId);
+  if (!field) return;
+  
+  field.focus();
+  
+  if (format === 'bold') {
+    document.execCommand('bold', false, null);
+  } else if (format === 'italic') {
+    document.execCommand('italic', false, null);
+  }
+  
+  // Déclencher la mise à jour de l'aperçu
+  updateLivePreview();
+}
+
+// ═══════════════════════════════════════════════════
+// COLLECTE DES DONNÉES
+// ═══════════════════════════════════════════════════
 function collecterEntete() {
   const objectifHTML = getQuillHTML('objectif-wrapper');
   const objectifText = getQuillText('objectif-wrapper');
   
   return {
-    // Valeurs
-    prof:       document.getElementById('prof')?.value.trim() || 'EZ-ZAKY AZIZ',
-    niveau:     document.getElementById('niveau')?.value.trim() || '',
-    module:     document.getElementById('module')?.value.trim() || '',
-    sequence:   document.getElementById('sequence')?.value.trim() || '',
-    activite:   document.getElementById('activite')?.value.trim() || '',
-    support:    document.getElementById('support')?.value.trim() || '',
+    // Valeurs récupérées depuis les champs contenteditable (avec HTML pour le formatage)
+    prof:       document.getElementById('prof')?.innerHTML.trim() || 'EZ-ZAKY AZIZ',
+    niveau:     document.getElementById('niveau')?.innerHTML.trim() || '',
+    module:     document.getElementById('module')?.innerHTML.trim() || '',
+    sequence:   document.getElementById('sequence')?.innerHTML.trim() || '',
+    activite:   document.getElementById('activite')?.innerHTML.trim() || '',
+    support:    document.getElementById('support')?.innerHTML.trim() || '',
     objectif:   objectifHTML || objectifText || '',
     // Labels personnalisés
     labelProf:      getFixedLabel('fgrp-ligne1', 0)     || 'PROF',
@@ -3579,13 +3722,10 @@ function htmlToRichSegments(html) {
   const segments = [];
 
   // Tailles Quill → points PDF (base 9 pt)
-  const quillSizeMap = {
-    'small': 7.5,
-    'large': 12,
-    'huge': 15
-  };
+  const quillSizeMap = { 'small': 7.5, 'large': 12, 'huge': 15 };
+  // Headers → taille et gras
+  const headerSizeMap = { '1': 16, '2': 13, '3': 11 };
 
-  // Traversée récursive avec héritage de styles
   function walk(node, ctx) {
     if (node.nodeType === Node.TEXT_NODE) {
       const text = node.textContent;
@@ -3596,6 +3736,7 @@ function htmlToRichSegments(html) {
           italic: ctx.italic,
           underline: ctx.underline,
           fontSize: ctx.fontSize,
+          font: ctx.font || null,
           prefix: ctx.prefix || ''
         });
       }
@@ -3604,7 +3745,6 @@ function htmlToRichSegments(html) {
     if (node.nodeType !== Node.ELEMENT_NODE) return;
     const tag = node.tagName.toLowerCase();
 
-    // Copier le contexte et enrichir
     let c = Object.assign({}, ctx);
     c.prefix = '';
 
@@ -3612,63 +3752,80 @@ function htmlToRichSegments(html) {
     if (tag === 'em' || tag === 'i') c.italic = true;
     if (tag === 'u') c.underline = true;
 
-    // Classes Quill pour taille
+    // Headers h1/h2/h3
+    if (tag === 'h1') { c.bold = true; c.fontSize = headerSizeMap['1']; }
+    if (tag === 'h2') { c.bold = true; c.fontSize = headerSizeMap['2']; }
+    if (tag === 'h3') { c.bold = true; c.fontSize = headerSizeMap['3']; }
+
+    // Taille via classe ql-size
     if (node.classList) {
       if (node.classList.contains('ql-size-small'))  c.fontSize = quillSizeMap['small'];
       if (node.classList.contains('ql-size-large'))  c.fontSize = quillSizeMap['large'];
       if (node.classList.contains('ql-size-huge'))   c.fontSize = quillSizeMap['huge'];
+      // Police
+      if (node.classList.contains('ql-font-times'))        c.font = 'times';
+      if (node.classList.contains('ql-font-georgia'))      c.font = 'times'; // approx serif
+      if (node.classList.contains('ql-font-merriweather')) c.font = 'times';
+      if (node.classList.contains('ql-font-roboto'))       c.font = 'helvetica';
+      if (node.classList.contains('ql-font-lato'))         c.font = 'helvetica';
+      if (node.classList.contains('ql-font-opensans'))     c.font = 'helvetica';
+      if (node.classList.contains('ql-font-courier'))      c.font = 'courier';
     }
-
-    // Style inline font-size
+    // Taille via attribut data-size (Quill v2)
+    if (node.dataset && node.dataset.size) {
+      c.fontSize = quillSizeMap[node.dataset.size] || c.fontSize;
+    }
+    // Taille via style inline
     if (node.style && node.style.fontSize) {
       const fs = parseFloat(node.style.fontSize);
-      if (!isNaN(fs)) c.fontSize = fs * 0.75; // px → pt approx
+      if (!isNaN(fs)) c.fontSize = fs * 0.75;
     }
 
-    // Listes : ajouter préfixe sur chaque li
-    if (tag === 'ol') {
-      let idx = 1;
+    // ── LISTES Quill v2 : <ol> contient des <li data-list="bullet|ordered"> ──
+    if (tag === 'ol' || tag === 'ul') {
+      let orderedIdx = 1;
       Array.from(node.children).forEach(li => {
-        let liCtx = Object.assign({}, c, { prefix: idx + '. ' });
-        idx++;
-        segments.push({ text: liCtx.prefix, bold: liCtx.bold, italic: liCtx.italic, underline: liCtx.underline, fontSize: liCtx.fontSize, prefix: '', listStart: true });
-        Array.from(li.childNodes).forEach(ch => walk(ch, Object.assign({}, liCtx, { prefix: '' })));
+        const dataList = li.getAttribute('data-list') || (tag === 'ol' ? 'ordered' : 'bullet');
+        const isOrdered = dataList === 'ordered';
+        const prefix = isOrdered ? (orderedIdx++) + '. ' : '• ';
+        let liCtx = Object.assign({}, c, { prefix: '' });
+        segments.push({ text: prefix, bold: liCtx.bold, italic: liCtx.italic, underline: liCtx.underline, fontSize: liCtx.fontSize, prefix: '', listStart: true });
+        Array.from(li.childNodes).forEach(ch => walk(ch, liCtx));
         segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: liCtx.fontSize, prefix: '' });
       });
       return;
     }
-    if (tag === 'ul') {
-      Array.from(node.children).forEach(li => {
-        let liCtx = Object.assign({}, c, { prefix: '- ' });
-        segments.push({ text: liCtx.prefix, bold: liCtx.bold, italic: liCtx.italic, underline: liCtx.underline, fontSize: liCtx.fontSize, prefix: '', listStart: true });
-        Array.from(li.childNodes).forEach(ch => walk(ch, Object.assign({}, liCtx, { prefix: '' })));
-        segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: liCtx.fontSize, prefix: '' });
-      });
-      return;
-    }
-    if (tag === 'br') {
-      segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize, prefix: '' });
-      return;
-    }
-    if (tag === 'p') {
+    // Li isolé (hors ol/ul)
+    if (tag === 'li') {
+      const dataList = node.getAttribute('data-list') || 'bullet';
+      const prefix = dataList === 'ordered' ? '1. ' : '• ';
+      segments.push({ text: prefix, bold: c.bold, italic: c.italic, underline: c.underline, fontSize: c.fontSize, prefix: '', listStart: true });
       Array.from(node.childNodes).forEach(ch => walk(ch, c));
       segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize, prefix: '' });
       return;
     }
-    // ── Image base64 ──
+
+    if (tag === 'br') {
+      segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize, prefix: '' });
+      return;
+    }
+    if (tag === 'p' || tag === 'h1' || tag === 'h2' || tag === 'h3') {
+      Array.from(node.childNodes).forEach(ch => walk(ch, c));
+      segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize, prefix: '' });
+      return;
+    }
+    // Image base64
     if (tag === 'img') {
       const src = node.getAttribute('src') || '';
       if (src.startsWith('data:image')) {
-        segments.push({ type: 'image', src: src, prefix: '' });
-        segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize, prefix: '' });
+        segments.push({ type: 'image', src: src, w: node.naturalWidth || 0, h: node.naturalHeight || 0 });
       }
       return;
     }
-    // ── Tableau HTML ──
+    // Tableau HTML
     if (tag === 'table') {
       const tableData = [];
-      const rows = node.querySelectorAll('tr');
-      rows.forEach(tr => {
+      node.querySelectorAll('tr').forEach(tr => {
         const rowData = [];
         tr.querySelectorAll('td, th').forEach(cell => {
           rowData.push({
@@ -3684,14 +3841,13 @@ function htmlToRichSegments(html) {
       }
       return;
     }
-
     Array.from(node.childNodes).forEach(ch => walk(ch, c));
   }
 
   const baseCtx = { bold: false, italic: false, underline: false, fontSize: null, prefix: '' };
   Array.from(temp.childNodes).forEach(n => walk(n, baseCtx));
 
-  // Nettoyer : supprimer les \n finaux
+  // Nettoyer les \n finaux
   while (segments.length && segments[segments.length-1].text === '\n') segments.pop();
 
   return segments;
@@ -3761,17 +3917,179 @@ function genererPDF() {
   }
 
   // Dessine un rect blanc avec bordure bleue (zone de saisie remplie ou vide)
+  // Fonction pour dessiner du texte avec formatage HTML (gras, italique)
+  function drawFormattedText(htmlText, x, y, maxWidth, fontSize) {
+    if (!htmlText) return;
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlText;
+    
+    let currentX = x;
+    const currentY = y;
+    
+    function processNode(node, isBold, isItalic) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = normaliserTexte(node.textContent);
+        if (text) {
+          if (isBold && isItalic) {
+            doc.setFont('times', 'bolditalic');
+          } else if (isBold) {
+            doc.setFont('times', 'bold');
+          } else if (isItalic) {
+            doc.setFont('times', 'italic');
+          } else {
+            doc.setFont('times', 'normal');
+          }
+          
+          doc.setTextColor(0, 0, 0);
+          doc.setFontSize(fontSize);
+          doc.text(text, currentX, currentY);
+          currentX += doc.getTextWidth(text);
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const tagName = node.tagName.toLowerCase();
+        const bold = isBold || tagName === 'b' || tagName === 'strong';
+        const italic = isItalic || tagName === 'i' || tagName === 'em';
+        
+        Array.from(node.childNodes).forEach(child => {
+          processNode(child, bold, italic);
+        });
+      }
+    }
+    
+    Array.from(tempDiv.childNodes).forEach(child => {
+      processNode(child, false, false);
+    });
+    
+    doc.setFont('times', 'normal');
+  }
+
+  // Fonction pour dessiner du texte centré avec formatage HTML
+  function drawFormattedTextCentered(htmlText, centerX, y, maxWidth, fontSize, color) {
+    if (!htmlText) return;
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlText;
+    
+    let totalWidth = 0;
+    const segments = [];
+    
+    function measureNode(node, isBold, isItalic) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = normaliserTexte(node.textContent);
+        if (text) {
+          if (isBold && isItalic) {
+            doc.setFont('times', 'bolditalic');
+          } else if (isBold) {
+            doc.setFont('times', 'bold');
+          } else if (isItalic) {
+            doc.setFont('times', 'italic');
+          } else {
+            doc.setFont('times', 'normal');
+          }
+          doc.setFontSize(fontSize);
+          const width = doc.getTextWidth(text);
+          segments.push({ text, bold: isBold, italic: isItalic, width });
+          totalWidth += width;
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const tagName = node.tagName.toLowerCase();
+        const bold = isBold || tagName === 'b' || tagName === 'strong';
+        const italic = isItalic || tagName === 'i' || tagName === 'em';
+        Array.from(node.childNodes).forEach(child => measureNode(child, bold, italic));
+      }
+    }
+    
+    Array.from(tempDiv.childNodes).forEach(child => measureNode(child, false, false));
+    
+    let currentX = centerX - totalWidth / 2;
+    segments.forEach(seg => {
+      if (seg.bold && seg.italic) {
+        doc.setFont('times', 'bolditalic');
+      } else if (seg.bold) {
+        doc.setFont('times', 'bold');
+      } else if (seg.italic) {
+        doc.setFont('times', 'italic');
+      } else {
+        doc.setFont('times', 'normal');
+      }
+      doc.setTextColor(color[0], color[1], color[2]);
+      doc.setFontSize(fontSize);
+      doc.text(seg.text, currentX, y);
+      currentX += seg.width;
+    });
+    
+    doc.setFont('times', 'normal');
+  }
+
+  // Fonction pour dessiner du texte blanc avec formatage HTML et limite de largeur
+  function drawFormattedTextWhite(htmlText, x, y, maxWidth, fontSize) {
+    if (!htmlText) return;
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlText;
+    
+    let currentX = x;
+    const currentY = y;
+    
+    function processNode(node, isBold, isItalic) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = normaliserTexte(node.textContent);
+        if (text) {
+          if (isBold && isItalic) {
+            doc.setFont('times', 'bolditalic');
+          } else if (isBold) {
+            doc.setFont('times', 'bold');
+          } else if (isItalic) {
+            doc.setFont('times', 'italic');
+          } else {
+            doc.setFont('times', 'normal');
+          }
+          
+          doc.setTextColor(255, 255, 255);
+          doc.setFontSize(fontSize);
+          
+          const textWidth = doc.getTextWidth(text);
+          const remainingWidth = maxWidth - (currentX - x);
+          
+          if (textWidth > remainingWidth && remainingWidth > 0) {
+            let truncated = text;
+            while (doc.getTextWidth(truncated + '...') > remainingWidth && truncated.length > 0) {
+              truncated = truncated.slice(0, -1);
+            }
+            doc.text(truncated + '...', currentX, currentY);
+            currentX += doc.getTextWidth(truncated + '...');
+            return;
+          } else {
+            doc.text(text, currentX, currentY);
+            currentX += textWidth;
+          }
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const tagName = node.tagName.toLowerCase();
+        const bold = isBold || tagName === 'b' || tagName === 'strong';
+        const italic = isItalic || tagName === 'i' || tagName === 'em';
+        
+        Array.from(node.childNodes).forEach(child => {
+          processNode(child, bold, italic);
+        });
+      }
+    }
+    
+    Array.from(tempDiv.childNodes).forEach(child => {
+      processNode(child, false, false);
+    });
+    
+    doc.setFont('times', 'normal');
+  }
+
   function drawInputBox(x, y, w, h, text, fontSize) {
     doc.setFillColor(255,255,255);
     setBlueStroke(0.5);
     doc.rect(x, y, w, h, 'FD');
     if (text) {
-      const safeText = normaliserTexte(text);
-      doc.setTextColor(0,0,0);
-      doc.setFontSize(fontSize || P.fontEnteteContent);
-      doc.setFont('times','normal');
-      const lines = doc.splitTextToSize(safeText, w - 4);
-      doc.text(lines, x + 2, y + (fontSize || P.fontEnteteContent) * 0.85 + 1);
+      // Parser le HTML pour extraire le formatage
+      drawFormattedText(text, x + 2, y + (fontSize || P.fontEnteteContent) * 0.85 + 1, w - 4, fontSize || P.fontEnteteContent);
     }
   }
 
@@ -3823,8 +4141,9 @@ function genererPDF() {
       }
       const fs = seg.fontSize || baseFontSize;
       const fontStyle = seg.bold && seg.italic ? 'bolditalic' : seg.bold ? 'bold' : seg.italic ? 'italic' : 'normal';
+      const fontFace = seg.font || 'times';
       doc.setFontSize(fs);
-      doc.setFont('times', fontStyle);
+      doc.setFont(fontFace, fontStyle);
 
       const words = seg.text.split(/(\s+)/);
       words.forEach(word => {
@@ -3833,7 +4152,7 @@ function genererPDF() {
         if (pendingLineW + wW > maxW && pendingLine.length > 0 && word.trim() !== '') {
           flushPendingLine();
         }
-        pendingLine.push({ word, bold: seg.bold, italic: seg.italic, underline: seg.underline, fontSize: fs });
+        pendingLine.push({ word, bold: seg.bold, italic: seg.italic, underline: seg.underline, fontSize: fs, font: seg.font || 'times' });
         pendingLineW += wW;
       });
     });
@@ -3846,8 +4165,9 @@ function genererPDF() {
         block.items.forEach(item => {
           const fs = item.fontSize || baseFontSize;
           const fontStyle = item.bold && item.italic ? 'bolditalic' : item.bold ? 'bold' : item.italic ? 'italic' : 'normal';
+          const fontFace = item.font || 'times';
           doc.setFontSize(fs);
-          doc.setFont('times', fontStyle);
+          doc.setFont(fontFace, fontStyle);
           if (defaultColor) doc.setTextColor(...defaultColor);
           else doc.setTextColor(0, 0, 0);
           const safeWord = normaliserTexte(item.word);
@@ -4025,9 +4345,13 @@ function genererPDF() {
   doc.line(sep2, hy, sep2, hy+L1H);
   // Titre centré à gauche
   drawTextWhite('FICHE PEDAGOGIQUE', M+5, hy + L1H*0.65, P.fontEnteteLabel, true);
-  // Prof label + valeur
+  // Prof label + valeur avec formatage HTML
   const profLabel = normaliserTexte(entete.labelProf || 'PROF');
-  drawTextWhite(profLabel + ' : ' + entete.prof, sep1+5, hy + L1H*0.65, P.fontEnteteLabel, true);
+  drawTextWhite(profLabel + ' : ', sep1+5, hy + L1H*0.65, P.fontEnteteLabel, true);
+  const profLabelW = doc.getTextWidth(profLabel + ' : ');
+  // Dessiner la valeur du prof avec formatage HTML (limité en largeur)
+  const profValueMaxW = sep2 - (sep1 + 5 + profLabelW + 5);
+  drawFormattedTextWhite(entete.prof, sep1 + 5 + profLabelW, hy + L1H*0.65, profValueMaxW, P.fontEnteteLabel);
   // Niveau label
   const niveauLabel = normaliserTexte(entete.labelNiveau || 'NIVEAU');
   drawTextWhite(niveauLabel + ' :', sep2+5, hy + L1H*0.65, P.fontEnteteLabel, true);
@@ -4056,11 +4380,15 @@ function genererPDF() {
   hy += L234H;
 
   // ── Ligne 4 (activité + support) — hauteur dynamique
+  // Calculer la hauteur nécessaire pour le support en tenant compte du formatage HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = entete.support || '';
+  const supportPlainText = tempDiv.textContent || tempDiv.innerText || '';
+  
   doc.setFontSize(P.fontEnteteContent);
   doc.setFont('times','normal');
-  const supportSafe = normaliserTexte(entete.support || '');
   const supportBoxW = endX - (sep2+50) - 4;
-  const supportLines = supportSafe ? doc.splitTextToSize(supportSafe, supportBoxW - 4) : [];
+  const supportLines = supportPlainText ? doc.splitTextToSize(supportPlainText, supportBoxW - 4) : [];
   const supportLineH = P.fontEnteteContent * 1.4;
   const supportNeededH = Math.max(L234H, supportLines.length * supportLineH + 8);
   const hyL4 = hy;
@@ -4079,11 +4407,8 @@ function genererPDF() {
   doc.setFillColor(255,255,255);
   setBlueStroke(0.5);
   doc.rect(sep2+50, hyL4+3, supportBoxW, supportNeededH-6, 'FD');
-  if (supportLines.length > 0) {
-    doc.setTextColor(0,0,0);
-    doc.setFontSize(P.fontEnteteContent);
-    doc.setFont('times','normal');
-    doc.text(supportLines, sep2+52, hyL4 + P.fontEnteteContent * 0.85 + 4);
+  if (entete.support) {
+    drawFormattedText(entete.support, sep2+52, hyL4 + P.fontEnteteContent * 0.85 + 4, supportBoxW - 4, P.fontEnteteContent);
   }
   hy += supportNeededH;
 
@@ -4270,18 +4595,25 @@ function genererPDF() {
     doc.setFillColor(255,255,255);
     doc.rect(M, ty, UW, blockHeight, 'F');
 
-    // Texte col 0 : étape (centré verticalement, gras)
+    // Texte col 0 : étape (centré verticalement, avec formatage HTML)
     doc.setFontSize(P.fontTableContent);
-    doc.setFont('times','bold');
     doc.setTextColor(er, eg, eb);
     const etapeY = blockStart + blockHeight/2 + P.fontTableContent*0.35;
-    const etapeNomLines = wrapText(etape.nom, w0, P.fontTableContent);
+    
+    // Parser le HTML du nom de l'étape pour extraire texte simple (pour le wrapping)
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = etape.nom || '';
+    const plainText = tempDiv.textContent || tempDiv.innerText || '';
+    const etapeNomLines = wrapText(plainText, w0, P.fontTableContent);
+    
     const lineHeight = P.fontTableContent * 1.3;
     if (etapeNomLines.length === 1) {
-      doc.setFont('times','bold');
-      doc.text(normaliserTexte(etape.nom), M + w0/2, etapeY, {align:'center'});
+      // Une seule ligne - dessiner avec formatage HTML centré
+      drawFormattedTextCentered(etape.nom, M + w0/2, etapeY, w0, P.fontTableContent, [er, eg, eb]);
     } else {
+      // Multi-lignes - dessiner chaque ligne (sans HTML pour simplifier)
       const startY = blockStart + blockHeight/2 - (etapeNomLines.length * lineHeight)/2 + P.fontTableContent*0.85;
+      doc.setFont('times','bold');
       etapeNomLines.forEach((l, li) => {
         doc.text(l, M + w0/2, startY + li*lineHeight, {align:'center'});
       });
@@ -4696,11 +5028,126 @@ function genererDOCX() {
     </w:tc>`;
   }
 
+  // Cellule avec support du formatage HTML (gras/italique)
+  function cellWithFormat(htmlText, colored, w, center) {
+    const fill  = colored ? rawColor : 'FFFFFF';
+    const tClr  = colored ? 'FFFFFF' : '000000';
+    const jc    = center  ? '<w:jc w:val="center"/>' : '';
+    
+    const temp = document.createElement('div');
+    temp.innerHTML = htmlText || '';
+    
+    let runs = '';
+    
+    function processNode(node, isBold, isItalic) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent;
+        if (text) {
+          runs += `<w:r>
+            <w:rPr>
+              ${isBold ? '<w:b/>' : ''}
+              ${isItalic ? '<w:i/>' : ''}
+              <w:color w:val="${tClr}"/>
+              <w:sz w:val="18"/><w:szCs w:val="18"/>
+            </w:rPr>
+            <w:t xml:space="preserve">${x(text)}</w:t>
+          </w:r>`;
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const tag = node.tagName.toLowerCase();
+        const bold = isBold || tag === 'b' || tag === 'strong';
+        const italic = isItalic || tag === 'i' || tag === 'em';
+        
+        Array.from(node.childNodes).forEach(child => {
+          processNode(child, bold, italic);
+        });
+      }
+    }
+    
+    Array.from(temp.childNodes).forEach(child => {
+      processNode(child, false, false);
+    });
+    
+    if (!runs) {
+      runs = `<w:r>
+        <w:rPr>
+          <w:color w:val="${tClr}"/>
+          <w:sz w:val="18"/><w:szCs w:val="18"/>
+        </w:rPr>
+        <w:t xml:space="preserve"></w:t>
+      </w:r>`;
+    }
+    
+    return `<w:tc>
+      <w:tcPr>
+        <w:tcW w:w="${w}" w:type="dxa"/>
+        <w:shd w:val="clear" w:color="auto" w:fill="${fill}"/>
+        ${BDR(rawColor)}
+        ${CELL_MAR}
+      </w:tcPr>
+      <w:p>
+        <w:pPr><w:spacing w:before="40" w:after="40"/>${jc}</w:pPr>
+        ${runs}
+      </w:p>
+    </w:tc>`;
+  }
+
   // ── Convertit HTML Quill → paragraphes OpenXML ──
   // CORRECTION COMPLÈTE: Parser le HTML Quill pour extraire texte, images ET tableaux
   // Collecteur global d'images pour les ajouter au ZIP
   let docxImages = [];
   let docxImageCounter = 0;
+  
+  // Fonction helper pour convertir HTML en runs Word avec couleur personnalisée et gras par défaut
+  function htmlToRunsWithColor(htmlText, color) {
+    const temp = document.createElement('div');
+    temp.innerHTML = htmlText || '';
+    
+    let runs = '';
+    
+    function processNode(node, isBold, isItalic) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent;
+        if (text) {
+          runs += `<w:r>
+            <w:rPr>
+              <w:b/>
+              ${isBold ? '<w:b/>' : ''}
+              ${isItalic ? '<w:i/>' : ''}
+              <w:color w:val="${color}"/>
+              <w:sz w:val="18"/><w:szCs w:val="18"/>
+            </w:rPr>
+            <w:t>${x(text)}</w:t>
+          </w:r>`;
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const tag = node.tagName.toLowerCase();
+        const bold = isBold || tag === 'b' || tag === 'strong';
+        const italic = isItalic || tag === 'i' || tag === 'em';
+        
+        Array.from(node.childNodes).forEach(child => {
+          processNode(child, bold, italic);
+        });
+      }
+    }
+    
+    Array.from(temp.childNodes).forEach(child => {
+      processNode(child, false, false);
+    });
+    
+    if (!runs) {
+      runs = `<w:r>
+        <w:rPr>
+          <w:b/>
+          <w:color w:val="${color}"/>
+          <w:sz w:val="18"/><w:szCs w:val="18"/>
+        </w:rPr>
+        <w:t></w:t>
+      </w:r>`;
+    }
+    
+    return runs;
+  }
   
   function htmlToWParagraphs(html, fontSize) {
     if (!html) return `<w:p><w:pPr><w:spacing w:before="40" w:after="40"/></w:pPr></w:p>`;
@@ -4866,17 +5313,20 @@ function genererDOCX() {
       // TEXTE
       if (seg.text) {
         if (seg.text === '\n') {
-          // Nouveau paragraphe
           if (currentParagraph.length > 0) {
             output += `<w:p><w:pPr><w:spacing w:before="0" w:after="30"/></w:pPr>${currentParagraph.join('')}</w:p>`;
             currentParagraph = [];
           }
         } else {
-          // Ajouter le run au paragraphe courant
           const txt = x(seg.text);
           if (txt) {
             const segFs = seg.fontSize || fs;
-            currentParagraph.push(`<w:r><w:rPr>${seg.bold?'<w:b/><w:bCs/>':''}${seg.italic?'<w:i/><w:iCs/>':''}${seg.underline?'<w:u w:val="single"/>':''}<w:sz w:val="${segFs}"/><w:szCs w:val="${segFs}"/></w:rPr><w:t xml:space="preserve">${txt}</w:t></w:r>`);
+            if (seg.listStart && currentParagraph.length > 0) {
+              output += `<w:p><w:pPr><w:spacing w:before="0" w:after="30"/></w:pPr>${currentParagraph.join('')}</w:p>`;
+              currentParagraph = [];
+            }
+            const fontXml = seg.font ? `<w:rFonts w:ascii="${seg.font}" w:hAnsi="${seg.font}" w:cs="${seg.font}"/>` : '';
+            currentParagraph.push(`<w:r><w:rPr>${fontXml}${seg.bold?'<w:b/><w:bCs/>':''}${seg.italic?'<w:i/><w:iCs/>':''}${seg.underline?'<w:u w:val="single"/>':''}<w:sz w:val="${segFs}"/><w:szCs w:val="${segFs}"/></w:rPr><w:t xml:space="preserve">${txt}</w:t></w:r>`);
           }
         }
       }
@@ -4896,45 +5346,77 @@ function genererDOCX() {
     const temp = document.createElement('div');
     temp.innerHTML = html;
     const segments = [];
-    
+
+    const quillSizeMap = { 'small': 14, 'large': 24, 'huge': 30 }; // demi-points Word
+    const headerSizeMap = { '1': 32, '2': 26, '3': 22 }; // demi-points Word
+
     function walk(node, ctx) {
       if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent;
-        if (text) {
-          segments.push({
-            text: text,
-            bold: ctx.bold,
-            italic: ctx.italic,
-            underline: ctx.underline,
-            fontSize: ctx.fontSize
-          });
-        }
+        if (text) segments.push({ text, bold: ctx.bold, italic: ctx.italic, underline: ctx.underline, fontSize: ctx.fontSize, isHeader: ctx.isHeader, font: ctx.font || null });
         return;
       }
       if (node.nodeType !== Node.ELEMENT_NODE) return;
       const tag = node.tagName.toLowerCase();
-      
       let c = Object.assign({}, ctx);
-      
+
       if (tag === 'strong' || tag === 'b') c.bold = true;
-      if (tag === 'em' || tag === 'i') c.italic = true;
+      if (tag === 'em'     || tag === 'i') c.italic = true;
       if (tag === 'u') c.underline = true;
-      
+
+      // Headers
+      if (tag === 'h1') { c.bold = true; c.fontSize = headerSizeMap['1']; c.isHeader = true; }
+      if (tag === 'h2') { c.bold = true; c.fontSize = headerSizeMap['2']; c.isHeader = true; }
+      if (tag === 'h3') { c.bold = true; c.fontSize = headerSizeMap['3']; c.isHeader = true; }
+
+      // Taille via classe ql-size
+      if (node.classList) {
+        if (node.classList.contains('ql-size-small')) c.fontSize = quillSizeMap['small'];
+        if (node.classList.contains('ql-size-large')) c.fontSize = quillSizeMap['large'];
+        if (node.classList.contains('ql-size-huge'))  c.fontSize = quillSizeMap['huge'];
+        // Police
+        if (node.classList.contains('ql-font-times'))        c.font = 'Times New Roman';
+        if (node.classList.contains('ql-font-georgia'))      c.font = 'Georgia';
+        if (node.classList.contains('ql-font-merriweather')) c.font = 'Merriweather';
+        if (node.classList.contains('ql-font-roboto'))       c.font = 'Roboto';
+        if (node.classList.contains('ql-font-lato'))         c.font = 'Lato';
+        if (node.classList.contains('ql-font-opensans'))     c.font = 'Open Sans';
+        if (node.classList.contains('ql-font-courier'))      c.font = 'Courier New';
+      }
+
       if (tag === 'br') {
         segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize });
         return;
       }
-      if (tag === 'p') {
+      if (tag === 'p' || tag === 'h1' || tag === 'h2' || tag === 'h3') {
         Array.from(node.childNodes).forEach(ch => walk(ch, c));
         segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize });
         return;
       }
+
+      // ── LISTES Quill v2 : <ol> avec <li data-list="ordered|bullet"> ──
+      if (tag === 'ol' || tag === 'ul') {
+        let orderedIdx = 1;
+        Array.from(node.children).forEach(li => {
+          const dataList = li.getAttribute('data-list') || (tag === 'ol' ? 'ordered' : 'bullet');
+          const isOrdered = dataList === 'ordered';
+          const prefix = isOrdered ? (orderedIdx++) + '. ' : '• ';
+          segments.push({ text: prefix, bold: c.bold, italic: c.italic, underline: c.underline, fontSize: c.fontSize, listStart: true, isOrdered });
+          Array.from(li.childNodes).forEach(ch => walk(ch, c));
+          segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize });
+        });
+        return;
+      }
+      // Li isolé
       if (tag === 'li') {
-        segments.push({ text: '- ', bold: c.bold, italic: c.italic, underline: c.underline, fontSize: c.fontSize });
+        const dataList = node.getAttribute('data-list') || 'bullet';
+        const isOrdered = dataList === 'ordered';
+        segments.push({ text: isOrdered ? '1. ' : '• ', bold: c.bold, italic: c.italic, underline: c.underline, fontSize: c.fontSize, listStart: true, isOrdered });
         Array.from(node.childNodes).forEach(ch => walk(ch, c));
         segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize });
         return;
       }
+
       if (tag === 'img') {
         const src = node.getAttribute('src') || '';
         if (src.startsWith('data:image')) {
@@ -4945,33 +5427,25 @@ function genererDOCX() {
       }
       if (tag === 'table') {
         const tableData = [];
-        const rows = node.querySelectorAll('tr');
-        rows.forEach(tr => {
+        node.querySelectorAll('tr').forEach(tr => {
           const rowData = [];
           tr.querySelectorAll('td, th').forEach(cell => {
-            rowData.push({
-              text: cell.textContent.trim(),
-              isHeader: cell.tagName.toLowerCase() === 'th'
-            });
+            rowData.push({ text: cell.textContent.trim(), isHeader: cell.tagName.toLowerCase() === 'th' });
           });
           if (rowData.length > 0) tableData.push(rowData);
         });
         if (tableData.length > 0) {
-          segments.push({ type: 'table', tableData: tableData });
+          segments.push({ type: 'table', tableData });
           segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize });
         }
         return;
       }
-      
       Array.from(node.childNodes).forEach(ch => walk(ch, c));
     }
-    
-    const baseCtx = { bold: false, italic: false, underline: false, fontSize: null };
+
+    const baseCtx = { bold: false, italic: false, underline: false, fontSize: null, isHeader: false };
     Array.from(temp.childNodes).forEach(n => walk(n, baseCtx));
-    
-    // Nettoyer les \n finaux
     while (segments.length && segments[segments.length-1].text === '\n') segments.pop();
-    
     return segments;
   }
 
@@ -4980,7 +5454,7 @@ function genererDOCX() {
   docxImageCounter = 0;
 
   // Ligne simple : [LABEL | valeur pleine largeur]
-  const rowFull = (lbl, val) => `<w:tr>${cell(lbl,true,true,LBL_W,false,false)}${cell(val,false,false,VAL_W,false,false)}</w:tr>`;
+  const rowFull = (lbl, val) => `<w:tr>${cell(lbl,true,true,LBL_W,false,false)}${cellWithFormat(val,false,VAL_W,false)}</w:tr>`;
 
   // Ligne simple avec valeur HTML riche (objectif)
   const rowFullRich = (lbl, htmlVal) => `<w:tr>
@@ -4998,9 +5472,9 @@ function genererDOCX() {
   // Ligne double : [LABEL | val | LABEL | val]
   const rowDbl  = (l1,v1,l2,v2) => `<w:tr>
     ${cell(l1,true,true,LBL2_W,false,false)}
-    ${cell(v1,false,false,VAL2_W,false,false)}
+    ${cellWithFormat(v1,false,VAL2_W,false)}
     ${cell(l2,true,true,LBL2_W,false,false)}
-    ${cell(v2,false,false,VAL2_W,false,false)}
+    ${cellWithFormat(v2,false,VAL2_W,false)}
   </w:tr>`;
 
   // Lignes libres
@@ -5037,10 +5511,10 @@ function genererDOCX() {
   // Tableau en-tête
   const enteteTable = `<w:tbl>
     ${TBL_PR()}
-    ${rowDbl(x(entete.labelProf||'PROF'), x(entete.prof||''), x(entete.labelNiveau||'NIVEAU'), x(entete.niveau||''))}
-    ${rowFull(x(entete.labelModule||'MODULE'),   x(entete.module||''))}
-    ${rowFull(x(entete.labelSequence||'SÉQUENCE'), x(entete.sequence||''))}
-    ${rowDbl(x(entete.labelActivite||'ACTIVITÉ'), x(entete.activite||''), x(entete.labelSupport||'SUPPORT'), x(entete.support||''))}
+    ${rowDbl(x(entete.labelProf||'PROF'), entete.prof||'', x(entete.labelNiveau||'NIVEAU'), entete.niveau||'')}
+    ${rowFull(x(entete.labelModule||'MODULE'),   entete.module||'')}
+    ${rowFull(x(entete.labelSequence||'SÉQUENCE'), entete.sequence||'')}
+    ${rowDbl(x(entete.labelActivite||'ACTIVITÉ'), entete.activite||'', x(entete.labelSupport||'SUPPORT'), entete.support||'')}
     ${llXML}
     ${rowFullRich(x(entete.labelObjectif||'OBJECTIF(S)'), entete.objectif||'')}
   </w:tbl>`;
@@ -5083,10 +5557,7 @@ function genererDOCX() {
       </w:tcPr>
       <w:p>
         <w:pPr><w:jc w:val="center"/><w:spacing w:before="40" w:after="40"/></w:pPr>
-        <w:r>
-          <w:rPr><w:b/><w:color w:val="${rawColor}"/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>
-          <w:t>${x(e.nom||'')}</w:t>
-        </w:r>
+        ${htmlToRunsWithColor(e.nom||'', rawColor)}
       </w:p>
     </w:tc>
     <w:tc>
