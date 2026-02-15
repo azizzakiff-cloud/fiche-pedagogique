@@ -1,10 +1,30 @@
 <!DOCTYPE html>
+<!--
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    GÉNÉRATEUR DE FICHES PÉDAGOGIQUES                          ║
+║                                                                               ║
+║  © 2025 EZ-ZAKY AZIZ — Tous droits réservés                                  ║
+║  Licence : Creative Commons BY-NC-SA 4.0                                      ║
+║                                                                               ║
+║  Cette application est protégée par le droit d'auteur.                       ║
+║  Vous pouvez l'utiliser, la modifier et la partager UNIQUEMENT si vous :     ║
+║  ✓ Créditez l'auteur original (EZ-ZAKY AZIZ)                                ║
+║  ✓ N'en faites pas un usage commercial                                       ║
+║  ✓ Partagez vos modifications sous la même licence                           ║
+║                                                                               ║
+║  Application créée avec ❤️ pour les enseignants                              ║
+║  Version 2.11 — Février 2025                                                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+-->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Fiche Pédagogique — EZ-ZAKY AZIZ</title>
 <meta name="description" content="Générateur de fiches pédagogiques PDF">
+<meta name="author" content="EZ-ZAKY AZIZ">
+<meta name="copyright" content="© 2025 EZ-ZAKY AZIZ. Tous droits réservés.">
+<meta name="license" content="CC BY-NC-SA 4.0">
 <meta name="theme-color" content="#1565C0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -160,6 +180,7 @@ if ('serviceWorker' in navigator) {
     background: var(--off-white);
     color: var(--ink);
     min-height: 100vh;
+    padding-bottom: 32px; /* Espace pour le footer fixe */
   }
 
   /* ─── HEADER ─── */
@@ -1288,6 +1309,62 @@ if ('serviceWorker' in navigator) {
   }
 
 
+  /* ─── MODÈLES DE FICHES ─── */
+  .modele-tag {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 10px; margin-right: 4px; margin-bottom: 3px;
+  }
+  .modele-tag-matiere { background: #E3F2FD; color: #1565C0; }
+  .modele-tag-niveau  { background: #E8F5E9; color: #2E7D32; }
+  .modele-tag-duree   { background: #FFF3E0; color: #E65100; }
+  .modele-card {
+    background: white; border: 1.5px solid #E3EAF6; border-radius: 14px;
+    margin-bottom: 14px; overflow: hidden;
+    box-shadow: 0 2px 10px rgba(21,101,192,0.08);
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .modele-card:hover { box-shadow: 0 6px 22px rgba(21,101,192,0.18); transform: translateY(-2px); }
+  .modele-card-header {
+    background: linear-gradient(90deg, #1565C0, #1976D2);
+    padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .modele-card-icon {
+    font-size: 24px; width: 44px; height: 44px;
+    background: rgba(255,255,255,0.15); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .modele-card-title { font-family: 'Playfair Display',serif; color: white; font-size: 14px; font-weight: 700; line-height: 1.3; flex: 1; }
+  .modele-card-subtitle { color: rgba(255,255,255,0.8); font-size: 11px; margin-top: 2px; }
+  .modele-card-body { padding: 12px 14px 8px; }
+  .modele-desc { font-size: 12px; color: #555; line-height: 1.55; margin-bottom: 10px; }
+  .modele-etapes-preview { background: #F5F8FF; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; border: 1px solid #E3EAF6; }
+  .modele-etape-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 11px; color: #444; border-bottom: 1px dashed #E3EAF6; }
+  .modele-etape-row:last-child { border-bottom: none; }
+  .modele-etape-num { background: #1565C0; color: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .modele-etape-name { font-weight: 600; color: #1565C0; min-width: 80px; flex-shrink: 0; }
+  .modele-etape-desc { flex: 1; color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .modele-etape-duree { color: #E65100; font-weight: 600; flex-shrink: 0; }
+  .modele-card-actions { display: flex; gap: 8px; padding: 0 14px 12px; }
+  .btn-modele-charger {
+    flex: 1; background: #1565C0; color: white; border: none; border-radius: 8px;
+    padding: 9px 16px; font-family: 'Source Serif 4',serif; font-size: 12px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s;
+  }
+  .btn-modele-charger:hover { background: #0D47A1; }
+  .btn-modele-sauver {
+    background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9;
+    border-radius: 8px; padding: 9px 14px; font-family: 'Source Serif 4',serif;
+    font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background 0.2s;
+  }
+  .btn-modele-sauver:hover { background: #C8E6C9; }
+  .modeles-filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .modele-filter-btn {
+    padding: 5px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+    background: white; font-size: 12px; font-family: 'Source Serif 4',serif;
+    cursor: pointer; transition: all 0.18s; color: var(--muted);
+  }
+  .modele-filter-btn.active, .modele-filter-btn:hover { background: #1565C0; color: white; border-color: #1565C0; }
+
   /* Ajustement marges */
   .marge-controls {
     display: grid;
@@ -1309,6 +1386,41 @@ if ('serviceWorker' in navigator) {
     border: 1.5px solid var(--border);
     border-radius: 6px;
     font-size: 13px;
+  }
+
+  /* ── Footer permanent avec version ── */
+  .app-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    border-top: 1px solid rgba(21, 101, 192, 0.15);
+    padding: 4px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    color: #888;
+    z-index: 999;
+    backdrop-filter: blur(10px);
+  }
+  .app-footer a {
+    color: #1565C0;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .app-footer a:hover {
+    text-decoration: underline;
+  }
+  .version-badge {
+    background: rgba(21, 101, 192, 0.1);
+    color: #1565C0;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
   }
 
 
@@ -1345,8 +1457,14 @@ if ('serviceWorker' in navigator) {
   <button class="tab-btn" onclick="showTab('repertoire')" id="tab-repertoire">
     <span class="tab-icon">📁</span>Répertoire
   </button>
+  <button class="tab-btn" onclick="showTab('modeles')" id="tab-modeles">
+    <span class="tab-icon">🗂️</span>Modèles
+  </button>
   <button class="tab-btn" onclick="showTab('guide')" id="tab-guide">
     <span class="tab-icon">📖</span>Guide
+  </button>
+  <button class="tab-btn" onclick="showTab('apropos')" id="tab-apropos">
+    <span class="tab-icon">ℹ️</span>À propos
   </button>
 </div>
 
@@ -1813,6 +1931,37 @@ if ('serviceWorker' in navigator) {
 </div>
 
 <!-- ═══════════════════════════════════════════════════ -->
+<!-- PANEL MODÈLES : FICHES PRÊTES À L'EMPLOI          -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="panel" id="panel-modeles">
+  <div style="background:linear-gradient(135deg,#1565C0 0%,#0D47A1 100%);border-radius:14px;padding:18px 16px 14px;margin-bottom:16px;box-shadow:0 4px 18px rgba(21,101,192,0.3);">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+      <div style="font-size:32px;">🗂️</div>
+      <div>
+        <div style="color:#fff;font-weight:800;font-size:16px;font-family:'Playfair Display',serif;">Modèles de Fiches Pédagogiques</div>
+        <div style="color:rgba(255,255,255,0.8);font-size:11px;margin-top:2px;">Fiches prêtes à l'emploi · Chargez, personnalisez, exportez</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:14px;padding:3px 10px;font-size:10px;font-weight:600;">📖 Français</span>
+      <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:14px;padding:3px 10px;font-size:10px;font-weight:600;">📐 Maths</span>
+      <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:14px;padding:3px 10px;font-size:10px;font-weight:600;">🔬 SVT · 🏛️ Histoire · ⚗️ Physique · 🇬🇧 Anglais</span>
+      <span style="background:rgba(201,168,76,0.85);color:#fff;border-radius:14px;padding:3px 10px;font-size:10px;font-weight:700;">7 modèles</span>
+    </div>
+  </div>
+  <div class="modeles-filter-bar">
+    <button class="modele-filter-btn active" onclick="filtrerModeles('all',this)">📋 Tous</button>
+    <button class="modele-filter-btn" onclick="filtrerModeles('francais',this)">📖 Français</button>
+    <button class="modele-filter-btn" onclick="filtrerModeles('maths',this)">📐 Maths</button>
+    <button class="modele-filter-btn" onclick="filtrerModeles('svt',this)">🔬 SVT</button>
+    <button class="modele-filter-btn" onclick="filtrerModeles('histoire',this)">🏛️ Histoire</button>
+    <button class="modele-filter-btn" onclick="filtrerModeles('anglais',this)">🇬🇧 Anglais</button>
+    <button class="modele-filter-btn" onclick="filtrerModeles('physique',this)">⚗️ Physique</button>
+  </div>
+  <div id="modeles-liste"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
 <!-- PANEL 5 : GUIDE D'UTILISATION                      -->
 <!-- ═══════════════════════════════════════════════════ -->
 <div class="panel" id="panel-guide">
@@ -2077,6 +2226,166 @@ if ('serviceWorker' in navigator) {
 </div>
 
 <!-- ═══════════════════════════════════════════════════ -->
+<!-- PANEL : À PROPOS (COPYRIGHT & LICENCE)             -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="panel" id="panel-apropos">
+  <div id="apropos-content">
+
+    <!-- ── HERO À PROPOS ── -->
+    <div style="background:linear-gradient(135deg,#1565C0 0%,#0D47A1 60%,#1565C0 100%);border-radius:16px;padding:32px 20px;margin-bottom:18px;text-align:center;box-shadow:0 8px 28px rgba(21,101,192,0.4);">
+      <div style="font-size:64px;margin-bottom:12px;">📋</div>
+      <h1 style="color:#fff;font-size:22px;font-weight:800;margin:0 0 8px;letter-spacing:0.02em;">Générateur de Fiches Pédagogiques</h1>
+      <p style="color:rgba(255,255,255,0.95);font-size:14px;margin:0 0 6px;font-weight:600;">Version 2.11 — Février 2025</p>
+      <p style="color:rgba(255,255,255,0.85);font-size:13px;margin:0;">Conçu et développé par <strong>EZ-ZAKY AZIZ</strong></p>
+    </div>
+
+    <!-- ── COPYRIGHT ── -->
+    <div style="background:#fff;border-radius:14px;border:1.5px solid #E3EAF6;margin-bottom:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+      <div style="background:linear-gradient(90deg,#1565C0,#1976D2);padding:12px 16px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px;">©</span>
+        <span style="color:#fff;font-weight:700;font-size:14px;letter-spacing:0.04em;">COPYRIGHT & PROPRIÉTÉ INTELLECTUELLE</span>
+      </div>
+      <div style="padding:18px 16px;">
+        <div style="background:#E3F2FD;border-left:4px solid #1565C0;border-radius:0 8px 8px 0;padding:14px 16px;margin-bottom:14px;">
+          <div style="font-size:13px;color:#1565C0;font-weight:700;margin-bottom:8px;">© 2025 EZ-ZAKY AZIZ — Tous droits réservés</div>
+          <div style="font-size:12px;color:#444;line-height:1.7;">
+            Cette application et tous ses composants (code source, design, documentation, modèles) sont la propriété intellectuelle de <strong>EZ-ZAKY AZIZ</strong>.<br><br>
+            <strong>Créateur :</strong> EZ-ZAKY AZIZ<br>
+            <strong>Date de création :</strong> 2024-2025<br>
+            <strong>Contact :</strong> Pour toute question ou demande de collaboration, veuillez me contacter directement.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LICENCE D'UTILISATION ── -->
+    <div style="background:#fff;border-radius:14px;border:1.5px solid #E3EAF6;margin-bottom:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+      <div style="background:linear-gradient(90deg,#2E7D32,#388E3C);padding:12px 16px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px;">📜</span>
+        <span style="color:#fff;font-weight:700;font-size:14px;letter-spacing:0.04em;">LICENCE D'UTILISATION</span>
+      </div>
+      <div style="padding:18px 16px;">
+        <div style="font-size:13px;font-weight:700;color:#2E7D32;margin-bottom:10px;">Creative Commons BY-NC-SA 4.0</div>
+        <div style="font-size:12px;color:#444;line-height:1.7;margin-bottom:14px;">
+          Cette application est distribuée sous licence <strong>Creative Commons Attribution - Pas d'Utilisation Commerciale - Partage dans les Mêmes Conditions 4.0 International (CC BY-NC-SA 4.0)</strong>.
+        </div>
+
+        <div style="display:grid;gap:10px;">
+          <!-- Autorisé -->
+          <div style="background:#E8F5E9;border-left:4px solid #2E7D32;border-radius:0 8px 8px 0;padding:12px 14px;">
+            <div style="font-weight:700;color:#2E7D32;font-size:12px;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+              <span style="font-size:16px;">✅</span> VOUS POUVEZ (Usage autorisé)
+            </div>
+            <div style="font-size:12px;color:#555;line-height:1.6;">
+              • <strong>Utiliser</strong> l'application pour créer vos fiches pédagogiques<br>
+              • <strong>Partager</strong> l'application avec vos collègues enseignants<br>
+              • <strong>Modifier</strong> et adapter l'application à vos besoins personnels<br>
+              • <strong>Distribuer</strong> vos versions modifiées sous la même licence
+            </div>
+          </div>
+
+          <!-- Obligations -->
+          <div style="background:#FFF3E0;border-left:4px solid #F57C00;border-radius:0 8px 8px 0;padding:12px 14px;">
+            <div style="font-weight:700;color:#E65100;font-size:12px;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+              <span style="font-size:16px;">⚠️</span> VOUS DEVEZ (Obligations)
+            </div>
+            <div style="font-size:12px;color:#555;line-height:1.6;">
+              • <strong>Créditer</strong> l'auteur original : "Application créée par EZ-ZAKY AZIZ"<br>
+              • <strong>Indiquer</strong> si des modifications ont été apportées<br>
+              • <strong>Fournir</strong> un lien vers la licence CC BY-NC-SA 4.0<br>
+              • <strong>Distribuer vos modifications</strong> sous la même licence
+            </div>
+          </div>
+
+          <!-- Interdit -->
+          <div style="background:#FFEBEE;border-left:4px solid #C62828;border-radius:0 8px 8px 0;padding:12px 14px;">
+            <div style="font-weight:700;color:#C62828;font-size:12px;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+              <span style="font-size:16px;">❌</span> VOUS NE POUVEZ PAS (Interdit)
+            </div>
+            <div style="font-size:12px;color:#555;line-height:1.6;">
+              • <strong>Utilisation commerciale</strong> : vendre l'application ou l'utiliser dans un cadre commercial<br>
+              • <strong>Supprimer les crédits</strong> : retirer le nom de l'auteur original<br>
+              • <strong>Prétendre être l'auteur</strong> : vous ne pouvez pas vous présenter comme le créateur original<br>
+              • <strong>Appliquer des restrictions supplémentaires</strong> : vous ne pouvez pas restreindre davantage les droits
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;padding:12px;background:#F5F7FA;border-radius:8px;font-size:11px;color:#666;line-height:1.6;">
+          <strong>Note :</strong> Cette licence s'applique au code source et à l'application elle-même. Les fiches pédagogiques que vous créez avec cette application vous appartiennent entièrement et ne sont pas soumises à cette licence.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── INFORMATIONS TECHNIQUES ── -->
+    <div style="background:#fff;border-radius:14px;border:1.5px solid #E3EAF6;margin-bottom:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+      <div style="background:linear-gradient(90deg,#7B1FA2,#9C27B0);padding:12px 16px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px;">💻</span>
+        <span style="color:#fff;font-weight:700;font-size:14px;letter-spacing:0.04em;">INFORMATIONS TECHNIQUES</span>
+      </div>
+      <div style="padding:14px 16px;">
+        <div style="display:grid;gap:8px;font-size:12px;color:#444;">
+          <div style="display:flex;justify-content:space-between;padding:8px 10px;background:#F5F7FA;border-radius:6px;">
+            <span style="font-weight:600;">Version</span>
+            <span>2.11 (Février 2025)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 10px;background:#F5F7FA;border-radius:6px;">
+            <span style="font-weight:600;">Type d'application</span>
+            <span>PWA (Progressive Web App)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 10px;background:#F5F7FA;border-radius:6px;">
+            <span style="font-weight:600;">Technologies utilisées</span>
+            <span>HTML5, CSS3, JavaScript, jsPDF, Quill.js</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 10px;background:#F5F7FA;border-radius:6px;">
+            <span style="font-weight:600;">Compatibilité</span>
+            <span>Tous navigateurs modernes, Android, iOS</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 10px;background:#F5F7FA;border-radius:6px;">
+            <span style="font-weight:600;">Mode hors ligne</span>
+            <span>✅ Disponible</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 10px;background:#F5F7FA;border-radius:6px;">
+            <span style="font-weight:600;">Données</span>
+            <span>100% locales (navigateur)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REMERCIEMENTS ── -->
+    <div style="background:#fff;border-radius:14px;border:1.5px solid #E3EAF6;margin-bottom:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+      <div style="background:linear-gradient(90deg,#C9A84C,#E6B84C);padding:12px 16px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px;">🙏</span>
+        <span style="color:#fff;font-weight:700;font-size:14px;letter-spacing:0.04em;">REMERCIEMENTS</span>
+      </div>
+      <div style="padding:14px 16px;font-size:12px;color:#444;line-height:1.7;">
+        Cette application a été développée avec passion pour faciliter le travail des enseignants.<br><br>
+        Un grand merci à tous les collègues enseignants qui ont testé l'application et fourni leurs précieux retours pour l'améliorer.<br><br>
+        <strong>Bibliothèques open source utilisées :</strong><br>
+        • jsPDF — Génération de fichiers PDF<br>
+        • Quill.js — Éditeur de texte riche<br>
+        • JSZip — Création de fichiers DOCX
+      </div>
+    </div>
+
+    <!-- ── PIED À PROPOS ── -->
+    <div style="text-align:center;padding:20px 12px 24px;">
+      <div style="font-size:32px;margin-bottom:10px;">📋</div>
+      <div style="font-weight:700;color:#1565C0;font-size:14px;margin-bottom:6px;">Générateur de Fiches Pédagogiques</div>
+      <div style="color:#666;font-size:12px;margin-bottom:4px;">© 2025 <strong style="color:#1565C0;">EZ-ZAKY AZIZ</strong></div>
+      <div style="color:#999;font-size:11px;">Tous droits réservés — Licence CC BY-NC-SA 4.0</div>
+      <div style="margin-top:12px;padding:10px;background:#F5F7FA;border-radius:8px;display:inline-block;">
+        <div style="font-size:11px;color:#666;line-height:1.6;">
+          Application 100% locale — Vos données restent sur votre appareil<br>
+          Aucune connexion serveur — Respect total de votre vie privée
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════════════════ -->
 <div class="symbol-picker" id="symbol-picker">
   <div class="symbol-picker-header">
@@ -2141,10 +2450,13 @@ if ('serviceWorker' in navigator) {
 function showTab(name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('panel-' + name).classList.add('active');
-  document.getElementById('tab-' + name).classList.add('active');
-  if (name === 'apercu') { rafraichirApercu(); genererPreviewLive(); }
+  var panel = document.getElementById('panel-' + name);
+  var tab   = document.getElementById('tab-'   + name);
+  if (panel) panel.classList.add('active');
+  if (tab)   tab.classList.add('active');
+  if (name === 'apercu')    { rafraichirApercu(); genererPreviewLive(); }
   if (name === 'repertoire') afficherRepertoire();
+  if (name === 'modeles')    rendreTousLesModeles();
 }
 
 // ═══════════════════════════════════════════════════
@@ -2741,14 +3053,20 @@ function collecterTout() {
 
 function restaurerFiche(data) {
   if (!data) return;
-  // En-tête
+  // En-tête — champs contenteditable
   const e = data.entete || {};
-  if (e.prof     !== undefined) document.getElementById('prof').value     = e.prof;
-  if (e.niveau   !== undefined) document.getElementById('niveau').value   = e.niveau;
-  if (e.module   !== undefined) document.getElementById('module').value   = e.module;
-  if (e.sequence !== undefined) document.getElementById('sequence').value = e.sequence;
-  if (e.activite !== undefined) document.getElementById('activite').value = e.activite;
-  if (e.support  !== undefined) document.getElementById('support').value  = e.support;
+  const setContent = (id, val) => {
+    var el = document.getElementById(id);
+    if (!el || val === undefined) return;
+    if (el.contentEditable === 'true') el.innerHTML = val;
+    else el.value = val;
+  };
+  setContent('prof',     e.prof);
+  setContent('niveau',   e.niveau);
+  setContent('module',   e.module);
+  setContent('sequence', e.sequence);
+  setContent('activite', e.activite);
+  setContent('support',  e.support);
   if (e.objectif) setTimeout(() => setQuillHTML('objectif-wrapper', e.objectif), 200);
   // Étapes
   if (data.etapes && data.etapes.length > 0) {
@@ -2923,8 +3241,10 @@ function nouvelleFiche() {
 
   // Réinitialiser les champs de l'en-tête (sauf le prof)
   ['niveau','module','sequence','activite','support'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (el.contentEditable === 'true') el.innerHTML = '';
+    else el.value = '';
   });
   // Vider l'objectif
   setQuillHTML('objectif-wrapper', '');
@@ -4328,6 +4648,22 @@ function genererPDF() {
   }
 
   // ─────────────────────────────
+  // MÉTADONNÉES & WATERMARK INVISIBLE
+  // ─────────────────────────────
+  const timestamp = new Date().toISOString();
+  const uniqueId = 'FP-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 9);
+  
+  // Métadonnées du PDF (traçabilité invisible)
+  doc.setProperties({
+    title: `Fiche Pédagogique - ${entete.activite || 'Sans titre'}`,
+    subject: `${entete.module || ''} - ${entete.sequence || ''}`,
+    author: 'EZ-ZAKY AZIZ',
+    keywords: `fiche pédagogique, ${entete.niveau || ''}, éducation`,
+    creator: 'Générateur de Fiches Pédagogiques v2.11 © EZ-ZAKY AZIZ',
+    producer: `App ID: ${uniqueId} | Generated: ${timestamp}`
+  });
+
+  // ─────────────────────────────
   // PAGE 1 : EN-TÊTE
   // ─────────────────────────────
   const sep1 = M + UW * P.sep1Pct;
@@ -4379,38 +4715,59 @@ function genererPDF() {
   drawInputBox(M+seqLabelW+8, hy+3, endX-(M+seqLabelW+8)-4, L234H-6, entete.sequence, P.fontEnteteContent);
   hy += L234H;
 
-  // ── Ligne 4 (activité + support) — hauteur dynamique
-  // Calculer la hauteur nécessaire pour le support en tenant compte du formatage HTML
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = entete.support || '';
-  const supportPlainText = tempDiv.textContent || tempDiv.innerText || '';
-  
+  // ── Ligne 4 (activité + support) — hauteur flexible INDÉPENDANTE pour chaque case
   doc.setFontSize(P.fontEnteteContent);
   doc.setFont('times','normal');
-  const supportBoxW = endX - (sep2+50) - 4;
-  const supportLines = supportPlainText ? doc.splitTextToSize(supportPlainText, supportBoxW - 4) : [];
-  const supportLineH = P.fontEnteteContent * 1.4;
-  const supportNeededH = Math.max(L234H, supportLines.length * supportLineH + 8);
-  const hyL4 = hy;
-  setBlue();
-  doc.rect(M, hyL4, UW, supportNeededH, 'F');
 
   const activiteLabel = normaliserTexte(entete.labelActivite || 'Activite');
-  const actLabelY = hyL4 + supportNeededH * 0.5 + P.fontEnteteLabel * 0.35;
-  drawTextWhite(activiteLabel + ' :', M+5, actLabelY, P.fontEnteteLabel, true);
   const actLabelW = doc.getTextWidth(activiteLabel + ' :') + 4;
-  drawInputBox(M+actLabelW+8, hyL4+3, sep2-(M+actLabelW+8)-4, supportNeededH-6, entete.activite, P.fontEnteteContent);
-
+  // Largeur réelle de la zone de valeur Activité
+  const actBoxW = sep2 - (M + actLabelW + 8) - 4;
+  // Largeur réelle de la zone de valeur Support
   const supportLabel = normaliserTexte(entete.labelSupport || 'Support');
-  const supLabelY = hyL4 + supportNeededH * 0.5 + P.fontEnteteLabel * 0.35;
-  drawTextWhite(supportLabel + ' :', sep2+5, supLabelY, P.fontEnteteLabel, true);
+  doc.setFontSize(P.fontEnteteLabel); doc.setFont('times','bold');
+  const supLabelW = doc.getTextWidth(supportLabel + ' :') + 4;
+  doc.setFontSize(P.fontEnteteContent); doc.setFont('times','normal');
+  const supportBoxX = sep2 + supLabelW + 8;
+  const supportBoxW = endX - supportBoxX - 4;
+
+  // — Mesurer hauteur nécessaire pour Activité
+  const activiteSegments = htmlToRichSegments(entete.activite || '');
+  const actNeededH = Math.max(L234H, measureRichTextSegments(activiteSegments, actBoxW - 4, P.fontEnteteContent) + 8);
+
+  // — Mesurer hauteur nécessaire pour Support
+  const supportSegments = htmlToRichSegments(entete.support || '');
+  const supportNeededH = Math.max(L234H, measureRichTextSegments(supportSegments, supportBoxW - 4, P.fontEnteteContent) + 8);
+
+  // — Hauteur de la ligne 4 = max des deux pour le fond bleu
+  const rowL4H = Math.max(actNeededH, supportNeededH);
+  const hyL4 = hy;
+
+  // Fond bleu toute la ligne
+  setBlue();
+  doc.rect(M, hyL4, UW, rowL4H, 'F');
+
+  // — Zone Activité (gauche de sep2) avec SA propre hauteur
+  drawTextWhite(activiteLabel + ' :', M+5, hyL4 + P.fontEnteteLabel * 1.1 + 3, P.fontEnteteLabel, true);
   doc.setFillColor(255,255,255);
   setBlueStroke(0.5);
-  doc.rect(sep2+50, hyL4+3, supportBoxW, supportNeededH-6, 'FD');
-  if (entete.support) {
-    drawFormattedText(entete.support, sep2+52, hyL4 + P.fontEnteteContent * 0.85 + 4, supportBoxW - 4, P.fontEnteteContent);
+  // La case Activité utilise uniquement sa hauteur nécessaire
+  doc.rect(M + actLabelW + 8, hyL4 + 3, actBoxW, actNeededH - 6, 'FD');
+  if (activiteSegments && activiteSegments.length > 0) {
+    drawRichTextSegments(activiteSegments, M + actLabelW + 10, hyL4 + P.fontEnteteContent * 0.85 + 4, actBoxW - 4, P.fontEnteteContent, [0,0,0]);
   }
-  hy += supportNeededH;
+
+  // — Zone Support (droite de sep2) avec SA propre hauteur
+  setBlue();
+  drawTextWhite(supportLabel + ' :', sep2 + 5, hyL4 + P.fontEnteteLabel * 1.1 + 3, P.fontEnteteLabel, true);
+  doc.setFillColor(255,255,255);
+  setBlueStroke(0.5);
+  // La case Support utilise uniquement sa hauteur nécessaire
+  doc.rect(supportBoxX, hyL4 + 3, supportBoxW, supportNeededH - 6, 'FD');
+  if (supportSegments && supportSegments.length > 0) {
+    drawRichTextSegments(supportSegments, supportBoxX + 2, hyL4 + P.fontEnteteContent * 0.85 + 4, supportBoxW - 4, P.fontEnteteContent, [0,0,0]);
+  }
+  hy += rowL4H;
 
   // ── LIGNES LIBRES SUPPLÉMENTAIRES (entre ligne 4 et objectif)
   if (entete.lignesLibres && entete.lignesLibres.length > 0) {
@@ -4448,14 +4805,46 @@ function genererPDF() {
     });
   }
 
-  // ── Ligne Objectif — hauteur dynamique
+  // ── Ligne Objectif — hauteur 100 % flexible selon contenu réel
   const L5H = P.l5h;
-  // Convertir le HTML Quill en segments riches
-  const objectifSegments = htmlToRichSegments(entete.objectif);
-  const objectifBoxW = endX - (M+60) - 2;
-  const objectifNeededH = Math.max(L5H, measureRichTextSegments(objectifSegments, objectifBoxW - 6, P.fontEnteteContent) + 8);
-
   const objectifLabel = normaliserTexte(entete.labelObjectif || 'Objectif');
+  const objectifSegments = htmlToRichSegments(entete.objectif);
+  const objectifBoxW = endX - (M + 60) - 2;
+
+  // Mesurer la hauteur réelle nécessaire pour le contenu de l'objectif
+  let objectifMeasuredH = 0;
+  if (objectifSegments.length > 0) {
+    // Compter lignes : chaque newline et chaque wrapping de texte
+    const lineHObj = P.fontEnteteContent * 1.45;
+    let curLineW = 0;
+    let lineCount = 1; // au moins 1 ligne
+    objectifSegments.forEach(seg => {
+      if (seg.type === 'image') { lineCount += Math.ceil(120 / lineHObj) + 1; curLineW = 0; return; }
+      if (seg.type === 'table') {
+        const tdata = seg.tableData || [];
+        tdata.forEach(row => { lineCount += 2; });
+        curLineW = 0; return;
+      }
+      if (seg.text === '\n') { lineCount++; curLineW = 0; return; }
+      const fs = seg.fontSize || P.fontEnteteContent;
+      const style = seg.bold && seg.italic ? 'bolditalic' : seg.bold ? 'bold' : seg.italic ? 'italic' : 'normal';
+      doc.setFontSize(fs); doc.setFont('times', style);
+      const words = seg.text.split(/\s+/);
+      words.forEach(w => {
+        if (!w) return;
+        const wW = doc.getTextWidth(normaliserTexte(w));
+        if (curLineW + wW > objectifBoxW - 8 && curLineW > 0 && w.trim()) { lineCount++; curLineW = 0; }
+        curLineW += wW;
+      });
+    });
+    objectifMeasuredH = lineCount * lineHObj + 10; // +10 padding vertical (réduit de 12 à 10)
+  } else {
+    // Si vide, utiliser une hauteur minimale réduite
+    objectifMeasuredH = L5H * 0.5; // Hauteur minimale réduite quand vide
+  }
+  // Prendre le minimum entre L5H et la hauteur mesurée + padding
+  const objectifNeededH = Math.max(L5H * 0.6, objectifMeasuredH); // Hauteur minimum réduite à 60% de L5H
+
   setBlue();
   doc.rect(M, hy, 60, objectifNeededH, 'F');
   drawTextWhite(objectifLabel + ' :', M+3, hy + Math.min(20, objectifNeededH * 0.4), P.fontEnteteLabel, true);
@@ -4673,16 +5062,23 @@ function genererPDF() {
     ty += RH;
   }
 
-  // Numéros de page
+  // Numéros de page et copyright
   const totalPages = doc.internal.getNumberOfPages();
   for (let p = 1; p <= totalPages; p++) {
     doc.setPage(p);
     doc.setFontSize(8);
     doc.setTextColor(150,150,150);
     doc.setFont('times','normal');
+    // Numéro de page centré
     doc.text(`Page ${p} / ${totalPages}`, PW/2, PH-4, {align:'center'});
+    // Date à gauche
     doc.text(`${new Date().toLocaleDateString('fr-FR')}`, M, PH-4);
+    // Professeur à droite
     doc.text(normaliserTexte(entete.prof || ''), endX, PH-4, {align:'right'});
+    // Copyright discret en bas (très petit) avec ID unique invisible
+    doc.setFontSize(6);
+    doc.setTextColor(180,180,180);
+    doc.text(`\u00A9 EZ-ZAKY AZIZ | App v2.11 | ${uniqueId}`, M, PH-1);
   }
 
   // Sauvegarde — méthode spéciale AppsGeyser WebView
@@ -5725,6 +6121,277 @@ function genererDOCX() {
 }
 
 
+
+// ════════════════════════════════════════════════════════════
+// MODÈLES DE FICHES PÉDAGOGIQUES — ANGLAIS / LYCÉE / ENVIRONNEMENT
+// ════════════════════════════════════════════════════════════
+const MODELES_FICHES = [
+
+  // ══════════════════════════════════════════════
+  // 1. FRANÇAIS — Lecture / Compréhension de texte
+  // ══════════════════════════════════════════════
+  {
+    id:'fr1', titre:'Lecture analytique — La description dans le roman réaliste',
+    sousTitre:'Français · Lecture / Analyse littéraire · Lycée', icone:'📖',
+    matiere:'Français', niveau:'2BAC', categorie:'francais',
+    description:'Séance de lecture analytique d\'un extrait de roman réaliste (Balzac / Zola). Les élèves identifient les procédés de la description, analysent leur fonction narrative et construisent un commentaire structuré.',
+    tags:['francais','2BAC','Lycée'],
+    data:{
+      v:2,
+      entete:{prof:'EZ-ZAKY AZIZ',niveau:'2 BAC',module:'Module 2 — Le Roman et ses personnages',sequence:'Séquence 3 : La description réaliste',activite:'Lecture analytique',support:'Extrait : Balzac, "Le Père Goriot" — description de la pension Vauquer',
+        objectif:'<ul><li>Identifier les caractéristiques de la description réaliste (accumulation, lexique, focalisation)</li><li>Analyser la fonction de la description dans l\'économie du récit</li><li>Construire un commentaire littéraire structuré à partir d\'un extrait</li><li>Maîtriser le vocabulaire de l\'analyse littéraire (champ lexical, métaphore, isotopie…)</li></ul>'},
+      etapes:[
+        {nom:'Mise en route',enseignant:'<p><strong>🖼️ Entrée dans le texte — L\'image déclencheur</strong></p><p>• Projeter une image d\'intérieur bourgeois du XIXe siècle</p><p>• Questions orales : <em>« Que voyez-vous ? Quelle atmosphère se dégage ? À quelle époque situez-vous cette scène ? »</em></p><p>• Mise en commun — introduction de la notion de "roman réaliste" : peindre le réel</p><p>• Annonce de l\'objectif : comprendre comment Balzac fait "voir" un lieu</p>',duree:'8 min'},
+        {nom:'Lecture & découverte',enseignant:'<p><strong>📄 Lecture silencieuse puis lecture expressive</strong></p><p>• Lecture individuelle silencieuse (2 min) — repérage des mots inconnus</p><p>• Lecture expressive par l\'enseignant — mise en voix du texte</p><p>• Questions de compréhension globale :</p><ul><li>Quel lieu est décrit ? Par qui ?</li><li>Quelle est l\'impression dominante qui se dégage ?</li><li>Relevez trois mots qui caractérisent ce lieu</li></ul>',duree:'10 min'},
+        {nom:'Analyse',enseignant:'<p><strong>🔍 Analyse des procédés d\'écriture</strong></p><p>• Travail en groupes (3–4 élèves) — chaque groupe analyse un aspect :</p><ul><li>Groupe 1 : Le champ lexical dominant</li><li>Groupe 2 : Les figures de style (comparaisons, métaphores)</li><li>Groupe 3 : L\'organisation spatiale de la description</li><li>Groupe 4 : Le point de vue narratif et ses effets</li></ul><p>• Mise en commun avec prise de notes au tableau</p>',duree:'15 min'},
+        {nom:'Interprétation',enseignant:'<p><strong>💡 Sens et fonctions de la description</strong></p><p>• Discussion guidée :</p><ul><li><em>« Pourquoi Balzac consacre-t-il autant de place à décrire ce lieu ? »</em></li><li><em>« Que nous apprend cette description sur les personnages qui y vivent ? »</em></li><li><em>« Quel effet produit cette description sur le lecteur ? »</em></li></ul><p>• Élaboration collective d\'une réponse à la problématique : la description comme révélateur social</p>',duree:'10 min'},
+        {nom:'Synthèse',enseignant:'<p><strong>📝 Construction du commentaire</strong></p><p>• Formulation collective du plan du commentaire :</p><ul><li>Axe I : Une description réaliste minutieuse</li><li>Axe II : Un lieu révélateur de la misère sociale</li></ul><p>• Chaque élève rédige l\'introduction et un paragraphe de commentaire</p><p>• Bilan de séance — retour sur les outils d\'analyse acquis</p>',duree:'7 min'}
+      ],
+      params:{marge:'8.5',gap:'5',fontEnteteLabel:'11',fontEnteteContent:'10',fontTableHeader:'10',fontTableContent:'9',rowHeight:'8',tableHeaderH:'18',headerH:'100',l1h:'22',l234h:'18',l5h:'40',sep1:'32',sep2:'60',col1:'20',col2:'65',colorMain:'#4A148C',colorAccent:'#C9A84C',colorGrid:'#CE93D8',colorEtapeText:'#4A148C',labelColEtapes:'Étapes',labelColDerou:'Déroulement de la séance',labelColDuree:'Durée'},
+      resume:'5 étapes · 50 min',niveau:'2 BAC',module:'Module 2 — Le Roman et ses personnages'
+    }
+  },
+
+  // ══════════════════════════════════════════════
+  // 2. MATHÉMATIQUES — Fonctions du second degré
+  // ══════════════════════════════════════════════
+  {
+    id:'ma1', titre:'Les fonctions du second degré — Forme canonique et représentation',
+    sousTitre:'Mathématiques · Algèbre · 2 BAC', icone:'📐',
+    matiere:'Mathématiques', niveau:'2BAC', categorie:'maths',
+    description:'Séance d\'algèbre sur les fonctions du second degré. Les élèves passent de la forme développée à la forme canonique, en déduisent les propriétés de la parabole et résolvent des problèmes d\'optimisation.',
+    tags:['maths','2BAC','Lycée'],
+    data:{
+      v:2,
+      entete:{prof:'EZ-ZAKY AZIZ',niveau:'2 BAC',module:'Module 1 — Analyse et fonctions',sequence:'Séquence 4 : Fonctions polynômes du second degré',activite:'Cours + Exercices — Forme canonique',support:'Manuel + Fiche exercices "Parabole et optimisation"',
+        objectif:'<ul><li>Passer de la forme développée ax²+bx+c à la forme canonique a(x-α)²+β</li><li>Identifier le sommet de la parabole et l\'axe de symétrie</li><li>Déterminer les extrema (maximum ou minimum) d\'une fonction du second degré</li><li>Résoudre des problèmes d\'optimisation faisant intervenir une fonction du second degré</li></ul>'},
+      etapes:[
+        {nom:'Rappel & activation',enseignant:'<p><strong>🔁 Révision — Forme développée</strong></p><p>• Questions flash au tableau (5 min) :</p><ul><li>Développer : (x+3)² ; (2x-1)² ; (x+a)²</li><li>Factoriser : x²-4 ; x²+6x+9</li></ul><p>• Correction collective — rappel des identités remarquables</p><p>• Transition : <em>« Comment trouver le minimum de f(x) = x²-6x+11 ? »</em></p>',duree:'8 min'},
+        {nom:'Découverte',enseignant:'<p><strong>💡 Construction de la forme canonique</strong></p><p>• Démonstration au tableau — méthode de complétion du carré :</p><p>f(x) = x²-6x+11 = (x²-6x+9)+2 = (x-3)²+2</p><p>• Questions guidées :</p><ul><li>Quel est le minimum de (x-3)² ? Pour quelle valeur de x ?</li><li>Quel est donc le minimum de f ? En quel point ?</li></ul><p>• Formule générale : α = -b/2a ; β = f(α)</p>',duree:'12 min'},
+        {nom:'Entraînement guidé',enseignant:'<p><strong>✏️ Exercices progressifs (par niveaux)</strong></p><p>• Niveau 1 : Mettre sous forme canonique (a=1) :<br>f(x) = x²-4x+7 ; g(x) = x²+8x+3</p><p>• Niveau 2 : Cas général (a≠1) :<br>h(x) = 2x²-12x+5 ; k(x) = -3x²+6x+1</p><p>• Niveau 3 : Déduire le sommet, le sens de variation, le minimum/maximum</p><p>• Correction au tableau — erreurs fréquentes signalées</p>',duree:'15 min'},
+        {nom:'Problème',enseignant:'<p><strong>🧮 Problème d\'optimisation</strong></p><p>• Problème contextualisé :</p><p><em>« Un rectangle a un périmètre de 20 cm. Exprimer son aire en fonction de la longueur d\'un côté, puis déterminer les dimensions qui maximisent l\'aire. »</em></p><p>• Résolution guidée : modélisation → forme canonique → conclusion</p><p>• Correction collective — interprétation géométrique de la solution</p>',duree:'10 min'},
+        {nom:'Bilan',enseignant:'<p><strong>📊 Synthèse & devoir</strong></p><p>• Fiche récapitulative : tableau forme développée ↔ canonique ↔ propriétés</p><p>• Auto-évaluation : 3 questions flash (vrai/faux)</p><p>• Devoir maison : 3 exercices de mise sous forme canonique + 1 problème d\'optimisation</p>',duree:'5 min'}
+      ],
+      params:{marge:'8.5',gap:'5',fontEnteteLabel:'11',fontEnteteContent:'10',fontTableHeader:'10',fontTableContent:'9',rowHeight:'8',tableHeaderH:'18',headerH:'100',l1h:'22',l234h:'18',l5h:'40',sep1:'32',sep2:'60',col1:'20',col2:'65',colorMain:'#0D47A1',colorAccent:'#C9A84C',colorGrid:'#90CAF9',colorEtapeText:'#0D47A1',labelColEtapes:'Étapes',labelColDerou:'Déroulement de la séance',labelColDuree:'Durée'},
+      resume:'5 étapes · 50 min',niveau:'2 BAC',module:'Module 1 — Analyse et fonctions'
+    }
+  },
+
+  // ══════════════════════════════════════════════
+  // 3. SVT — La mitose et la reproduction cellulaire
+  // ══════════════════════════════════════════════
+  {
+    id:'sv1', titre:'La mitose — Division cellulaire et cycle cellulaire',
+    sousTitre:'SVT · Biologie cellulaire · 1 BAC', icone:'🔬',
+    matiere:'SVT', niveau:'1BAC', categorie:'svt',
+    description:'Séance de biologie sur la mitose. Les élèves observent les différentes phases de la division cellulaire sur des préparations microscopiques, schématisent et expliquent les mécanismes de transmission de l\'information génétique.',
+    tags:['svt','1BAC','Lycée'],
+    data:{
+      v:2,
+      entete:{prof:'EZ-ZAKY AZIZ',niveau:'1 BAC',module:'Module 1 — Reproduction et génétique',sequence:'Séquence 2 : La division cellulaire',activite:'TP + Cours — La mitose',support:'Microscope + Préparations oignon / Schémas + Vidéo animation mitose',
+        objectif:'<ul><li>Décrire et schématiser les différentes phases de la mitose (interphase, prophase, métaphase, anaphase, télophase)</li><li>Comprendre le rôle de la mitose dans la croissance et la régénération des tissus</li><li>Relier la mitose à la conservation du caryotype (2n chromosomes)</li><li>Réaliser une observation microscopique et en faire un schéma légendé</li></ul>'},
+      etapes:[
+        {nom:'Problématique',enseignant:'<p><strong>❓ Mise en situation — Problème biologique</strong></p><p>• Question déclencheur : <em>« Comment une cellule unique (zygote) peut-elle donner un organisme de plusieurs milliards de cellules identiques ? »</em></p><p>• Recueil des représentations initiales des élèves — carte mentale collective</p><p>• Annonce du plan : observer → schématiser → expliquer</p>',duree:'5 min'},
+        {nom:'Observation TP',enseignant:'<p><strong>🔬 Travaux pratiques — Observation microscopique</strong></p><p>• Distribution des préparations microscopiques (racine d\'oignon)</p><p>• Consignes :</p><ul><li>Observer à différents grossissements</li><li>Repérer des cellules à différents stades</li><li>Dessiner une cellule par phase observée avec légendes</li></ul><p>• Circuler dans les rangs — aide à l\'identification des phases</p>',duree:'15 min'},
+        {nom:'Cours',enseignant:'<p><strong>📋 Construction du cours — Les 5 phases</strong></p><p>• Présentation animée des phases :</p><ul><li><strong>Interphase :</strong> réplication de l\'ADN (2n → 4n chromatides)</li><li><strong>Prophase :</strong> condensation des chromosomes, disparition membrane nucléaire</li><li><strong>Métaphase :</strong> alignement sur la plaque équatoriale</li><li><strong>Anaphase :</strong> migration des chromatides aux pôles</li><li><strong>Télophase :</strong> cytocinèse — 2 cellules filles (2n)</li></ul><p>• Schéma bilan à compléter par les élèves</p>',duree:'15 min'},
+        {nom:'Exercices',enseignant:'<p><strong>✏️ Application et exercices</strong></p><p>• Ex 1 : Légender un schéma de mitose</p><p>• Ex 2 : Ordonner des photos de phases dans le bon ordre</p><p>• Ex 3 : Calculer le nombre de chromosomes à chaque phase pour une espèce 2n=46</p><p>• Correction collective</p>',duree:'10 min'},
+        {nom:'Bilan',enseignant:'<p><strong>📊 Synthèse — Rôle biologique de la mitose</strong></p><p>• Discussion : <em>« Mitose et croissance / régénération / reproduction asexuée »</em></p><p>• Bilan schématique au tableau : cycle cellulaire complet (G1, S, G2, M)</p><p>• Questions flash auto-évaluation</p><p>• DM : rédiger un texte expliquant la mitose à partir du schéma bilan</p>',duree:'5 min'}
+      ],
+      params:{marge:'8.5',gap:'5',fontEnteteLabel:'11',fontEnteteContent:'10',fontTableHeader:'10',fontTableContent:'9',rowHeight:'8',tableHeaderH:'18',headerH:'100',l1h:'22',l234h:'18',l5h:'40',sep1:'32',sep2:'60',col1:'20',col2:'65',colorMain:'#1B5E20',colorAccent:'#C9A84C',colorGrid:'#A5D6A7',colorEtapeText:'#1B5E20',labelColEtapes:'Étapes',labelColDerou:'Déroulement de la séance',labelColDuree:'Durée'},
+      resume:'5 étapes · 50 min',niveau:'1 BAC',module:'Module 1 — Reproduction et génétique'
+    }
+  },
+
+  // ══════════════════════════════════════════════
+  // 4. HISTOIRE — La Première Guerre mondiale
+  // ══════════════════════════════════════════════
+  {
+    id:'hi1', titre:'La Première Guerre mondiale — Une guerre totale',
+    sousTitre:'Histoire · TC / 1 BAC', icone:'🏛️',
+    matiere:'Histoire', niveau:'TC', categorie:'histoire',
+    description:'Séance d\'histoire sur la notion de "guerre totale" lors de la Première Guerre mondiale. À partir de documents variés (carte, témoignage, affiche de propagande), les élèves construisent et argumentent ce concept.',
+    tags:['histoire','TC','1BAC','Lycée'],
+    data:{
+      v:2,
+      entete:{prof:'EZ-ZAKY AZIZ',niveau:'Tronc Commun / 1 BAC',module:'Module 3 — Les guerres mondiales du XXe siècle',sequence:'Séquence 1 : La Première Guerre mondiale (1914–1918)',activite:'Étude documentaire — La notion de guerre totale',support:'Dossier documentaire : carte du front, témoignage de soldat, affiche de propagande, statistiques de pertes',
+        objectif:'<ul><li>Comprendre et définir le concept de "guerre totale"</li><li>Analyser des documents historiques de nature différente (carte, témoignage, affiche)</li><li>Identifier les dimensions militaires, économiques, sociales et psychologiques du conflit</li><li>Construire un raisonnement historique argumenté à partir de documents</li></ul>'},
+      etapes:[
+        {nom:'Mise en situation',enseignant:'<p><strong>🗺️ Entrée dans le cours — Situation géographique</strong></p><p>• Afficher la carte de l\'Europe en 1914 — identifier les empires, les alliances</p><p>• Chronologie rapide : attentats de Sarajevo (28 juin 1914) → déclarations de guerre</p><p>• Question-problème : <em>« En quoi la guerre de 1914–1918 est-elle différente des guerres précédentes ? »</em></p><p>• Recueil des hypothèses des élèves</p>',duree:'8 min'},
+        {nom:'Étude de docs',enseignant:'<p><strong>📄 Analyse documentaire en groupes</strong></p><p>• 4 groupes — chaque groupe analyse un document :</p><ul><li>Groupe 1 : Carte des fronts — les tranchées, la guerre de position</li><li>Groupe 2 : Témoignage de soldat — conditions de vie dans les tranchées</li><li>Groupe 3 : Affiche de propagande — mobilisation des civils</li><li>Groupe 4 : Statistiques des pertes — ampleur des destructions humaines</li></ul><p>• Questions-guide pour chaque document (fiche distribuée)</p>',duree:'15 min'},
+        {nom:'Mise en commun',enseignant:'<p><strong>🗣️ Présentation et construction du concept</strong></p><p>• Chaque groupe présente ses conclusions (2 min par groupe)</p><p>• Construction collective au tableau de la notion de "guerre totale" :</p><ul><li>Dimension militaire : industrialisation de la guerre, nouvelles armes</li><li>Dimension économique : économie de guerre, rationnement</li><li>Dimension sociale : rôle des femmes, travailleurs coloniaux</li><li>Dimension psychologique : propagande, moral des troupes</li></ul>',duree:'12 min'},
+        {nom:'Cours structuré',enseignant:'<p><strong>📋 Bilan de cours — Trace écrite</strong></p><p>• Dictée de la trace écrite structurée en 3 parties :</p><ul><li>I. Une guerre industrielle et meurtrière</li><li>II. La mobilisation totale des sociétés</li><li>III. Un bilan humain et matériel sans précédent</li></ul><p>• Compléter le schéma bilan : "Guerre totale" au centre, 4 dimensions rayonnantes</p>',duree:'10 min'},
+        {nom:'Évaluation formative',enseignant:'<p><strong>✏️ Exercice de rédaction courte</strong></p><p>• Consigne : <em>« En vous appuyant sur les documents étudiés, expliquez en 8–10 lignes pourquoi la Première Guerre mondiale est qualifiée de guerre totale. »</em></p><p>• Échange de copies — correction entre pairs avec grille de critères</p><p>• Bilan et annonce de la prochaine séance : les conséquences du conflit</p>',duree:'5 min'}
+      ],
+      params:{marge:'8.5',gap:'5',fontEnteteLabel:'11',fontEnteteContent:'10',fontTableHeader:'10',fontTableContent:'9',rowHeight:'8',tableHeaderH:'18',headerH:'100',l1h:'22',l234h:'18',l5h:'40',sep1:'32',sep2:'60',col1:'20',col2:'65',colorMain:'#BF360C',colorAccent:'#C9A84C',colorGrid:'#FFCCBC',colorEtapeText:'#BF360C',labelColEtapes:'Étapes',labelColDerou:'Déroulement de la séance',labelColDuree:'Durée'},
+      resume:'5 étapes · 50 min',niveau:'TC / 1 BAC',module:'Module 3 — Les guerres mondiales du XXe siècle'
+    }
+  },
+
+  // ══════════════════════════════════════════════
+  // 5. PHYSIQUE-CHIMIE — Les lois de l'électricité
+  // ══════════════════════════════════════════════
+  {
+    id:'ph1', titre:'Loi d\'Ohm et circuits électriques — Série et parallèle',
+    sousTitre:'Physique-Chimie · Électricité · Tronc Commun', icone:'⚗️',
+    matiere:'Physique-Chimie', niveau:'TC', categorie:'physique',
+    description:'Séance d\'électricité sur la loi d\'Ohm et les circuits série/parallèle. Approche expérimentale : les élèves réalisent des montages, mesurent les grandeurs et vérifient les lois par l\'expérience avant de les formaliser.',
+    tags:['physique','TC','Lycée'],
+    data:{
+      v:2,
+      entete:{prof:'EZ-ZAKY AZIZ',niveau:'Tronc Commun',module:'Module 2 — Électricité',sequence:'Séquence 3 : Loi d\'Ohm — Circuits série et parallèle',activite:'TP + Cours — Vérification expérimentale de la loi d\'Ohm',support:'Matériel TP : générateur, résistances, ampèremètre, voltmètre, fils + Fiche TP',
+        objectif:'<ul><li>Énoncer et appliquer la loi d\'Ohm : U = R × I</li><li>Distinguer les caractéristiques d\'un circuit série (même intensité) et parallèle (même tension)</li><li>Réaliser un montage électrique en respectant les conventions de branchement</li><li>Analyser des résultats expérimentaux et calculer une résistance</li></ul>'},
+      etapes:[
+        {nom:'Problématique',enseignant:'<p><strong>⚡ Mise en situation expérimentale</strong></p><p>• Présenter deux ampoules : l\'une dans un circuit série, l\'autre en parallèle</p><p>• Observation : <em>« Que se passe-t-il quand on enlève une ampoule dans chaque circuit ? »</em></p><p>• Problématique : <em>« Quelles lois régissent la tension et l\'intensité dans ces circuits ? »</em></p><p>• Hypothèses des élèves notées au tableau</p>',duree:'7 min'},
+        {nom:'TP Circuit série',enseignant:'<p><strong>🔌 TP 1 — Circuit série</strong></p><p>• Réaliser le montage : générateur + 2 résistances en série + ampèremètre</p><p>• Mesures à effectuer :</p><ul><li>Intensité I₁, I₂ en différents points → conclusion sur I</li><li>Tensions U₁, U₂, U_total → loi des tensions en série</li></ul><p>• Appliquer U = R×I pour calculer chaque résistance</p><p>• Tableau de résultats à compléter sur la fiche TP</p>',duree:'13 min'},
+        {nom:'TP Circuit parallèle',enseignant:'<p><strong>🔌 TP 2 — Circuit parallèle</strong></p><p>• Modifier le montage : 2 résistances en dérivation</p><p>• Mesures :</p><ul><li>Tensions U₁, U₂ → loi des tensions en parallèle</li><li>Intensités I₁, I₂, I_total → loi des intensités (nœuds)</li></ul><p>• Calcul de la résistance équivalente R_eq = R₁R₂/(R₁+R₂)</p><p>• Comparaison des résultats théoriques/expérimentaux</p>',duree:'13 min'},
+        {nom:'Formalisation',enseignant:'<p><strong>📋 Construction du cours — Synthèse théorique</strong></p><p>• Loi d\'Ohm : U = R × I — unités (V, Ω, A)</p><p>• Circuit série : I = cst ; U_tot = U₁+U₂+… ; R_eq = R₁+R₂+…</p><p>• Circuit parallèle : U = cst ; I_tot = I₁+I₂+… ; 1/R_eq = 1/R₁+1/R₂+…</p><p>• Exemples d\'applications domestiques (éclairage, prise de courant)</p>',duree:'10 min'},
+        {nom:'Exercices',enseignant:'<p><strong>✏️ Application numérique</strong></p><p>• Ex 1 : R = 220 Ω, U = 12 V → calculer I</p><p>• Ex 2 : Deux résistances 100 Ω en série — U_total = 6 V → calculer I et U₁</p><p>• Ex 3 : Résistance équivalente de 3 résistances en parallèle</p><p>• Correction rapide — bilan + devoir maison</p>',duree:'7 min'}
+      ],
+      params:{marge:'8.5',gap:'5',fontEnteteLabel:'11',fontEnteteContent:'10',fontTableHeader:'10',fontTableContent:'9',rowHeight:'8',tableHeaderH:'18',headerH:'100',l1h:'22',l234h:'18',l5h:'40',sep1:'32',sep2:'60',col1:'20',col2:'65',colorMain:'#37474F',colorAccent:'#C9A84C',colorGrid:'#B0BEC5',colorEtapeText:'#37474F',labelColEtapes:'Étapes',labelColDerou:'Déroulement de la séance',labelColDuree:'Durée'},
+      resume:'5 étapes · 50 min',niveau:'Tronc Commun',module:'Module 2 — Électricité'
+    }
+  },
+
+  // ══════════════════════════════════════════════
+  // 6. MATHÉMATIQUES — Statistiques et probabilités
+  // ══════════════════════════════════════════════
+  {
+    id:'ma2', titre:'Statistiques descriptives — Moyenne, médiane, étendue',
+    sousTitre:'Mathématiques · Statistiques · Tronc Commun', icone:'📊',
+    matiere:'Mathématiques', niveau:'TC', categorie:'maths',
+    description:'Séance de statistiques sur les indicateurs de tendance centrale et de dispersion. Approche active : les élèves collectent des données réelles, calculent les indicateurs et les interprètent dans un contexte concret.',
+    tags:['maths','TC','Lycée'],
+    data:{
+      v:2,
+      entete:{prof:'EZ-ZAKY AZIZ',niveau:'Tronc Commun',module:'Module 3 — Statistiques et probabilités',sequence:'Séquence 1 : Statistiques descriptives',activite:'Cours + Activité — Indicateurs statistiques',support:'Données réelles : notes de classe + Fiche activité + Calculatrice',
+        objectif:'<ul><li>Calculer et interpréter la moyenne, la médiane et l\'étendue d\'une série statistique</li><li>Représenter graphiquement une série statistique (histogramme, diagramme circulaire)</li><li>Choisir l\'indicateur le plus adapté selon la situation</li><li>Lire et interpréter un tableau statistique ou un graphique</li></ul>'},
+      etapes:[
+        {nom:'Situation réelle',enseignant:'<p><strong>📊 Collecte de données réelles</strong></p><p>• Demander aux élèves leur note de mathématiques du dernier contrôle</p><p>• Saisir les données au tableau — les classer</p><p>• Question : <em>« Comment résumer ces données en un seul chiffre ? Lequel choisiriez-vous ? »</em></p><p>• Discussion : intuition de la "note moyenne" vs "note du milieu"</p>',duree:'8 min'},
+        {nom:'Cours — Moyenne',enseignant:'<p><strong>📐 La moyenne arithmétique</strong></p><p>• Définition et formule : x̄ = (Σxᵢ)/n</p><p>• Calcul sur les données de la classe</p><p>• Exemple guidé : série de températures mensuelles</p><p>• Propriétés : sensibilité aux valeurs extrêmes (exemple avec une valeur aberrante)</p><p>• Exercices d\'application immédiats (2 séries)</p>',duree:'10 min'},
+        {nom:'Cours — Médiane',enseignant:'<p><strong>📐 La médiane et l\'étendue</strong></p><p>• Définition de la médiane : valeur qui partage la série en deux moitiés égales</p><p>• Méthode : trier la série → trouver la valeur centrale (n impair) ou la moyenne des deux (n pair)</p><p>• Calcul de la médiane et de l\'étendue sur les données de la classe</p><p>• Comparaison moyenne/médiane : quand préférer l\'une ou l\'autre ?</p>',duree:'10 min'},
+        {nom:'Représentation',enseignant:'<p><strong>📉 Représentations graphiques</strong></p><p>• Construire l\'histogramme des notes de la classe</p><p>• Construction du diagramme circulaire (répartition par tranches)</p><p>• Lecture et interprétation : <em>« Quelle information donne chaque type de graphique ? »</em></p><p>• Exercice : lire un graphique statistique et répondre à des questions</p>',duree:'12 min'},
+        {nom:'Synthèse',enseignant:'<p><strong>📝 Bilan et exercice récapitulatif</strong></p><p>• Tableau récapitulatif des indicateurs : définition, formule, usage</p><p>• Exercice récapitulatif : série de données → calculer moyenne, médiane, étendue, tracer histogramme</p><p>• Auto-correction</p><p>• DM : 2 exercices de statistiques sur des données réelles (températures, population)</p>',duree:'10 min'}
+      ],
+      params:{marge:'8.5',gap:'5',fontEnteteLabel:'11',fontEnteteContent:'10',fontTableHeader:'10',fontTableContent:'9',rowHeight:'8',tableHeaderH:'18',headerH:'100',l1h:'22',l234h:'18',l5h:'40',sep1:'32',sep2:'60',col1:'20',col2:'65',colorMain:'#1565C0',colorAccent:'#C9A84C',colorGrid:'#90CAF9',colorEtapeText:'#1565C0',labelColEtapes:'Étapes',labelColDerou:'Déroulement de la séance',labelColDuree:'Durée'},
+      resume:'5 étapes · 50 min',niveau:'Tronc Commun',module:'Module 3 — Statistiques et probabilités'
+    }
+  },
+
+  // ══════════════════════════════════════════════
+  // 7. ANGLAIS — Compréhension orale (1 seul modèle)
+  // ══════════════════════════════════════════════
+  {
+    id:'an1', titre:'Listening & Comprehension — Climate Change',
+    sousTitre:'Anglais · Compréhension de l\'oral · 1 BAC', icone:'🇬🇧',
+    matiere:'Anglais', niveau:'1BAC', categorie:'anglais',
+    description:'Séance de compréhension de l\'oral sur le changement climatique. Les élèves écoutent un reportage audio, extraient les informations clés et répondent à des questions de compréhension globale et détaillée.',
+    tags:['anglais','1BAC','Lycée'],
+    data:{
+      v:2,
+      entete:{prof:'EZ-ZAKY AZIZ',niveau:'1 BAC',module:'Module 2 — Our Environment',sequence:'Séquence 3 : Climate Change & Global Warming',activite:'Listening Comprehension',support:'Audio : "Climate Crisis" — BBC Learning English',
+        objectif:'<ul><li>Identifier les informations clés dans un document audio authentique</li><li>Comprendre le vocabulaire lié à l\'environnement et au changement climatique</li><li>Répondre à des questions de compréhension globale et détaillée</li><li>Développer des stratégies d\'écoute active</li></ul>'},
+      etapes:[
+        {nom:'Warm-up',enseignant:'<p><strong>🌡️ Pre-listening — Brain Activation</strong></p><p>• Afficher des images : fonte des glaces, canicules, inondations</p><p>• Questions : <em>"What do you see? What problems do they illustrate? What do you know about climate change?"</em></p><p>• Brainstorming collectif — recueil des hypothèses au tableau</p>',duree:'8 min'},
+        {nom:'Pre-listening',enseignant:'<p><strong>📖 Vocabulary & Context Preparation</strong></p><p>• Vocabulaire clé : <em>greenhouse gases, carbon dioxide (CO₂), fossil fuels, renewable energy, deforestation, biodiversity</em></p><p>• Prédiction du contenu à partir du titre</p><p>• Distribution de la fiche d\'écoute (questions + grille de prise de notes)</p>',duree:'10 min'},
+        {nom:'1ère écoute',enseignant:'<p><strong>🎙️ First Listening — Global Comprehension</strong></p><p>• Écoute complète <strong>sans interruption</strong></p><p>• Tâche : identifier le thème général, le ton, l\'idée principale</p><p>• Mise en commun orale — correction collective</p>',duree:'10 min'},
+        {nom:'2ème écoute',enseignant:'<p><strong>🔍 Second Listening — Detailed Comprehension</strong></p><p>• Réécouter avec pauses possibles</p><p>• Questions de détail : causes, conséquences, solutions citées dans le document</p><p>• Travail individuel puis correction en binômes</p>',duree:'12 min'},
+        {nom:'Post-listening',enseignant:'<p><strong>💬 Reaction & Personal Expression</strong></p><p>• Discussion : <em>"What surprised you? What can WE do to fight climate change?"</em></p><p>• Notes sur des actions concrètes (at home / at school / in the community)</p><p>• Bilan — auto-évaluation rapide (pouce levé)</p>',duree:'10 min'}
+      ],
+      params:{marge:'8.5',gap:'5',fontEnteteLabel:'11',fontEnteteContent:'10',fontTableHeader:'10',fontTableContent:'9',rowHeight:'8',tableHeaderH:'18',headerH:'100',l1h:'22',l234h:'18',l5h:'40',sep1:'32',sep2:'60',col1:'20',col2:'65',colorMain:'#1565C0',colorAccent:'#C9A84C',colorGrid:'#AAAAAA',colorEtapeText:'#1565C0',labelColEtapes:'Étapes',labelColDerou:'Déroulement de la séance',labelColDuree:'Durée'},
+      resume:'5 étapes · 50 min',niveau:'1 BAC',module:'Module 2 — Our Environment'
+    }
+  }
+
+];
+
+var filtreModeleActif = 'all';
+
+function rendreTousLesModeles() { renderModeles(MODELES_FICHES); }
+
+function filtrerModeles(filtre, btnEl) {
+  filtreModeleActif = filtre;
+  document.querySelectorAll('.modele-filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btnEl) btnEl.classList.add('active');
+  var filtres = filtre === 'all' ? MODELES_FICHES : MODELES_FICHES.filter(function(m){ return m.tags.indexOf(filtre) !== -1; });
+  renderModeles(filtres);
+}
+
+function renderModeles(liste) {
+  var container = document.getElementById('modeles-liste');
+  if (!container) return;
+  if (!liste || liste.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:#aaa;font-size:14px;">Aucun modèle pour ce filtre.</div>';
+    return;
+  }
+  container.innerHTML = liste.map(function(m) {
+    var etapesHtml = m.data.etapes.map(function(e, i) {
+      var desc = e.enseignant.replace(/<[^>]*>/g,'').substring(0, 70) + '…';
+      return '<div class="modele-etape-row"><div class="modele-etape-num">'+(i+1)+'</div><div class="modele-etape-name">'+e.nom+'</div><div class="modele-etape-desc">'+desc+'</div><div class="modele-etape-duree">'+e.duree+'</div></div>';
+    }).join('');
+    return '<div class="modele-card">'+
+      '<div class="modele-card-header">'+
+        '<div class="modele-card-icon">'+m.icone+'</div>'+
+        '<div><div class="modele-card-title">'+m.titre+'</div><div class="modele-card-subtitle">'+m.sousTitre+'</div></div>'+
+      '</div>'+
+      '<div class="modele-card-body">'+
+        '<div style="margin-bottom:8px;">'+
+          '<span class="modele-tag modele-tag-matiere">🇬🇧 '+m.matiere+'</span>'+
+          '<span class="modele-tag modele-tag-niveau">📚 '+m.niveau+'</span>'+
+          '<span class="modele-tag modele-tag-duree">⏱ '+m.data.resume+'</span>'+
+        '</div>'+
+        '<div class="modele-desc">'+m.description+'</div>'+
+        '<div class="modele-etapes-preview">'+
+          '<div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Aperçu des étapes</div>'+
+          etapesHtml+
+        '</div>'+
+      '</div>'+
+      '<div class="modele-card-actions">'+
+        '<button class="btn-modele-charger" onclick="chargerModele(\''+m.id+'\')">📂 Charger ce modèle</button>'+
+        '<button class="btn-modele-sauver" onclick="sauverModeleRepertoire(\''+m.id+'\')">💾 Sauver</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function chargerModele(id) {
+  var modele = null;
+  for (var i=0; i<MODELES_FICHES.length; i++) { if (MODELES_FICHES[i].id === id) { modele = MODELES_FICHES[i]; break; } }
+  if (!modele) return;
+  if (!confirm('📂 Charger le modèle "'+modele.titre+'" ?\n\nLe contenu actuel sera remplacé.')) return;
+  var data = JSON.parse(JSON.stringify(modele.data));
+  restaurerFiche(data);
+  showTab('entete');
+  var toast = document.getElementById('toast');
+  if (toast) toast.textContent = '✅ Modèle chargé — personnalisez et exportez !';
+  showToast();
+}
+
+function sauverModeleRepertoire(id) {
+  var modele = null;
+  for (var i=0; i<MODELES_FICHES.length; i++) { if (MODELES_FICHES[i].id === id) { modele = MODELES_FICHES[i]; break; } }
+  if (!modele) return;
+  var fiches = lireRepertoire();
+  var nomFinal = '[MODÈLE] ' + modele.titre;
+  var existant = -1;
+  for (var j=0; j<fiches.length; j++) { if (fiches[j].nom === nomFinal) { existant = j; break; } }
+  if (existant !== -1) {
+    if (!confirm('⚠️ Ce modèle est déjà dans le répertoire.\nVoulez-vous le remplacer ?')) return;
+    fiches.splice(existant, 1);
+  }
+  var data = JSON.parse(JSON.stringify(modele.data));
+  data.nom = nomFinal;
+  data.savedAt = new Date().toLocaleString('fr-FR');
+  data.resume = modele.data.resume;
+  data.niveau = modele.niveau;
+  data.module = modele.data.entete.module;
+  fiches.push(data);
+  ecrireRepertoire(fiches);
+  mettreAJourBadgeRepertoire();
+  var toast = document.getElementById('toast');
+  if (toast) toast.textContent = '💾 Modèle sauvegardé dans le répertoire !';
+  showToast();
+}
+
 (function() {
   const banner = document.getElementById('offline-banner');
   let restoreTimer = null;
@@ -5764,8 +6431,81 @@ function genererDOCX() {
   }
 
   window.addEventListener('load', injectJsPdfFallback);
+
+  // ═══════════════════════════════════════════════════
+  // MESSAGE DE BIENVENUE & LICENCE (Premier lancement)
+  // ═══════════════════════════════════════════════════
+  window.addEventListener('load', function() {
+    // Vérifier si c'est la première visite
+    const hasSeenWelcome = localStorage.getItem('fp_welcome_seen');
+    
+    if (!hasSeenWelcome) {
+      // Attendre 800ms pour que la page soit bien chargée
+      setTimeout(function() {
+        const acceptLicense = confirm(
+          '📋 BIENVENUE dans le Générateur de Fiches Pédagogiques !\n\n' +
+          '© 2025 EZ-ZAKY AZIZ — Version 2.11\n\n' +
+          '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' +
+          'LICENCE D\'UTILISATION\n' +
+          '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+          'Cette application est gratuite et distribuée sous licence\n' +
+          'Creative Commons BY-NC-SA 4.0.\n\n' +
+          '✅ VOUS POUVEZ :\n' +
+          '   • Utiliser l\'application gratuitement\n' +
+          '   • La partager avec vos collègues\n' +
+          '   • La modifier pour vos besoins\n\n' +
+          '⚠️ VOUS DEVEZ :\n' +
+          '   • Toujours créditer l\'auteur (EZ-ZAKY AZIZ)\n' +
+          '   • Partager vos modifications sous la même licence\n\n' +
+          '❌ INTERDIT :\n' +
+          '   • Usage commercial (vente de l\'application)\n' +
+          '   • Retirer le nom de l\'auteur\n\n' +
+          '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+          'Pour plus de détails, consultez l\'onglet "À propos".\n\n' +
+          'Acceptez-vous ces conditions d\'utilisation ?'
+        );
+        
+        if (acceptLicense) {
+          // Marquer comme vu
+          localStorage.setItem('fp_welcome_seen', 'true');
+          localStorage.setItem('fp_license_accepted', new Date().toISOString());
+          
+          // Message de bienvenue
+          alert(
+            '🎉 Merci et bienvenue !\n\n' +
+            'Consultez l\'onglet "📖 Guide" pour découvrir\n' +
+            'toutes les fonctionnalités de l\'application.\n\n' +
+            'Bonne création de fiches pédagogiques ! 📚'
+          );
+        } else {
+          // L'utilisateur a refusé
+          alert(
+            '⚠️ Conditions non acceptées\n\n' +
+            'Vous devez accepter la licence pour utiliser cette application.\n\n' +
+            'L\'application va maintenant se fermer.'
+          );
+          // Rediriger vers une page blanche
+          document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;text-align:center;padding:20px;"><div><h1 style="color:#1565C0;">📋</h1><h2>Licence non acceptée</h2><p style="color:#666;">Vous devez accepter les conditions d\'utilisation<br>pour utiliser cette application.</p><button onclick="location.reload()" style="margin-top:20px;padding:10px 20px;background:#1565C0;color:white;border:none;border-radius:5px;cursor:pointer;font-size:14px;">🔄 Recharger et accepter</button></div></div>';
+        }
+      }, 800);
+    }
+  });
 })();
 </script>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- FOOTER PERMANENT — VERSION & COPYRIGHT              -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="app-footer">
+  <div>
+    © 2025 <a href="#" onclick="showTab('apropos'); return false;">EZ-ZAKY AZIZ</a> — Tous droits réservés
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span class="version-badge">v2.11</span>
+    <span style="color:#aaa;">|</span>
+    <a href="#" onclick="showTab('apropos'); return false;">Licence CC BY-NC-SA 4.0</a>
+  </div>
+</div>
 
 </body>
 </html>
