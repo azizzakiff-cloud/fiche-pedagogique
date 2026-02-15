@@ -709,6 +709,21 @@ if ('serviceWorker' in navigator) {
     background: var(--blue);
     color: white;
   }
+  
+  /* ─── SÉLECTEURS DE COULEUR COMPACTS ─── */
+  .color-picker-btn {
+    width: 32px;
+    height: 28px;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 2px;
+    background: white;
+  }
+  .color-picker-btn:hover {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px var(--blue-pale);
+  }
 
   /* ─── CHAMPS ÉDITABLES (contenteditable) ─── */
   .editable-input {
@@ -1424,6 +1439,53 @@ if ('serviceWorker' in navigator) {
   }
 
 
+
+  /* ─── REDIMENSIONNEMENT D'IMAGE ─── */
+  .ql-editor img { cursor: pointer; transition: outline 0.15s; }
+  .ql-editor img.img-selected { outline: 2px solid var(--blue); outline-offset: 2px; }
+  #img-resize-panel {
+    display: none; position: fixed; z-index: 9999;
+    background: white; border: 1.5px solid var(--blue);
+    border-radius: 10px; box-shadow: 0 6px 24px rgba(21,101,192,0.20);
+    padding: 12px 16px; min-width: 250px;
+    font-family: 'Source Serif 4', serif; font-size: 12px;
+  }
+  #img-resize-panel.show { display: block; }
+  #img-resize-panel .rp-head {
+    font-weight: 700; color: var(--blue-dark); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
+  }
+  #img-resize-panel .rp-dims { font-weight: 400; color: var(--muted); font-size: 10px; }
+  #img-resize-panel .rp-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  #img-resize-panel .rp-lbl { color: var(--muted); font-size: 11px; min-width: 56px; }
+  #img-resize-panel input[type="range"] { flex: 1; accent-color: var(--blue); height: 4px; }
+  #img-resize-panel input[type="number"] {
+    width: 60px; padding: 3px 6px; border: 1.5px solid var(--border);
+    border-radius: 5px; font-size: 12px; font-family: inherit; text-align: center;
+    color: var(--ink);
+  }
+  #img-resize-panel .rp-unit { font-size: 10px; color: var(--muted); }
+  #img-resize-panel .rp-presets { display: flex; gap: 5px; margin: 4px 0 10px; }
+  #img-resize-panel .rp-pre {
+    flex: 1; padding: 4px 0; background: var(--blue-pale); border: 1px solid var(--border);
+    border-radius: 5px; font-size: 11px; cursor: pointer; text-align: center;
+    color: var(--blue-dark); transition: all 0.15s; font-family: inherit;
+  }
+  #img-resize-panel .rp-pre:hover, #img-resize-panel .rp-pre.active {
+    background: var(--blue); color: white; border-color: var(--blue);
+  }
+  #img-resize-panel .rp-info { font-size: 10px; color: var(--muted); margin-bottom: 10px; }
+  #img-resize-panel .rp-btns { display: flex; gap: 8px; }
+  #img-resize-panel .rp-btn {
+    flex: 1; padding: 6px 0; border: none; border-radius: 6px;
+    font-size: 12px; cursor: pointer; font-family: inherit; font-weight: 600;
+    transition: opacity 0.15s;
+  }
+  #img-resize-panel .rp-ok { background: var(--blue); color: white; }
+  #img-resize-panel .rp-cancel { background: var(--off-white); color: var(--muted); border: 1px solid var(--border); font-weight: 400; }
+
 </style>
 </head>
 <body>
@@ -1512,9 +1574,12 @@ if ('serviceWorker' in navigator) {
               <span class="label-text">Professeur</span>
               <span class="label-edit-hint">✏️</span>
             </label>
-            <div style="display:flex;gap:4px;margin-bottom:4px;">
+            <div style="display:flex;gap:4px;margin-bottom:4px;flex-wrap:wrap;">
               <button type="button" class="format-btn" onclick="toggleFormat('prof', 'bold')" title="Gras"><b>B</b></button>
               <button type="button" class="format-btn" onclick="toggleFormat('prof', 'italic')" title="Italique"><i>I</i></button>
+              <input type="color" class="color-picker-btn" onchange="applyColorToContentEditable('prof', this.value)" title="Couleur du texte" value="#000000">
+              <input type="color" class="color-picker-btn" onchange="applyBackgroundToContentEditable('prof', this.value)" title="Couleur de surlignage" value="#FFFFFF">
+              <button type="button" class="format-btn" onclick="removeColorFromContentEditable('prof')" title="Supprimer les couleurs" style="font-size:11px;">🚫</button>
             </div>
             <div id="prof" contenteditable="true" class="editable-input" oninput="updateLivePreview()">EZ-ZAKY AZIZ</div>
           </div>
@@ -1523,7 +1588,12 @@ if ('serviceWorker' in navigator) {
               <span class="label-text">Niveau</span>
               <span class="label-edit-hint">✏️</span>
             </label>
-            <div style="display:flex;gap:4px;margin-bottom:4px;"><button type="button" class="format-btn" onclick="toggleFormat('niveau', 'bold')" title="Gras"><b>B</b></button><button type="button" class="format-btn" onclick="toggleFormat('niveau', 'italic')" title="Italique"><i>I</i></button></div><div id="niveau" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Ex : 1BAC, 2BAC, TC…"></div>
+            <div style="display:flex;gap:4px;margin-bottom:4px;flex-wrap:wrap;">
+              <button type="button" class="format-btn" onclick="toggleFormat('niveau', 'bold')" title="Gras"><b>B</b></button>
+              <button type="button" class="format-btn" onclick="toggleFormat('niveau', 'italic')" title="Italique"><i>I</i></button>
+              <input type="color" class="color-picker-btn" onchange="applyColorToContentEditable('niveau', this.value)" title="Couleur du texte" value="#000000">
+              <input type="color" class="color-picker-btn" onchange="applyBackgroundToContentEditable('niveau', this.value)" title="Couleur de surlignage" value="#FFFFFF">
+            </div><div id="niveau" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Ex : 1BAC, 2BAC, TC…"></div>
           </div>
         </div>
       </div>
@@ -1536,7 +1606,12 @@ if ('serviceWorker' in navigator) {
             <span class="label-text">Module</span>
             <span class="label-edit-hint">✏️</span>
           </label>
-          <div style="display:flex;gap:4px;margin-bottom:4px;"><button type="button" class="format-btn" onclick="toggleFormat('module', 'bold')" title="Gras"><b>B</b></button><button type="button" class="format-btn" onclick="toggleFormat('module', 'italic')" title="Italique"><i>I</i></button></div><div id="module" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Intitulé exact du module"></div>
+          <div style="display:flex;gap:4px;margin-bottom:4px;flex-wrap:wrap;">
+            <button type="button" class="format-btn" onclick="toggleFormat('module', 'bold')" title="Gras"><b>B</b></button>
+            <button type="button" class="format-btn" onclick="toggleFormat('module', 'italic')" title="Italique"><i>I</i></button>
+            <input type="color" class="color-picker-btn" onchange="applyColorToContentEditable('module', this.value)" title="Couleur du texte" value="#000000">
+            <input type="color" class="color-picker-btn" onchange="applyBackgroundToContentEditable('module', this.value)" title="Couleur de surlignage" value="#FFFFFF">
+          </div><div id="module" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Intitulé exact du module"></div>
         </div>
       </div>
 
@@ -1548,7 +1623,12 @@ if ('serviceWorker' in navigator) {
             <span class="label-text">Séquence</span>
             <span class="label-edit-hint">✏️</span>
           </label>
-          <div style="display:flex;gap:4px;margin-bottom:4px;"><button type="button" class="format-btn" onclick="toggleFormat('sequence', 'bold')" title="Gras"><b>B</b></button><button type="button" class="format-btn" onclick="toggleFormat('sequence', 'italic')" title="Italique"><i>I</i></button></div><div id="sequence" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Intitulé exact de la séquence"></div>
+          <div style="display:flex;gap:4px;margin-bottom:4px;flex-wrap:wrap;">
+            <button type="button" class="format-btn" onclick="toggleFormat('sequence', 'bold')" title="Gras"><b>B</b></button>
+            <button type="button" class="format-btn" onclick="toggleFormat('sequence', 'italic')" title="Italique"><i>I</i></button>
+            <input type="color" class="color-picker-btn" onchange="applyColorToContentEditable('sequence', this.value)" title="Couleur du texte" value="#000000">
+            <input type="color" class="color-picker-btn" onchange="applyBackgroundToContentEditable('sequence', this.value)" title="Couleur de surlignage" value="#FFFFFF">
+          </div><div id="sequence" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Intitulé exact de la séquence"></div>
         </div>
       </div>
 
@@ -1561,14 +1641,24 @@ if ('serviceWorker' in navigator) {
               <span class="label-text">Activité</span>
               <span class="label-edit-hint">✏️</span>
             </label>
-            <div style="display:flex;gap:4px;margin-bottom:4px;"><button type="button" class="format-btn" onclick="toggleFormat('activite', 'bold')" title="Gras"><b>B</b></button><button type="button" class="format-btn" onclick="toggleFormat('activite', 'italic')" title="Italique"><i>I</i></button></div><div id="activite" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Intitulé de l'activité"></div>
+            <div style="display:flex;gap:4px;margin-bottom:4px;flex-wrap:wrap;">
+              <button type="button" class="format-btn" onclick="toggleFormat('activite', 'bold')" title="Gras"><b>B</b></button>
+              <button type="button" class="format-btn" onclick="toggleFormat('activite', 'italic')" title="Italique"><i>I</i></button>
+              <input type="color" class="color-picker-btn" onchange="applyColorToContentEditable('activite', this.value)" title="Couleur du texte" value="#000000">
+              <input type="color" class="color-picker-btn" onchange="applyBackgroundToContentEditable('activite', this.value)" title="Couleur de surlignage" value="#FFFFFF">
+            </div><div id="activite" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Intitulé de l'activité"></div>
           </div>
           <div class="field editable-field-wrap">
             <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier">
               <span class="label-text">Support</span>
               <span class="label-edit-hint">✏️</span>
             </label>
-            <div style="display:flex;gap:4px;margin-bottom:4px;"><button type="button" class="format-btn" onclick="toggleFormat('support', 'bold')" title="Gras"><b>B</b></button><button type="button" class="format-btn" onclick="toggleFormat('support', 'italic')" title="Italique"><i>I</i></button></div><div id="support" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Titre / référence support"></div>
+            <div style="display:flex;gap:4px;margin-bottom:4px;flex-wrap:wrap;">
+              <button type="button" class="format-btn" onclick="toggleFormat('support', 'bold')" title="Gras"><b>B</b></button>
+              <button type="button" class="format-btn" onclick="toggleFormat('support', 'italic')" title="Italique"><i>I</i></button>
+              <input type="color" class="color-picker-btn" onchange="applyColorToContentEditable('support', this.value)" title="Couleur du texte" value="#000000">
+              <input type="color" class="color-picker-btn" onchange="applyBackgroundToContentEditable('support', this.value)" title="Couleur de surlignage" value="#FFFFFF">
+            </div><div id="support" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Titre / référence support"></div>
           </div>
         </div>
       </div>
@@ -2428,6 +2518,41 @@ if ('serviceWorker' in navigator) {
   </div>
 </div>
 
+
+<!-- PANNEAU REDIMENSIONNEMENT IMAGE -->
+<div id="img-resize-panel">
+  <div class="rp-head">
+    <span>🖼 Taille de l'image</span>
+    <span class="rp-dims" id="rp-dims-orig"></span>
+  </div>
+  <div class="rp-row">
+    <span class="rp-lbl">Largeur</span>
+    <input type="range" id="rp-range" min="5" max="100" value="100" step="1"
+           oninput="rpUpdateFromRange(this.value)">
+  </div>
+  <div class="rp-row">
+    <span class="rp-lbl">En pixels</span>
+    <input type="number" id="rp-px" min="10" max="3000" step="1"
+           oninput="rpUpdateFromPx(this.value)">
+    <span class="rp-unit">px</span>
+    <span style="color:var(--muted);font-size:10px;">×</span>
+    <input type="number" id="rp-py" min="10" max="3000" step="1" style="width:60px"
+           oninput="rpUpdateFromPy(this.value)">
+    <span class="rp-unit">px</span>
+  </div>
+  <div class="rp-presets">
+    <button class="rp-pre" onclick="rpSetPct(25)">25%</button>
+    <button class="rp-pre" onclick="rpSetPct(50)">50%</button>
+    <button class="rp-pre" onclick="rpSetPct(75)">75%</button>
+    <button class="rp-pre" onclick="rpSetPct(100)">100%</button>
+  </div>
+  <div class="rp-info" id="rp-preview-size"></div>
+  <div class="rp-btns">
+    <button class="rp-btn rp-cancel" onclick="rpFermer(false)">Annuler</button>
+    <button class="rp-btn rp-ok" onclick="rpAppliquer()">✔ Appliquer</button>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast">✅ PDF généré et téléchargé !</div>
 
@@ -2488,9 +2613,11 @@ function ajouterEtape(data) {
     <div class="etape-body">
       <div class="field">
         <label>Nom de l'étape <span class="required">*</span></label>
-        <div style="display:flex;gap:4px;margin-bottom:4px;">
+        <div style="display:flex;gap:4px;margin-bottom:4px;flex-wrap:wrap;">
           <button type="button" class="format-btn" onclick="toggleFormat('e${n}-nom', 'bold')" title="Gras"><b>B</b></button>
           <button type="button" class="format-btn" onclick="toggleFormat('e${n}-nom', 'italic')" title="Italique"><i>I</i></button>
+          <input type="color" class="color-picker-btn" onchange="applyColorToContentEditable('e${n}-nom', this.value)" title="Couleur du texte" value="#000000">
+          <input type="color" class="color-picker-btn" onchange="applyBackgroundToContentEditable('e${n}-nom', this.value)" title="Couleur de surlignage" value="#FFFFFF">
         </div>
         <div id="e${n}-nom" contenteditable="true" class="editable-input" data-placeholder="Ex : Mise en route, Présentation…">${d.nom||''}</div>
       </div>
@@ -2576,6 +2703,84 @@ function initQuillEditor(wrapperId, placeholder = '') {
         <button class="ql-underline" title="Souligné"></button>
       </span>
       <span class="ql-formats">
+        <select class="ql-color" title="Couleur du texte">
+          <option value="#000000"></option>
+          <option value="#e60000"></option>
+          <option value="#ff9900"></option>
+          <option value="#ffff00"></option>
+          <option value="#008a00"></option>
+          <option value="#0066cc"></option>
+          <option value="#9933ff"></option>
+          <option value="#ffffff"></option>
+          <option value="#facccc"></option>
+          <option value="#ffebcc"></option>
+          <option value="#ffffcc"></option>
+          <option value="#cce8cc"></option>
+          <option value="#cce0f5"></option>
+          <option value="#ebd6ff"></option>
+          <option value="#bbbbbb"></option>
+          <option value="#f06666"></option>
+          <option value="#ffc266"></option>
+          <option value="#ffff66"></option>
+          <option value="#66b966"></option>
+          <option value="#66a3e0"></option>
+          <option value="#c285ff"></option>
+          <option value="#888888"></option>
+          <option value="#a10000"></option>
+          <option value="#b26b00"></option>
+          <option value="#b2b200"></option>
+          <option value="#006100"></option>
+          <option value="#0047b2"></option>
+          <option value="#6b24b2"></option>
+          <option value="#444444"></option>
+          <option value="#5c0000"></option>
+          <option value="#663d00"></option>
+          <option value="#666600"></option>
+          <option value="#003700"></option>
+          <option value="#002966"></option>
+          <option value="#3d1466"></option>
+          <option selected></option>
+        </select>
+        <select class="ql-background" title="Couleur de surlignage">
+          <option value="#000000"></option>
+          <option value="#e60000"></option>
+          <option value="#ff9900"></option>
+          <option value="#ffff00"></option>
+          <option value="#008a00"></option>
+          <option value="#0066cc"></option>
+          <option value="#9933ff"></option>
+          <option value="#ffffff"></option>
+          <option value="#facccc"></option>
+          <option value="#ffebcc"></option>
+          <option value="#ffffcc"></option>
+          <option value="#cce8cc"></option>
+          <option value="#cce0f5"></option>
+          <option value="#ebd6ff"></option>
+          <option value="#bbbbbb"></option>
+          <option value="#f06666"></option>
+          <option value="#ffc266"></option>
+          <option value="#ffff66"></option>
+          <option value="#66b966"></option>
+          <option value="#66a3e0"></option>
+          <option value="#c285ff"></option>
+          <option value="#888888"></option>
+          <option value="#a10000"></option>
+          <option value="#b26b00"></option>
+          <option value="#b2b200"></option>
+          <option value="#006100"></option>
+          <option value="#0047b2"></option>
+          <option value="#6b24b2"></option>
+          <option value="#444444"></option>
+          <option value="#5c0000"></option>
+          <option value="#663d00"></option>
+          <option value="#666600"></option>
+          <option value="#003700"></option>
+          <option value="#002966"></option>
+          <option value="#3d1466"></option>
+          <option selected></option>
+        </select>
+      </span>
+      <span class="ql-formats">
         <button class="ql-list" value="ordered" title="Liste numérotée"></button>
         <button class="ql-list" value="bullet"  title="Liste à puces"></button>
       </span>
@@ -2643,12 +2848,174 @@ function ouvrirSelecteurImage(wrapperId) {
 function insererImageQuill(wrapperId, dataUrl) {
   const quill = quillInstances[wrapperId];
   if (!quill) return;
-  // Insérer l'image à la position du curseur
   const range = quill.getSelection(true);
   const index = range ? range.index : quill.getLength();
   quill.insertEmbed(index, 'image', dataUrl, Quill.sources.USER);
   quill.setSelection(index + 1, Quill.sources.SILENT);
+  // Ouvrir automatiquement le panneau de redimensionnement après insertion
+  setTimeout(() => {
+    const imgs = quill.root.querySelectorAll('img');
+    const img = imgs[imgs.length - 1];
+    if (img) rpOuvrir(img, wrapperId);
+  }, 100);
 }
+
+// ═══════════════════════════════════════════════════
+// REDIMENSIONNEMENT D'IMAGE — PANNEAU FLOTTANT
+// ═══════════════════════════════════════════════════
+let _rpImg   = null;   // <img> en cours
+let _rpWId   = null;   // wrapperId Quill
+let _rpNatW  = 1;      // largeur naturelle originale
+let _rpNatH  = 1;      // hauteur naturelle originale
+let _rpSavedW = null;  // taille avant ouverture (pour annuler)
+let _rpSavedH = null;
+
+function rpOuvrir(imgEl, wrapperId) {
+  _rpImg  = imgEl;
+  _rpWId  = wrapperId;
+
+  // Charger les dimensions naturelles (stockées en data ou lues)
+  const tmp = new Image();
+  tmp.src = imgEl.src;
+  _rpNatW = parseInt(imgEl.getAttribute('data-nat-w')) || tmp.naturalWidth  || imgEl.naturalWidth  || 400;
+  _rpNatH = parseInt(imgEl.getAttribute('data-nat-h')) || tmp.naturalHeight || imgEl.naturalHeight || 300;
+  // Stocker les dims naturelles sur l'élément pour usage futur
+  if (!imgEl.getAttribute('data-nat-w')) imgEl.setAttribute('data-nat-w', _rpNatW);
+  if (!imgEl.getAttribute('data-nat-h')) imgEl.setAttribute('data-nat-h', _rpNatH);
+
+  // Taille actuelle
+  const curW = parseInt(imgEl.getAttribute('data-w') || imgEl.style.width) || _rpNatW;
+  const curH = parseInt(imgEl.getAttribute('data-h') || imgEl.style.height) || _rpNatH;
+  _rpSavedW = curW; _rpSavedH = curH;
+
+  // Mettre en évidence l'image
+  document.querySelectorAll('.ql-editor img').forEach(i => i.classList.remove('img-selected'));
+  imgEl.classList.add('img-selected');
+
+  // Remplir le panneau
+  document.getElementById('rp-dims-orig').textContent = _rpNatW + ' × ' + _rpNatH + ' px (original)';
+  document.getElementById('rp-px').value = curW;
+  document.getElementById('rp-py').value = curH;
+  const pct = Math.round((curW / _rpNatW) * 100);
+  document.getElementById('rp-range').value = Math.min(pct, 100);
+  rpUpdateInfo(curW, curH);
+  rpHighlightPreset(pct);
+
+  // Positionner le panneau (fixed, près de l'image)
+  const panel = document.getElementById('img-resize-panel');
+  const rect  = imgEl.getBoundingClientRect();
+  let top  = rect.bottom + 8;
+  let left = rect.left;
+  // Garder dans la fenêtre
+  const pw = 270;
+  if (left + pw > window.innerWidth - 12) left = window.innerWidth - pw - 12;
+  if (left < 8) left = 8;
+  if (top + 280 > window.innerHeight) top = Math.max(8, rect.top - 290);
+  panel.style.top  = top  + 'px';
+  panel.style.left = left + 'px';
+  panel.classList.add('show');
+}
+
+function rpFermer(apply) {
+  if (!apply && _rpImg && _rpSavedW) {
+    // Restaurer la taille d'avant
+    _rpImg.style.width  = _rpSavedW + 'px';
+    _rpImg.style.height = _rpSavedH + 'px';
+  }
+  document.querySelectorAll('.ql-editor img').forEach(i => i.classList.remove('img-selected'));
+  document.getElementById('img-resize-panel').classList.remove('show');
+  _rpImg = null; _rpWId = null;
+}
+
+function rpAppliquer() {
+  if (!_rpImg) { rpFermer(true); return; }
+  const w = parseInt(document.getElementById('rp-px').value) || _rpNatW;
+  const h = parseInt(document.getElementById('rp-py').value) || _rpNatH;
+  _rpImg.style.width  = w + 'px';
+  _rpImg.style.height = h + 'px';
+  _rpImg.setAttribute('data-w', w);
+  _rpImg.setAttribute('data-h', h);
+  // Forcer la mise à jour Quill
+  const quill = _rpWId ? quillInstances[_rpWId] : null;
+  if (quill) quill.update();
+  rpFermer(true);
+}
+
+function rpUpdateFromRange(pct) {
+  const w = Math.max(10, Math.round((parseInt(pct) / 100) * _rpNatW));
+  const h = Math.round(w * (_rpNatH / (_rpNatW || 1)));
+  document.getElementById('rp-px').value = w;
+  document.getElementById('rp-py').value = h;
+  rpPreviewLive(w, h);
+  rpUpdateInfo(w, h);
+  rpHighlightPreset(parseInt(pct));
+}
+
+function rpUpdateFromPx(val) {
+  const w = Math.max(10, parseInt(val) || 10);
+  const h = Math.round(w * (_rpNatH / (_rpNatW || 1)));
+  document.getElementById('rp-py').value = h;
+  const pct = Math.round((w / _rpNatW) * 100);
+  document.getElementById('rp-range').value = Math.min(pct, 100);
+  rpPreviewLive(w, h);
+  rpUpdateInfo(w, h);
+  rpHighlightPreset(pct);
+}
+
+function rpUpdateFromPy(val) {
+  const h = Math.max(10, parseInt(val) || 10);
+  const w = Math.round(h * (_rpNatW / (_rpNatH || 1)));
+  document.getElementById('rp-px').value = w;
+  const pct = Math.round((w / _rpNatW) * 100);
+  document.getElementById('rp-range').value = Math.min(pct, 100);
+  rpPreviewLive(w, h);
+  rpUpdateInfo(w, h);
+  rpHighlightPreset(pct);
+}
+
+function rpSetPct(pct) {
+  const w = Math.round((pct / 100) * _rpNatW);
+  const h = Math.round(w * (_rpNatH / (_rpNatW || 1)));
+  document.getElementById('rp-px').value    = w;
+  document.getElementById('rp-py').value    = h;
+  document.getElementById('rp-range').value = pct;
+  rpPreviewLive(w, h);
+  rpUpdateInfo(w, h);
+  rpHighlightPreset(pct);
+}
+
+function rpPreviewLive(w, h) {
+  if (!_rpImg) return;
+  _rpImg.style.width  = w + 'px';
+  _rpImg.style.height = h + 'px';
+}
+
+function rpUpdateInfo(w, h) {
+  document.getElementById('rp-preview-size').textContent =
+    'Aperçu : ' + w + ' × ' + h + ' px';
+}
+
+function rpHighlightPreset(pct) {
+  document.querySelectorAll('#img-resize-panel .rp-pre').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.textContent) === pct);
+  });
+}
+
+// Écoute globale : clic sur image Quill → ouvrir panneau
+document.addEventListener('click', function(e) {
+  const target = e.target;
+  const panel  = document.getElementById('img-resize-panel');
+  if (target.tagName === 'IMG' && target.closest('.ql-editor')) {
+    e.preventDefault(); e.stopPropagation();
+    const wrapper = target.closest('.quill-wrapper');
+    rpOuvrir(target, wrapper ? wrapper.id : null);
+    return;
+  }
+  // Fermer si clic hors panneau et hors image
+  if (panel && panel.classList.contains('show') && !panel.contains(target) && target.tagName !== 'IMG') {
+    rpFermer(false);
+  }
+});
 
 // ═══════════════════════════════════════════════════
 // TABLEAU — MODAL ET INSERTION DANS QUILL
@@ -3444,6 +3811,16 @@ function ajouterLigneLibre(type) {
   div.id = 'll-card-' + n;
   div.dataset.type = type;
 
+  // Toolbar de formatage réutilisable pour un champ contenteditable
+  const llToolbar = (fieldId) => `
+    <div style="display:flex;gap:4px;margin-bottom:4px;flex-wrap:wrap;">
+      <button type="button" class="format-btn" onclick="toggleFormat('${fieldId}','bold')" title="Gras"><b>B</b></button>
+      <button type="button" class="format-btn" onclick="toggleFormat('${fieldId}','italic')" title="Italique"><i>I</i></button>
+      <input type="color" class="color-picker-btn" onchange="applyColorToContentEditable('${fieldId}',this.value)" title="Couleur du texte" value="#000000">
+      <input type="color" class="color-picker-btn" onchange="applyBackgroundToContentEditable('${fieldId}',this.value)" title="Couleur de surlignage" value="#FFFFFF">
+      <button type="button" class="format-btn" onclick="removeColorFromContentEditable('${fieldId}')" title="Supprimer les couleurs" style="font-size:11px;">🚫</button>
+    </div>`;
+
   if (type === 'simple') {
     div.innerHTML = `
       <div class="ligne-libre-header">
@@ -3460,7 +3837,8 @@ function ajouterLigneLibre(type) {
             <span class="label-text">Champ ${n}</span>
             <span class="label-edit-hint">✏️</span>
           </label>
-          <input type="text" id="ll${n}-val1" placeholder="Contenu du champ…" oninput="updateLivePreview()">
+          ${llToolbar('ll'+n+'-val1')}
+          <div id="ll${n}-val1" contenteditable="true" class="editable-input" data-placeholder="Contenu du champ…" oninput="updateLivePreview()"></div>
         </div>
       </div>`;
   } else {
@@ -3480,14 +3858,16 @@ function ajouterLigneLibre(type) {
               <span class="label-text">Champ ${n}a</span>
               <span class="label-edit-hint">✏️</span>
             </label>
-            <input type="text" id="ll${n}-val1" placeholder="Contenu gauche…" oninput="updateLivePreview()">
+            ${llToolbar('ll'+n+'-val1')}
+            <div id="ll${n}-val1" contenteditable="true" class="editable-input" data-placeholder="Contenu gauche…" oninput="updateLivePreview()"></div>
           </div>
           <div class="field editable-field-wrap">
             <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier le label">
               <span class="label-text">Champ ${n}b</span>
               <span class="label-edit-hint">✏️</span>
             </label>
-            <input type="text" id="ll${n}-val2" placeholder="Contenu droit…" oninput="updateLivePreview()">
+            ${llToolbar('ll'+n+'-val2')}
+            <div id="ll${n}-val2" contenteditable="true" class="editable-input" data-placeholder="Contenu droit…" oninput="updateLivePreview()"></div>
           </div>
         </div>
       </div>`;
@@ -3534,19 +3914,25 @@ function collecterLignesLibres() {
     const labels = card.querySelectorAll('.editable-label');
     const val1El = document.getElementById('ll'+n+'-val1');
     const val2El = document.getElementById('ll'+n+'-val2');
+    // Lire innerHTML si contenteditable, sinon value (rétrocompatibilité)
+    const readVal = (el) => {
+      if (!el) return '';
+      if (el.contentEditable === 'true') return el.innerHTML.trim();
+      return el.value ? el.value.trim() : '';
+    };
     if (type === 'simple') {
       lines.push({
         type: 'simple',
         label: getLabelText(labels[0]),
-        val1: val1El ? val1El.value.trim() : ''
+        val1: readVal(val1El)
       });
     } else {
       lines.push({
         type: 'double',
         label1: getLabelText(labels[0]),
-        val1: val1El ? val1El.value.trim() : '',
+        val1: readVal(val1El),
         label2: getLabelText(labels[1]),
-        val2: val2El ? val2El.value.trim() : ''
+        val2: readVal(val2El)
       });
     }
   });
@@ -3671,6 +4057,47 @@ function toggleFormat(fieldId, format) {
   }
   
   // Déclencher la mise à jour de l'aperçu
+  updateLivePreview();
+}
+
+// ═══════════════════════════════════════════════════
+// COULEURS POUR LES CHAMPS CONTENTEDITABLE
+// ═══════════════════════════════════════════════════
+function applyColorToContentEditable(fieldId, color) {
+  const field = document.getElementById(fieldId);
+  if (!field) return;
+  
+  field.focus();
+  
+  // Utiliser execCommand pour appliquer la couleur
+  document.execCommand('foreColor', false, color);
+  
+  updateLivePreview();
+}
+
+function applyBackgroundToContentEditable(fieldId, color) {
+  const field = document.getElementById(fieldId);
+  if (!field) return;
+  
+  field.focus();
+  
+  // Utiliser execCommand pour appliquer le surlignage
+  document.execCommand('backColor', false, color);
+  
+  updateLivePreview();
+}
+
+function removeColorFromContentEditable(fieldId) {
+  const field = document.getElementById(fieldId);
+  if (!field) return;
+  
+  field.focus();
+  
+  // Supprimer les couleurs
+  document.execCommand('foreColor', false, '#000000');
+  document.execCommand('backColor', false, '#ffffff');
+  document.execCommand('removeFormat', false, null);
+  
   updateLivePreview();
 }
 
@@ -3837,11 +4264,34 @@ function collecterParams() {
 // ═══════════════════════════════════════════════════
 // UTILITAIRES COULEURS
 // ═══════════════════════════════════════════════════
-function hexToRgb(hex) {
-  const r = parseInt(hex.slice(1,3),16);
-  const g = parseInt(hex.slice(3,5),16);
-  const b = parseInt(hex.slice(5,7),16);
-  return [r,g,b];
+function hexToRgb(color) {
+  if (!color) return [0, 0, 0]; // Retourner noir par défaut
+  
+  // Convertir rgb(r,g,b) ou rgba(r,g,b,a)
+  if (color.startsWith('rgb')) {
+    const match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+      return [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])];
+    }
+  }
+  
+  // Convertir #RRGGBB ou #RGB
+  if (color.startsWith('#')) {
+    let hex = color.substring(1);
+    // Convertir #RGB en #RRGGBB
+    if (hex.length === 3) {
+      hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    }
+    if (hex.length === 6) {
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      return [r, g, b];
+    }
+  }
+  
+  // Fallback
+  return [0, 0, 0];
 }
 
 // ═══════════════════════════════════════════════════
@@ -4057,6 +4507,8 @@ function htmlToRichSegments(html) {
           underline: ctx.underline,
           fontSize: ctx.fontSize,
           font: ctx.font || null,
+          color: ctx.color || null,
+          background: ctx.background || null,
           prefix: ctx.prefix || ''
         });
       }
@@ -4071,6 +4523,26 @@ function htmlToRichSegments(html) {
     if (tag === 'strong' || tag === 'b') c.bold = true;
     if (tag === 'em' || tag === 'i') c.italic = true;
     if (tag === 'u') c.underline = true;
+    
+    // Balise <font> avec attributs color et/ou bgcolor (généré par execCommand)
+    if (tag === 'font') {
+      if (node.getAttribute('color')) {
+        c.color = node.getAttribute('color');
+      }
+      if (node.getAttribute('bgcolor')) {
+        c.background = node.getAttribute('bgcolor');
+      }
+    }
+    
+    // Balise <span> avec attributs style (généré par execCommand moderne)
+    if (tag === 'span') {
+      if (node.style.color) {
+        c.color = node.style.color;
+      }
+      if (node.style.backgroundColor) {
+        c.background = node.style.backgroundColor;
+      }
+    }
 
     // Headers h1/h2/h3
     if (tag === 'h1') { c.bold = true; c.fontSize = headerSizeMap['1']; }
@@ -4099,6 +4571,32 @@ function htmlToRichSegments(html) {
     if (node.style && node.style.fontSize) {
       const fs = parseFloat(node.style.fontSize);
       if (!isNaN(fs)) c.fontSize = fs * 0.75;
+    }
+
+    // ── COULEURS Quill ──
+    // Couleur du texte via classe .ql-color-xxx ou style.color
+    if (node.classList) {
+      // Quill génère des classes comme ql-color-#e60000
+      const colorClass = Array.from(node.classList).find(cls => cls.startsWith('ql-color-'));
+      if (colorClass) {
+        const colorValue = colorClass.replace('ql-color-', '').replace(/_/g, '');
+        c.color = '#' + colorValue;
+      }
+      // Fond (surlignage) via classe .ql-bg-xxx
+      const bgClass = Array.from(node.classList).find(cls => cls.startsWith('ql-bg-'));
+      if (bgClass) {
+        const bgValue = bgClass.replace('ql-bg-', '').replace(/_/g, '');
+        c.background = '#' + bgValue;
+      }
+    }
+    // Couleur via style inline
+    if (node.style) {
+      if (node.style.color) {
+        c.color = node.style.color;
+      }
+      if (node.style.backgroundColor) {
+        c.background = node.style.backgroundColor;
+      }
     }
 
     // ── LISTES Quill v2 : <ol> contient des <li data-list="bullet|ordered"> ──
@@ -4138,19 +4636,41 @@ function htmlToRichSegments(html) {
     if (tag === 'img') {
       const src = node.getAttribute('src') || '';
       if (src.startsWith('data:image')) {
-        segments.push({ type: 'image', src: src, w: node.naturalWidth || 0, h: node.naturalHeight || 0 });
+        // Taille définie par l'utilisateur (data-w/data-h ou style.width), sinon naturelle
+        const userW = parseInt(node.getAttribute('data-w'))  || parseInt(node.style.width)  || node.naturalWidth  || 0;
+        const userH = parseInt(node.getAttribute('data-h'))  || parseInt(node.style.height) || node.naturalHeight || 0;
+        segments.push({ type: 'image', src: src, w: userW, h: userH });
       }
       return;
     }
-    // Tableau HTML
+    // Tableau HTML — chaque cellule produit des segments riches (couleurs, gras, etc.)
     if (tag === 'table') {
       const tableData = [];
       node.querySelectorAll('tr').forEach(tr => {
         const rowData = [];
         tr.querySelectorAll('td, th').forEach(cell => {
+          const isHeader = cell.tagName.toLowerCase() === 'th';
+          // Couleur de fond de la cellule elle-même
+          let cellBg = null;
+          if (cell.style && cell.style.backgroundColor) cellBg = cell.style.backgroundColor;
+          // Contexte de base pour le contenu de la cellule
+          const cellCtx = Object.assign({}, c, {
+            bold:       isHeader || c.bold,
+            color:      (cell.style && cell.style.color) ? cell.style.color : c.color,
+            background: null,
+            prefix:     ''
+          });
+          // Extraire les segments riches du contenu de la cellule
+          const before = segments.length;
+          Array.from(cell.childNodes).forEach(ch => walk(ch, cellCtx));
+          const richContent = segments.splice(before);
+          // Nettoyer les \n terminaux
+          while (richContent.length && richContent[richContent.length-1].text === '\n') richContent.pop();
           rowData.push({
-            text: cell.textContent.trim(),
-            isHeader: cell.tagName.toLowerCase() === 'th'
+            text:        cell.textContent.trim(),
+            isHeader:    isHeader,
+            bgColor:     cellBg,
+            richContent: richContent
           });
         });
         if (rowData.length > 0) tableData.push(rowData);
@@ -4164,7 +4684,7 @@ function htmlToRichSegments(html) {
     Array.from(node.childNodes).forEach(ch => walk(ch, c));
   }
 
-  const baseCtx = { bold: false, italic: false, underline: false, fontSize: null, prefix: '' };
+  const baseCtx = { bold: false, italic: false, underline: false, fontSize: null, color: null, background: null, prefix: '' };
   Array.from(temp.childNodes).forEach(n => walk(n, baseCtx));
 
   // Nettoyer les \n finaux
@@ -4237,170 +4757,174 @@ function genererPDF() {
   }
 
   // Dessine un rect blanc avec bordure bleue (zone de saisie remplie ou vide)
-  // Fonction pour dessiner du texte avec formatage HTML (gras, italique)
+  // Fonction pour dessiner du texte avec formatage HTML (gras, italique, COULEURS)
   function drawFormattedText(htmlText, x, y, maxWidth, fontSize) {
     if (!htmlText) return;
     
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlText;
+    // Utiliser htmlToRichSegments pour détecter tous les formats y compris les couleurs
+    const segments = htmlToRichSegments(htmlText);
+    if (segments.length === 0) return;
     
     let currentX = x;
     const currentY = y;
     
-    function processNode(node, isBold, isItalic) {
-      if (node.nodeType === Node.TEXT_NODE) {
-        const text = normaliserTexte(node.textContent);
-        if (text) {
-          if (isBold && isItalic) {
-            doc.setFont('times', 'bolditalic');
-          } else if (isBold) {
-            doc.setFont('times', 'bold');
-          } else if (isItalic) {
-            doc.setFont('times', 'italic');
-          } else {
-            doc.setFont('times', 'normal');
-          }
-          
-          doc.setTextColor(0, 0, 0);
-          doc.setFontSize(fontSize);
-          doc.text(text, currentX, currentY);
-          currentX += doc.getTextWidth(text);
-        }
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        const tagName = node.tagName.toLowerCase();
-        const bold = isBold || tagName === 'b' || tagName === 'strong';
-        const italic = isItalic || tagName === 'i' || tagName === 'em';
+    segments.forEach(seg => {
+      if (seg.text && seg.text !== '\n') {
+        const fs = seg.fontSize || fontSize;
+        const fontStyle = seg.bold && seg.italic ? 'bolditalic' : seg.bold ? 'bold' : seg.italic ? 'italic' : 'normal';
         
-        Array.from(node.childNodes).forEach(child => {
-          processNode(child, bold, italic);
-        });
+        doc.setFontSize(fs);
+        doc.setFont('times', fontStyle);
+        
+        // Appliquer la couleur du texte si présente
+        if (seg.color) {
+          const [r, g, b] = hexToRgb(seg.color);
+          doc.setTextColor(r, g, b);
+        } else {
+          doc.setTextColor(0, 0, 0);
+        }
+        
+        const safeText = normaliserTexte(seg.text);
+        const textWidth = doc.getTextWidth(safeText);
+        
+        // Appliquer le surlignage si présent
+        if (seg.background) {
+          const [br, bg, bb] = hexToRgb(seg.background);
+          doc.setFillColor(br, bg, bb);
+          doc.rect(currentX, currentY - fs * 0.85, textWidth, fs * 1.1, 'F');
+        }
+        
+        doc.text(safeText, currentX, currentY);
+        currentX += textWidth;
       }
-    }
-    
-    Array.from(tempDiv.childNodes).forEach(child => {
-      processNode(child, false, false);
     });
     
     doc.setFont('times', 'normal');
+    doc.setTextColor(0, 0, 0);
   }
 
   // Fonction pour dessiner du texte centré avec formatage HTML
-  function drawFormattedTextCentered(htmlText, centerX, y, maxWidth, fontSize, color) {
+  function drawFormattedTextCentered(htmlText, centerX, y, maxWidth, fontSize, defaultColor) {
     if (!htmlText) return;
     
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlText;
+    // Utiliser htmlToRichSegments pour détecter tous les formats y compris les couleurs
+    const segments = htmlToRichSegments(htmlText);
+    if (segments.length === 0) return;
     
+    // Filtrer les segments de texte (pas les \n)
+    const textSegments = segments.filter(seg => seg.text && seg.text !== '\n');
+    
+    // Calculer la largeur totale pour centrer
     let totalWidth = 0;
-    const segments = [];
+    textSegments.forEach(seg => {
+      const fs = seg.fontSize || fontSize;
+      const fontStyle = seg.bold && seg.italic ? 'bolditalic' : seg.bold ? 'bold' : seg.italic ? 'italic' : 'normal';
+      doc.setFont('times', fontStyle);
+      doc.setFontSize(fs);
+      totalWidth += doc.getTextWidth(normaliserTexte(seg.text));
+    });
     
-    function measureNode(node, isBold, isItalic) {
-      if (node.nodeType === Node.TEXT_NODE) {
-        const text = normaliserTexte(node.textContent);
-        if (text) {
-          if (isBold && isItalic) {
-            doc.setFont('times', 'bolditalic');
-          } else if (isBold) {
-            doc.setFont('times', 'bold');
-          } else if (isItalic) {
-            doc.setFont('times', 'italic');
-          } else {
-            doc.setFont('times', 'normal');
-          }
-          doc.setFontSize(fontSize);
-          const width = doc.getTextWidth(text);
-          segments.push({ text, bold: isBold, italic: isItalic, width });
-          totalWidth += width;
-        }
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        const tagName = node.tagName.toLowerCase();
-        const bold = isBold || tagName === 'b' || tagName === 'strong';
-        const italic = isItalic || tagName === 'i' || tagName === 'em';
-        Array.from(node.childNodes).forEach(child => measureNode(child, bold, italic));
-      }
-    }
-    
-    Array.from(tempDiv.childNodes).forEach(child => measureNode(child, false, false));
-    
+    // Dessiner en centrant
     let currentX = centerX - totalWidth / 2;
-    segments.forEach(seg => {
-      if (seg.bold && seg.italic) {
-        doc.setFont('times', 'bolditalic');
-      } else if (seg.bold) {
-        doc.setFont('times', 'bold');
-      } else if (seg.italic) {
-        doc.setFont('times', 'italic');
+    
+    textSegments.forEach(seg => {
+      const fs = seg.fontSize || fontSize;
+      const fontStyle = seg.bold && seg.italic ? 'bolditalic' : seg.bold ? 'bold' : seg.italic ? 'italic' : 'normal';
+      
+      doc.setFont('times', fontStyle);
+      doc.setFontSize(fs);
+      
+      // Appliquer la couleur du segment si présente, sinon la couleur par défaut
+      if (seg.color) {
+        const [r, g, b] = hexToRgb(seg.color);
+        doc.setTextColor(r, g, b);
+      } else if (defaultColor) {
+        doc.setTextColor(defaultColor[0], defaultColor[1], defaultColor[2]);
       } else {
-        doc.setFont('times', 'normal');
+        doc.setTextColor(0, 0, 0);
       }
-      doc.setTextColor(color[0], color[1], color[2]);
-      doc.setFontSize(fontSize);
-      doc.text(seg.text, currentX, y);
-      currentX += seg.width;
+      
+      const safeText = normaliserTexte(seg.text);
+      const textWidth = doc.getTextWidth(safeText);
+      
+      // Appliquer le surlignage si présent
+      if (seg.background) {
+        const [br, bg, bb] = hexToRgb(seg.background);
+        doc.setFillColor(br, bg, bb);
+        doc.rect(currentX, y - fs * 0.85, textWidth, fs * 1.1, 'F');
+      }
+      
+      doc.text(safeText, currentX, y);
+      currentX += textWidth;
     });
     
     doc.setFont('times', 'normal');
+    doc.setTextColor(0, 0, 0);
   }
 
   // Fonction pour dessiner du texte blanc avec formatage HTML et limite de largeur
   function drawFormattedTextWhite(htmlText, x, y, maxWidth, fontSize) {
     if (!htmlText) return;
     
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlText;
+    // Utiliser htmlToRichSegments pour détecter tous les formats y compris les couleurs
+    const segments = htmlToRichSegments(htmlText);
+    if (segments.length === 0) return;
     
     let currentX = x;
     const currentY = y;
     
-    function processNode(node, isBold, isItalic) {
-      if (node.nodeType === Node.TEXT_NODE) {
-        const text = normaliserTexte(node.textContent);
-        if (text) {
-          if (isBold && isItalic) {
-            doc.setFont('times', 'bolditalic');
-          } else if (isBold) {
-            doc.setFont('times', 'bold');
-          } else if (isItalic) {
-            doc.setFont('times', 'italic');
-          } else {
-            doc.setFont('times', 'normal');
-          }
-          
-          doc.setTextColor(255, 255, 255);
-          doc.setFontSize(fontSize);
-          
-          const textWidth = doc.getTextWidth(text);
-          const remainingWidth = maxWidth - (currentX - x);
-          
-          if (textWidth > remainingWidth && remainingWidth > 0) {
-            let truncated = text;
-            while (doc.getTextWidth(truncated + '...') > remainingWidth && truncated.length > 0) {
-              truncated = truncated.slice(0, -1);
-            }
-            doc.text(truncated + '...', currentX, currentY);
-            currentX += doc.getTextWidth(truncated + '...');
-            return;
-          } else {
-            doc.text(text, currentX, currentY);
-            currentX += textWidth;
-          }
-        }
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        const tagName = node.tagName.toLowerCase();
-        const bold = isBold || tagName === 'b' || tagName === 'strong';
-        const italic = isItalic || tagName === 'i' || tagName === 'em';
+    segments.forEach(seg => {
+      if (seg.text && seg.text !== '\n') {
+        const fs = seg.fontSize || fontSize;
+        const fontStyle = seg.bold && seg.italic ? 'bolditalic' : seg.bold ? 'bold' : seg.italic ? 'italic' : 'normal';
         
-        Array.from(node.childNodes).forEach(child => {
-          processNode(child, bold, italic);
-        });
+        doc.setFontSize(fs);
+        doc.setFont('times', fontStyle);
+        
+        // Appliquer la couleur du texte si présente, sinon BLANC par défaut
+        if (seg.color) {
+          const [r, g, b] = hexToRgb(seg.color);
+          doc.setTextColor(r, g, b);
+        } else {
+          doc.setTextColor(255, 255, 255); // BLANC par défaut pour fond bleu
+        }
+        
+        const safeText = normaliserTexte(seg.text);
+        const textWidth = doc.getTextWidth(safeText);
+        
+        // Vérifier si on dépasse la largeur max
+        const remainingWidth = maxWidth - (currentX - x);
+        if (textWidth > remainingWidth && remainingWidth > 0) {
+          let truncated = safeText;
+          while (doc.getTextWidth(truncated + '...') > remainingWidth && truncated.length > 0) {
+            truncated = truncated.slice(0, -1);
+          }
+          
+          // Appliquer surlignage si présent
+          if (seg.background) {
+            const [br, bg, bb] = hexToRgb(seg.background);
+            doc.setFillColor(br, bg, bb);
+            doc.rect(currentX, currentY - fs * 0.85, doc.getTextWidth(truncated + '...'), fs * 1.1, 'F');
+          }
+          
+          doc.text(truncated + '...', currentX, currentY);
+          return;
+        }
+        
+        // Appliquer le surlignage si présent
+        if (seg.background) {
+          const [br, bg, bb] = hexToRgb(seg.background);
+          doc.setFillColor(br, bg, bb);
+          doc.rect(currentX, currentY - fs * 0.85, textWidth, fs * 1.1, 'F');
+        }
+        
+        doc.text(safeText, currentX, currentY);
+        currentX += textWidth;
       }
-    }
-    
-    Array.from(tempDiv.childNodes).forEach(child => {
-      processNode(child, false, false);
     });
     
     doc.setFont('times', 'normal');
+    doc.setTextColor(0, 0, 0);
   }
 
   function drawInputBox(x, y, w, h, text, fontSize) {
@@ -4472,7 +4996,16 @@ function genererPDF() {
         if (pendingLineW + wW > maxW && pendingLine.length > 0 && word.trim() !== '') {
           flushPendingLine();
         }
-        pendingLine.push({ word, bold: seg.bold, italic: seg.italic, underline: seg.underline, fontSize: fs, font: seg.font || 'times' });
+        pendingLine.push({ 
+          word, 
+          bold: seg.bold, 
+          italic: seg.italic, 
+          underline: seg.underline, 
+          fontSize: fs, 
+          font: seg.font || 'times',
+          color: seg.color || null,
+          background: seg.background || null
+        });
         pendingLineW += wW;
       });
     });
@@ -4488,13 +5021,35 @@ function genererPDF() {
           const fontFace = item.font || 'times';
           doc.setFontSize(fs);
           doc.setFont(fontFace, fontStyle);
-          if (defaultColor) doc.setTextColor(...defaultColor);
-          else doc.setTextColor(0, 0, 0);
+          
+          // Appliquer la couleur du texte
+          if (item.color) {
+            const [r, g, b] = hexToRgb(item.color);
+            doc.setTextColor(r, g, b);
+          } else if (defaultColor) {
+            doc.setTextColor(...defaultColor);
+          } else {
+            doc.setTextColor(0, 0, 0);
+          }
+          
           const safeWord = normaliserTexte(item.word);
-          doc.text(safeWord, lx, curY);
           const w = doc.getTextWidth(safeWord);
+          
+          // Appliquer le surlignage (background)
+          if (item.background) {
+            const [br, bg, bb] = hexToRgb(item.background);
+            doc.setFillColor(br, bg, bb);
+            doc.rect(lx, curY - fs * 0.85, w, fs * 1.1, 'F');
+          }
+          
+          // Dessiner le texte
+          doc.text(safeWord, lx, curY);
+          
+          // Soulignement
           if (item.underline) {
-            doc.setDrawColor(0,0,0); doc.setLineWidth(0.3);
+            const [ur, ug, ub] = item.color ? hexToRgb(item.color) : [0, 0, 0];
+            doc.setDrawColor(ur, ug, ub);
+            doc.setLineWidth(0.3);
             doc.line(lx, curY + 0.8, lx + w, curY + 0.8);
           }
           lx += w;
@@ -4502,27 +5057,32 @@ function genererPDF() {
         curY += lineH;
 
       } else if (block.type === 'image') {
-        // Dimensions : largeur max = maxW, hauteur proportionnelle
+        // Dimensions : taille user en px → converti en pt (1px ≈ 0.75pt), borné à maxW
         try {
           const imgEl = new Image();
           imgEl.src = block.src;
-          const natW = imgEl.naturalWidth || 200;
+          const natW = imgEl.naturalWidth  || 200;
           const natH = imgEl.naturalHeight || 150;
-          const ratio = natH / natW;
-          const imgW = Math.min(maxW, 160); // max 160pt de large
-          const imgH = imgW * ratio;
-          // Détecter le format
+          const ratio = natH / (natW || 1);
+          let imgW, imgH;
+          if (block.w && block.w > 0) {
+            // Taille définie par l'utilisateur : 1px CSS = 0.75pt PDF
+            imgW = Math.min(maxW, block.w * 0.75);
+            imgH = block.h ? block.h * 0.75 : imgW * ratio;
+          } else {
+            // Pas de taille définie : limiter à 160pt de large
+            imgW = Math.min(maxW, 160);
+            imgH = imgW * ratio;
+          }
           let fmt = 'JPEG';
-          if (block.src.includes('image/png')) fmt = 'PNG';
-          else if (block.src.includes('image/gif')) fmt = 'GIF';
+          if (block.src.includes('image/png'))  fmt = 'PNG';
+          else if (block.src.includes('image/gif'))  fmt = 'GIF';
           else if (block.src.includes('image/webp')) fmt = 'WEBP';
           doc.addImage(block.src, fmt, x, curY, imgW, imgH);
-          // Bordure légère autour de l'image
           doc.setDrawColor(180,180,180); doc.setLineWidth(0.4);
           doc.rect(x, curY, imgW, imgH, 'S');
           curY += imgH + 3;
         } catch(e) {
-          // Si l'image échoue, on laisse un espace
           curY += lineH;
         }
 
@@ -4537,7 +5097,7 @@ function genererPDF() {
         const cellFontSize = baseFontSize * 0.88;
 
         tdata.forEach(row => {
-          // Calculer la hauteur de la ligne (multi-wrap)
+          // Calculer la hauteur de la ligne (multi-wrap) en se basant sur le texte brut
           let maxLinesInRow = 1;
           row.forEach(cell => {
             doc.setFontSize(cellFontSize);
@@ -4551,23 +5111,66 @@ function genererPDF() {
           let cx = x;
           row.forEach((cell, ci) => {
             const cw = colW;
-            // Fond header
-            if (cell.isHeader) {
-              doc.setFillColor(227, 242, 253); // bleu très pâle
-              doc.rect(cx, curY, cw, rowH, 'F');
+            // Fond de la cellule : couleur personnalisée > header bleu pâle > blanc
+            if (cell.bgColor) {
+              const [br2, bg2, bb2] = hexToRgb(cell.bgColor);
+              doc.setFillColor(br2, bg2, bb2);
+            } else if (cell.isHeader) {
+              doc.setFillColor(227, 242, 253);
             } else {
-              doc.setFillColor(255,255,255);
-              doc.rect(cx, curY, cw, rowH, 'F');
+              doc.setFillColor(255, 255, 255);
             }
+            doc.rect(cx, curY, cw, rowH, 'F');
             // Bordure cellule
             doc.setDrawColor(mr, mg, mb); doc.setLineWidth(0.5);
             doc.rect(cx, curY, cw, rowH, 'S');
-            // Texte
-            doc.setFontSize(cellFontSize);
-            doc.setFont('times', cell.isHeader ? 'bold' : 'normal');
-            doc.setTextColor(0,0,0);
-            const wrapped = doc.splitTextToSize(normaliserTexte(cell.text || ''), cw - cellPadLeft*2);
-            doc.text(wrapped, cx + cellPadLeft, curY + cellPadTop + cellFontSize * 0.85);
+
+            // Texte riche : parcourir les segments de la cellule
+            const segs = (cell.richContent && cell.richContent.length > 0)
+              ? cell.richContent
+              : [{ text: cell.text || '', bold: cell.isHeader, italic: false, color: null }];
+
+            let ty = curY + cellPadTop + cellFontSize * 0.85;
+            let lineX = cx + cellPadLeft;
+            let lineW = 0;
+
+            segs.forEach(seg => {
+              if (!seg.text || seg.text === '\n') {
+                if (seg.text === '\n') { ty += cellFontSize * 1.3; lineX = cx + cellPadLeft; lineW = 0; }
+                return;
+              }
+              const fontStyle = (seg.bold && seg.italic) ? 'bolditalic' : seg.bold ? 'bold' : seg.italic ? 'italic' : 'normal';
+              doc.setFontSize(cellFontSize);
+              doc.setFont('times', fontStyle);
+              // Couleur du texte
+              if (seg.color) {
+                const [tr2, tg2, tb2] = hexToRgb(seg.color);
+                doc.setTextColor(tr2, tg2, tb2);
+              } else {
+                doc.setTextColor(0, 0, 0);
+              }
+              // Fond du run (surlignage dans la cellule)
+              if (seg.background) {
+                const [hr2, hg2, hb2] = hexToRgb(seg.background);
+                const runW = doc.getTextWidth(normaliserTexte(seg.text));
+                doc.setFillColor(hr2, hg2, hb2);
+                doc.rect(lineX + lineW, ty - cellFontSize * 0.8, runW, cellFontSize * 1.1, 'F');
+                // Rétablir la couleur du texte après avoir dessiné le fond
+                if (seg.color) {
+                  const [tr2, tg2, tb2] = hexToRgb(seg.color);
+                  doc.setTextColor(tr2, tg2, tb2);
+                } else {
+                  doc.setTextColor(0, 0, 0);
+                }
+              }
+              // Wrap simple dans la largeur de la cellule
+              const words = doc.splitTextToSize(normaliserTexte(seg.text), cw - cellPadLeft * 2);
+              words.forEach((line, li) => {
+                if (li > 0) { ty += cellFontSize * 1.3; lineX = cx + cellPadLeft; lineW = 0; }
+                doc.text(line, lineX + lineW, ty);
+                lineW += doc.getTextWidth(line);
+              });
+            });
             cx += cw;
           });
           curY += rowH;
@@ -4598,8 +5201,15 @@ function genererPDF() {
     segments.forEach(seg => {
       if (seg.type === 'image') {
         flushLines();
-        // Estimation : image de 120pt de haut max
-        totalH += 123;
+        // Estimation hauteur image : taille user en pt ou 120pt par défaut
+        if (seg.w && seg.h && seg.w > 0) {
+          const maxW2 = maxW || 160;
+          const imgW2 = Math.min(maxW2, seg.w * 0.75);
+          const imgH2 = seg.h * 0.75 * (imgW2 / (seg.w * 0.75));
+          totalH += imgH2 + 3;
+        } else {
+          totalH += 123;
+        }
         return;
       }
       if (seg.type === 'table') {
@@ -5337,6 +5947,29 @@ document.addEventListener('input', function(e) {
   window.saveTimeout = setTimeout(sauvegarderAutomatique, 1500);
 });
 
+// ═══════════════════════════════════════════════════
+// UTILITAIRE : Conversion couleur vers format Word (RRGGBB)
+// ═══════════════════════════════════════════════════
+function colorToWordHex(color) {
+  if (!color) return null;
+  
+  // Si déjà au format RRGGBB (6 caractères sans #)
+  if (/^[0-9A-Fa-f]{6}$/.test(color)) {
+    return color.toUpperCase();
+  }
+  
+  // Utiliser hexToRgb pour convertir n'importe quel format
+  const [r, g, b] = hexToRgb(color);
+  
+  // Convertir en hexadécimal RRGGBB
+  const toHex = (n) => {
+    const hex = n.toString(16).toUpperCase();
+    return hex.length === 1 ? '0' + hex : hex;
+  };
+  
+  return toHex(r) + toHex(g) + toHex(b);
+}
+
 // ────── EXPORT DOCX (OpenXML via JSZip) ──────
 function genererDOCX() {
   if (typeof JSZip === 'undefined') {
@@ -5424,7 +6057,7 @@ function genererDOCX() {
     </w:tc>`;
   }
 
-  // Cellule avec support du formatage HTML (gras/italique)
+  // Cellule avec support du formatage HTML (gras/italique/couleur/surlignage)
   function cellWithFormat(htmlText, colored, w, center) {
     const fill  = colored ? rawColor : 'FFFFFF';
     const tClr  = colored ? 'FFFFFF' : '000000';
@@ -5435,15 +6068,21 @@ function genererDOCX() {
     
     let runs = '';
     
-    function processNode(node, isBold, isItalic) {
+    function processNode(node, isBold, isItalic, isUnderline, textColor, bgColor) {
       if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent;
         if (text) {
+          // Couleur du texte : priorité à la couleur héritée, sinon couleur par défaut de la cellule
+          const resolvedColor = textColor ? colorToWordHex(textColor) : tClr;
+          // Couleur de fond (surlignage)
+          const bgXml = bgColor ? `<w:shd w:val="clear" w:color="auto" w:fill="${colorToWordHex(bgColor)}"/>` : '';
           runs += `<w:r>
             <w:rPr>
-              ${isBold ? '<w:b/>' : ''}
-              ${isItalic ? '<w:i/>' : ''}
-              <w:color w:val="${tClr}"/>
+              ${isBold ? '<w:b/><w:bCs/>' : ''}
+              ${isItalic ? '<w:i/><w:iCs/>' : ''}
+              ${isUnderline ? '<w:u w:val="single"/>' : ''}
+              <w:color w:val="${resolvedColor}"/>
+              ${bgXml}
               <w:sz w:val="18"/><w:szCs w:val="18"/>
             </w:rPr>
             <w:t xml:space="preserve">${x(text)}</w:t>
@@ -5451,17 +6090,35 @@ function genererDOCX() {
         }
       } else if (node.nodeType === Node.ELEMENT_NODE) {
         const tag = node.tagName.toLowerCase();
-        const bold = isBold || tag === 'b' || tag === 'strong';
-        const italic = isItalic || tag === 'i' || tag === 'em';
+        let bold      = isBold      || tag === 'b' || tag === 'strong';
+        let italic    = isItalic    || tag === 'i' || tag === 'em';
+        let underline = isUnderline || tag === 'u';
+        let color     = textColor;
+        let bg        = bgColor;
+        
+        // <font color="..."> généré par execCommand('foreColor')
+        if (tag === 'font') {
+          if (node.getAttribute('color')) color = node.getAttribute('color');
+          if (node.getAttribute('bgcolor')) bg = node.getAttribute('bgcolor');
+        }
+        // <span style="color:...; background-color:..."> généré par execCommand moderne
+        if (node.style && node.style.color) color = node.style.color;
+        if (node.style && node.style.backgroundColor) bg = node.style.backgroundColor;
+        
+        // Saut de ligne
+        if (tag === 'br') {
+          runs += `<w:r><w:br/></w:r>`;
+          return;
+        }
         
         Array.from(node.childNodes).forEach(child => {
-          processNode(child, bold, italic);
+          processNode(child, bold, italic, underline, color, bg);
         });
       }
     }
     
     Array.from(temp.childNodes).forEach(child => {
-      processNode(child, false, false);
+      processNode(child, false, false, false, null, null);
     });
     
     if (!runs) {
@@ -5494,48 +6151,69 @@ function genererDOCX() {
   let docxImages = [];
   let docxImageCounter = 0;
   
-  // Fonction helper pour convertir HTML en runs Word avec couleur personnalisée et gras par défaut
-  function htmlToRunsWithColor(htmlText, color) {
+  // Fonction helper pour convertir HTML en runs Word — lit les couleurs du contenu, avec gras par défaut
+  function htmlToRunsWithColor(htmlText, defaultColor) {
     const temp = document.createElement('div');
     temp.innerHTML = htmlText || '';
     
     let runs = '';
     
-    function processNode(node, isBold, isItalic) {
+    function processNode(node, isBold, isItalic, isUnderline, textColor, bgColor) {
       if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent;
         if (text) {
+          // Couleur résolue : couleur héritée du HTML, sinon defaultColor (couleur du thème)
+          const resolvedColor = textColor ? colorToWordHex(textColor) : defaultColor;
+          const bgXml = bgColor ? `<w:shd w:val="clear" w:color="auto" w:fill="${colorToWordHex(bgColor)}"/>` : '';
           runs += `<w:r>
             <w:rPr>
-              <w:b/>
-              ${isBold ? '<w:b/>' : ''}
-              ${isItalic ? '<w:i/>' : ''}
-              <w:color w:val="${color}"/>
+              <w:b/><w:bCs/>
+              ${isItalic ? '<w:i/><w:iCs/>' : ''}
+              ${isUnderline ? '<w:u w:val="single"/>' : ''}
+              <w:color w:val="${resolvedColor}"/>
+              ${bgXml}
               <w:sz w:val="18"/><w:szCs w:val="18"/>
             </w:rPr>
-            <w:t>${x(text)}</w:t>
+            <w:t xml:space="preserve">${x(text)}</w:t>
           </w:r>`;
         }
       } else if (node.nodeType === Node.ELEMENT_NODE) {
         const tag = node.tagName.toLowerCase();
-        const bold = isBold || tag === 'b' || tag === 'strong';
-        const italic = isItalic || tag === 'i' || tag === 'em';
+        let bold      = isBold      || tag === 'b' || tag === 'strong';
+        let italic    = isItalic    || tag === 'i' || tag === 'em';
+        let underline = isUnderline || tag === 'u';
+        let color     = textColor;
+        let bg        = bgColor;
+        
+        // <font color="..."> généré par execCommand('foreColor')
+        if (tag === 'font') {
+          if (node.getAttribute('color')) color = node.getAttribute('color');
+          if (node.getAttribute('bgcolor')) bg = node.getAttribute('bgcolor');
+        }
+        // <span style="color:...; background-color:...">
+        if (node.style && node.style.color) color = node.style.color;
+        if (node.style && node.style.backgroundColor) bg = node.style.backgroundColor;
+        
+        if (tag === 'br') {
+          runs += `<w:r><w:br/></w:r>`;
+          return;
+        }
         
         Array.from(node.childNodes).forEach(child => {
-          processNode(child, bold, italic);
+          processNode(child, bold, italic, underline, color, bg);
         });
       }
     }
     
     Array.from(temp.childNodes).forEach(child => {
-      processNode(child, false, false);
+      processNode(child, false, false, false, null, null);
     });
     
     if (!runs) {
       runs = `<w:r>
         <w:rPr>
-          <w:b/>
-          <w:color w:val="${color}"/>
+          <w:b/><w:bCs/>
+          <w:color w:val="${defaultColor}"/>
           <w:sz w:val="18"/><w:szCs w:val="18"/>
         </w:rPr>
         <w:t></w:t>
@@ -5577,20 +6255,21 @@ function genererDOCX() {
           ext = 'gif';
         }
         
-        // Calculer les dimensions réelles de l'image
-        let natW = 400, natH = 300; // valeurs par défaut
+        // Dimensions : taille user (seg.w/seg.h en px CSS) ou naturelle
+        let natW = 400, natH = 300;
         try {
           const tmpImg = new Image();
           tmpImg.src = seg.src;
           if (tmpImg.naturalWidth > 0) { natW = tmpImg.naturalWidth; natH = tmpImg.naturalHeight; }
         } catch(e) {}
-        
-        // Largeur max ~14cm (5386800 EMU), hauteur max ~10cm (3600000 EMU)
-        // 1 pixel = 9525 EMU (à 96 DPI)
-        const MAX_W_EMU = 5000000;
-        const MAX_H_EMU = 3600000;
-        const ratio = natH / (natW || 1);
-        let widthEMU = Math.min(MAX_W_EMU, natW * 9525);
+        // Utiliser la taille définie par l'utilisateur si disponible
+        const usedW = (seg.w && seg.w > 0) ? seg.w : natW;
+        const usedH = (seg.h && seg.h > 0) ? seg.h : Math.round(usedW * (natH / (natW || 1)));
+        // 1 px CSS (96 DPI) = 9525 EMU ; largeur max ~14cm, hauteur max ~20cm
+        const MAX_W_EMU = 5040000;
+        const MAX_H_EMU = 7200000;
+        const ratio = usedH / (usedW || 1);
+        let widthEMU = Math.min(MAX_W_EMU, usedW * 9525);
         let heightEMU = Math.round(widthEMU * ratio);
         if (heightEMU > MAX_H_EMU) {
           heightEMU = MAX_H_EMU;
@@ -5677,24 +6356,50 @@ function genererDOCX() {
           }
           output += `</w:tblGrid>`;
           
-          // Lignes du tableau
+          // Lignes du tableau — segments riches avec couleurs par run
           tableData.forEach((row, rowIdx) => {
             output += `<w:tr>`;
             row.forEach((cell, cellIdx) => {
               const isHeader = cell.isHeader || rowIdx === 0;
-              const bgColor = isHeader ? 'E3F2FD' : 'FFFFFF';
-              
+              // Fond de cellule : couleur personnalisée > header bleu pâle > blanc
+              const bgFill = cell.bgColor
+                ? colorToWordHex(cell.bgColor)
+                : (isHeader ? 'E3F2FD' : 'FFFFFF');
+
+              // Construire les runs riches depuis richContent
+              const cellSegs = (cell.richContent && cell.richContent.length > 0)
+                ? cell.richContent
+                : [{ text: cell.text || '', bold: isHeader, italic: false, color: null, background: null }];
+
+              let cellParagraphs = '';
+              let curRuns = [];
+
+              const flushCellPara = () => {
+                const jc = isHeader ? '<w:jc w:val="center"/>' : '';
+                cellParagraphs += `<w:p><w:pPr><w:spacing w:before="20" w:after="20"/>${jc}</w:pPr>${curRuns.join('')}</w:p>`;
+                curRuns = [];
+              };
+
+              cellSegs.forEach(seg => {
+                if (seg.text === '\n') { flushCellPara(); return; }
+                if (!seg.text) return;
+                const txtHex   = seg.color      ? colorToWordHex(seg.color)      : '000000';
+                const bgHex    = seg.background ? colorToWordHex(seg.background) : null;
+                const bgRunXml = bgHex ? `<w:shd w:val="clear" w:color="auto" w:fill="${bgHex}"/>` : '';
+                const fontXml  = seg.font ? `<w:rFonts w:ascii="${seg.font}" w:hAnsi="${seg.font}" w:cs="${seg.font}"/>` : '';
+                curRuns.push(`<w:r><w:rPr>${fontXml}${(seg.bold || isHeader) ? '<w:b/><w:bCs/>' : ''}${seg.italic ? '<w:i/><w:iCs/>' : ''}${seg.underline ? '<w:u w:val="single"/>' : ''}<w:color w:val="${txtHex}"/>${bgRunXml}<w:sz w:val="${fs}"/><w:szCs w:val="${fs}"/></w:rPr><w:t xml:space="preserve">${x(seg.text)}</w:t></w:r>`);
+              });
+              if (curRuns.length > 0) flushCellPara();
+              if (!cellParagraphs) {
+                cellParagraphs = `<w:p><w:pPr><w:spacing w:before="20" w:after="20"/></w:pPr><w:r><w:rPr><w:sz w:val="${fs}"/></w:rPr><w:t></w:t></w:r></w:p>`;
+              }
+
               output += `<w:tc>
                 <w:tcPr>
                   <w:tcW w:w="${colWidth}" w:type="dxa"/>
-                  <w:shd w:val="clear" w:color="auto" w:fill="${bgColor}"/>
+                  <w:shd w:val="clear" w:color="auto" w:fill="${bgFill}"/>
                 </w:tcPr>
-                <w:p>
-                  <w:r>
-                    <w:rPr>${isHeader ? '<w:b/>' : ''}<w:sz w:val="${fs}"/></w:rPr>
-                    <w:t>${x(cell.text || '')}</w:t>
-                  </w:r>
-                </w:p>
+                ${cellParagraphs}
               </w:tc>`;
             });
             output += `</w:tr>`;
@@ -5722,7 +6427,22 @@ function genererDOCX() {
               currentParagraph = [];
             }
             const fontXml = seg.font ? `<w:rFonts w:ascii="${seg.font}" w:hAnsi="${seg.font}" w:cs="${seg.font}"/>` : '';
-            currentParagraph.push(`<w:r><w:rPr>${fontXml}${seg.bold?'<w:b/><w:bCs/>':''}${seg.italic?'<w:i/><w:iCs/>':''}${seg.underline?'<w:u w:val="single"/>':''}<w:sz w:val="${segFs}"/><w:szCs w:val="${segFs}"/></w:rPr><w:t xml:space="preserve">${txt}</w:t></w:r>`);
+            
+            // Couleur du texte - Convertir en format Word (RRGGBB sans #)
+            let colorXml = '';
+            if (seg.color) {
+              const colorHex = colorToWordHex(seg.color);
+              if (colorHex) colorXml = `<w:color w:val="${colorHex}"/>`;
+            }
+            
+            // Couleur de fond (surlignage) - Word utilise w:shd
+            let bgXml = '';
+            if (seg.background) {
+              const bgHex = colorToWordHex(seg.background);
+              if (bgHex) bgXml = `<w:shd w:val="clear" w:color="auto" w:fill="${bgHex}"/>`;
+            }
+            
+            currentParagraph.push(`<w:r><w:rPr>${fontXml}${seg.bold?'<w:b/><w:bCs/>':''}${seg.italic?'<w:i/><w:iCs/>':''}${seg.underline?'<w:u w:val="single"/>':''}${colorXml}${bgXml}<w:sz w:val="${segFs}"/><w:szCs w:val="${segFs}"/></w:rPr><w:t xml:space="preserve">${txt}</w:t></w:r>`);
           }
         }
       }
@@ -5749,7 +6469,17 @@ function genererDOCX() {
     function walk(node, ctx) {
       if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent;
-        if (text) segments.push({ text, bold: ctx.bold, italic: ctx.italic, underline: ctx.underline, fontSize: ctx.fontSize, isHeader: ctx.isHeader, font: ctx.font || null });
+        if (text) segments.push({ 
+          text, 
+          bold: ctx.bold, 
+          italic: ctx.italic, 
+          underline: ctx.underline, 
+          fontSize: ctx.fontSize, 
+          isHeader: ctx.isHeader, 
+          font: ctx.font || null,
+          color: ctx.color || null,
+          background: ctx.background || null
+        });
         return;
       }
       if (node.nodeType !== Node.ELEMENT_NODE) return;
@@ -5759,6 +6489,26 @@ function genererDOCX() {
       if (tag === 'strong' || tag === 'b') c.bold = true;
       if (tag === 'em'     || tag === 'i') c.italic = true;
       if (tag === 'u') c.underline = true;
+      
+      // Balise <font> avec attributs color et/ou bgcolor (généré par execCommand)
+      if (tag === 'font') {
+        if (node.getAttribute('color')) {
+          c.color = node.getAttribute('color');
+        }
+        if (node.getAttribute('bgcolor')) {
+          c.background = node.getAttribute('bgcolor');
+        }
+      }
+      
+      // Balise <span> avec attributs style (généré par execCommand moderne)
+      if (tag === 'span') {
+        if (node.style.color) {
+          c.color = node.style.color;
+        }
+        if (node.style.backgroundColor) {
+          c.background = node.style.backgroundColor;
+        }
+      }
 
       // Headers
       if (tag === 'h1') { c.bold = true; c.fontSize = headerSizeMap['1']; c.isHeader = true; }
@@ -5778,6 +6528,24 @@ function genererDOCX() {
         if (node.classList.contains('ql-font-lato'))         c.font = 'Lato';
         if (node.classList.contains('ql-font-opensans'))     c.font = 'Open Sans';
         if (node.classList.contains('ql-font-courier'))      c.font = 'Courier New';
+        
+        // Couleurs Quill
+        const colorClass = Array.from(node.classList).find(cls => cls.startsWith('ql-color-'));
+        if (colorClass) {
+          const colorValue = colorClass.replace('ql-color-', '').replace(/_/g, '');
+          c.color = '#' + colorValue;
+        }
+        const bgClass = Array.from(node.classList).find(cls => cls.startsWith('ql-bg-'));
+        if (bgClass) {
+          const bgValue = bgClass.replace('ql-bg-', '').replace(/_/g, '');
+          c.background = '#' + bgValue;
+        }
+      }
+      
+      // Couleur via style inline
+      if (node.style) {
+        if (node.style.color) c.color = node.style.color;
+        if (node.style.backgroundColor) c.background = node.style.backgroundColor;
       }
 
       if (tag === 'br') {
@@ -5816,7 +6584,10 @@ function genererDOCX() {
       if (tag === 'img') {
         const src = node.getAttribute('src') || '';
         if (src.startsWith('data:image')) {
-          segments.push({ type: 'image', src: src });
+          // Lire la taille définie par l'utilisateur (data-w/data-h ou style)
+          const imgW = parseInt(node.getAttribute('data-w'))  || parseInt(node.style.width)  || node.naturalWidth  || 0;
+          const imgH = parseInt(node.getAttribute('data-h'))  || parseInt(node.style.height) || node.naturalHeight || 0;
+          segments.push({ type: 'image', src: src, w: imgW, h: imgH });
           segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize });
         }
         return;
@@ -5826,7 +6597,25 @@ function genererDOCX() {
         node.querySelectorAll('tr').forEach(tr => {
           const rowData = [];
           tr.querySelectorAll('td, th').forEach(cell => {
-            rowData.push({ text: cell.textContent.trim(), isHeader: cell.tagName.toLowerCase() === 'th' });
+            const isHeader = cell.tagName.toLowerCase() === 'th';
+            let cellBg = null;
+            if (cell.style && cell.style.backgroundColor) cellBg = cell.style.backgroundColor;
+            const cellCtx = Object.assign({}, c, {
+              bold:       isHeader || c.bold,
+              color:      (cell.style && cell.style.color) ? cell.style.color : c.color,
+              background: null
+            });
+            // Extraire les segments riches du contenu de la cellule
+            const before = segments.length;
+            Array.from(cell.childNodes).forEach(ch => walk(ch, cellCtx));
+            const richContent = segments.splice(before);
+            while (richContent.length && richContent[richContent.length-1].text === '\n') richContent.pop();
+            rowData.push({
+              text:        cell.textContent.trim(),
+              isHeader:    isHeader,
+              bgColor:     cellBg,
+              richContent: richContent
+            });
           });
           if (rowData.length > 0) tableData.push(rowData);
         });
