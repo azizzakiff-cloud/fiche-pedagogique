@@ -13,14 +13,14 @@
 ║  ✓ Partagez vos modifications sous la même licence                           ║
 ║                                                                               ║
 ║  Application créée avec ❤️ pour les enseignants                              ║
-║  Version 2.11 — Février 2025                                                  ║
+║  Version 3.0 — Février 2026                                                   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Fiche Pédagogique — EZ-ZAKY AZIZ</title>
+<title>Fiche Pédagogique v3.0 — EZ-ZAKY AZIZ</title>
 <meta name="description" content="Générateur de fiches pédagogiques PDF">
 <meta name="author" content="EZ-ZAKY AZIZ">
 <meta name="copyright" content="© 2025 EZ-ZAKY AZIZ. Tous droits réservés.">
@@ -1486,6 +1486,393 @@ if ('serviceWorker' in navigator) {
   #img-resize-panel .rp-ok { background: var(--blue); color: white; }
   #img-resize-panel .rp-cancel { background: var(--off-white); color: var(--muted); border: 1px solid var(--border); font-weight: 400; }
 
+  /* ═══════════════════════════════════════════════════
+     NOUVELLES FONCTIONNALITÉS v3.0
+  ═══════════════════════════════════════════════════ */
+
+  /* ─── LAYOUT TABLETTE (≥768px) ─── */
+  @media (min-width: 768px) {
+    body { display: flex; flex-direction: column; }
+    
+    .app-header h1 { font-size: 20px; }
+    .app-header h1 span { font-size: 13px; }
+    
+    /* Navigation latérale au lieu des onglets horizontaux */
+    .tabs {
+      position: fixed;
+      left: 0; top: 72px; bottom: 28px;
+      width: 130px;
+      flex-direction: column;
+      border-right: 2px solid var(--border);
+      border-bottom: none;
+      overflow-y: auto;
+      overflow-x: hidden;
+      z-index: 50;
+      box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+    }
+    .tab-btn {
+      min-width: unset;
+      width: 100%;
+      padding: 14px 8px;
+      border-bottom: none;
+      border-right: 3px solid transparent;
+      border-left: none;
+      margin-bottom: 0;
+      margin-right: -2px;
+      flex-direction: column;
+      font-size: 11px;
+      border-top: 1px solid var(--border);
+    }
+    .tab-btn.active {
+      border-right-color: var(--blue);
+      border-bottom: none;
+      background: var(--blue-pale);
+    }
+    .tab-btn .tab-icon { font-size: 22px; }
+    
+    /* Contenu principal décalé à droite de la nav */
+    .panel {
+      margin-left: 130px;
+      padding: 20px 24px;
+    }
+    #offline-banner {
+      margin-left: 130px;
+      top: 72px;
+    }
+    #save-bar { margin-left: 130px; }
+    
+    /* Layout 2 colonnes pour En-tête + Aperçu live côte à côte */
+    #panel-entete.active {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 20px;
+      align-items: start;
+    }
+    #card-entete-preview {
+      position: sticky;
+      top: 90px;
+      grid-row: 1 / 20;
+      grid-column: 2;
+    }
+    
+    /* Aperçu PDF en 2 colonnes */
+    #panel-apercu.active {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    
+    .app-footer { padding-left: 142px; }
+    
+    /* Boutons plus grands sur tablette */
+    .btn-generate { font-size: 16px; padding: 14px; }
+  }
+
+  @media (min-width: 1024px) {
+    .tabs { width: 160px; }
+    .panel { margin-left: 160px; padding: 24px 32px; }
+    #offline-banner, #save-bar { margin-left: 160px; }
+    #card-entete-preview { position: sticky; top: 90px; }
+    .app-footer { padding-left: 172px; }
+    #panel-apercu.active { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ─── MODAL GÉNÉRIQUE v3 ─── */
+  .modal-v3-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .modal-v3-overlay.show { opacity: 1; pointer-events: all; }
+  .modal-v3-box {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    padding: 24px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    transform: translateY(20px);
+    transition: transform 0.25s;
+  }
+  .modal-v3-overlay.show .modal-v3-box { transform: translateY(0); }
+  .modal-v3-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--blue-dark);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .modal-v3-actions {
+    display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;
+  }
+  .btn-v3 {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Source Serif 4', serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-v3-primary { background: var(--blue); color: white; }
+  .btn-v3-primary:hover { background: var(--blue-dark); }
+  .btn-v3-success { background: #2E7D32; color: white; }
+  .btn-v3-success:hover { background: #1B5E20; }
+  .btn-v3-warn { background: #E65100; color: white; }
+  .btn-v3-warn:hover { background: #BF360C; }
+  .btn-v3-ghost { background: var(--off-white); color: var(--muted); border: 1px solid var(--border); }
+  .btn-v3-ghost:hover { background: var(--border); }
+
+  /* ─── EXPORT/IMPORT SECTION ─── */
+  .export-section {
+    background: white;
+    border-radius: 14px;
+    border: 1.5px solid #E3EAF6;
+    margin-bottom: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(21,101,192,0.08);
+  }
+  .export-section-header {
+    background: linear-gradient(90deg, #1565C0, #1976D2);
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .export-section-header span { color: white; font-weight: 700; font-size: 14px; }
+  .export-section-body { padding: 16px; }
+  .export-btn-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  @media (max-width: 400px) { .export-btn-grid { grid-template-columns: 1fr; } }
+
+  /* ─── QR CODE ─── */
+  .qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #F5F8FF;
+    border-radius: 12px;
+    border: 1px solid #E3EAF6;
+  }
+  #qr-canvas {
+    border: 4px solid white;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  }
+  .qr-info {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.5;
+  }
+  .qr-url-box {
+    width: 100%;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 11px;
+    color: var(--muted);
+    word-break: break-all;
+    max-height: 80px;
+    overflow-y: auto;
+    font-family: monospace;
+  }
+
+  /* ─── APERÇU PDF SIMULÉ ─── */
+  .pdf-preview-container {
+    background: #888;
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .pdf-page-sim {
+    background: white;
+    width: 100%;
+    max-width: 595px;
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    padding: 28px 24px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 11px;
+    line-height: 1.4;
+    min-height: 300px;
+  }
+  .pdf-sim-header {
+    border: 2px solid var(--sim-color, #1565C0);
+    margin-bottom: 8px;
+    border-radius: 2px;
+  }
+  .pdf-sim-header-row {
+    display: flex;
+    border-bottom: 1px solid var(--sim-color, #1565C0);
+  }
+  .pdf-sim-header-row:last-child { border-bottom: none; }
+  .pdf-sim-label {
+    background: var(--sim-color, #1565C0);
+    color: white;
+    padding: 4px 8px;
+    font-size: 9px;
+    font-weight: 700;
+    min-width: 80px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .pdf-sim-value {
+    padding: 4px 8px;
+    font-size: 9px;
+    flex: 1;
+    border-left: 1px solid var(--sim-color, #1565C0);
+    word-break: break-word;
+  }
+  .pdf-sim-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--sim-color, #1565C0);
+    font-size: 9px;
+    margin-top: 8px;
+  }
+  .pdf-sim-table th {
+    background: var(--sim-color, #1565C0);
+    color: white;
+    padding: 5px 4px;
+    text-align: center;
+    font-size: 8px;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  .pdf-sim-table td {
+    border: 1px solid #ddd;
+    padding: 4px 5px;
+    vertical-align: top;
+    font-size: 8px;
+    line-height: 1.3;
+  }
+  .pdf-sim-etape {
+    font-weight: 700;
+    color: var(--sim-color, #1565C0);
+    text-align: center;
+  }
+  .pdf-sim-toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  .pdf-sim-info {
+    font-size: 11px;
+    color: #ddd;
+    text-align: center;
+    margin-top: 4px;
+  }
+  .pdf-preview-update-btn {
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-family: 'Source Serif 4', serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+  }
+  .pdf-preview-update-btn:hover { background: var(--blue-dark); }
+
+  /* ─── BARRE D'OUTILS TABLETTE ─── */
+  .tablet-toolbar {
+    display: none;
+  }
+  @media (min-width: 768px) {
+    .tablet-toolbar {
+      display: flex;
+      gap: 8px;
+      padding: 8px 16px 8px 146px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      align-items: center;
+      position: sticky;
+      top: 72px;
+      z-index: 49;
+    }
+    .tablet-toolbar-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .offline-banner-tablet { top: 108px !important; }
+    #offline-banner { top: 108px; }
+    #save-bar { top: 108px; position: sticky; z-index: 48; }
+    .panel { padding-top: 16px; }
+  }
+
+  /* ─── BACKUP WARNING CARD ─── */
+  .backup-warn {
+    background: #FFF3E0;
+    border: 1px solid #FFB74D;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #E65100;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .backup-warn-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+
+  /* ─── PARTAGE ─── */
+  .share-method-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .share-method-tab {
+    flex: 1;
+    padding: 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--off-white);
+    font-family: 'Source Serif 4', serif;
+    font-size: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    color: var(--muted);
+  }
+  .share-method-tab.active {
+    background: var(--blue);
+    color: white;
+    border-color: var(--blue);
+  }
+  .share-panel { display: none; }
+  .share-panel.active { display: block; }
+
 </style>
 </head>
 <body>
@@ -1493,7 +1880,7 @@ if ('serviceWorker' in navigator) {
 <div class="app-header">
   <div class="logo">📋</div>
   <h1>Fiche Pédagogique
-    <span>EZ-ZAKY AZIZ — Générateur PDF</span>
+    <span>EZ-ZAKY AZIZ — v3.0 · PDF · Tablette · Partage</span>
   </h1>
   <button onclick="nouvelleFiche()" title="Effacer et recommencer une nouvelle fiche" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.5);color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;">
     🔄 Nouvelle fiche
@@ -1527,6 +1914,31 @@ if ('serviceWorker' in navigator) {
   </button>
   <button class="tab-btn" onclick="showTab('apropos')" id="tab-apropos">
     <span class="tab-icon">ℹ️</span>À propos
+  </button>
+  <button class="tab-btn" onclick="showTab('partage')" id="tab-partage">
+    <span class="tab-icon">🔗</span>Partage
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- BARRE D'OUTILS RAPIDE (tablette uniquement)        -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="tablet-toolbar" id="tablet-toolbar">
+  <span class="tablet-toolbar-label">Actions rapides :</span>
+  <button class="btn-v3 btn-v3-primary" onclick="genererPDF()" style="padding:7px 14px;font-size:12px;">
+    📄 Générer PDF
+  </button>
+  <button class="btn-v3 btn-v3-success" onclick="enregistrerDansRepertoire()" style="padding:7px 14px;font-size:12px;">
+    💾 Sauvegarder
+  </button>
+  <button class="btn-v3" onclick="showTab('apercu');genererPreviewSimulee();" style="padding:7px 14px;font-size:12px;background:#E8F5E9;color:#2E7D32;border:1px solid #C8E6C9;">
+    👁️ Aperçu PDF
+  </button>
+  <button class="btn-v3 btn-v3-ghost" onclick="exporterToutesLesFinches()" style="padding:7px 14px;font-size:12px;">
+    📦 Exporter backup
+  </button>
+  <button class="btn-v3 btn-v3-ghost" onclick="showTab('partage');switchShareMethod('code',document.querySelector('.share-method-tab:nth-child(2)'));" style="padding:7px 14px;font-size:12px;">
+    🔑 Partager (code)
   </button>
 </div>
 
@@ -1971,6 +2383,24 @@ if ('serviceWorker' in navigator) {
     Remplissez l'en-tête et les étapes, puis revenez ici pour voir un aperçu avant génération.
   </div>
 
+  <!-- ── NOUVELLE : Aperçu PDF simulé en temps réel ── -->
+  <div class="card" id="card-pdf-sim">
+    <div class="card-header" style="justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <h2>APERÇU PDF SIMULÉ</h2>
+        <span class="badge">Temps réel</span>
+      </div>
+      <button onclick="genererPreviewSimulee()" class="pdf-preview-update-btn" style="font-size:11px;padding:5px 10px;">
+        🔄 Actualiser
+      </button>
+    </div>
+    <div style="padding:12px;">
+      <div class="pdf-preview-container" id="pdf-preview-container">
+        <div class="pdf-sim-info">Cliquez sur "Actualiser" pour générer l'aperçu</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Aperçu avec codes couleurs thématiques -->
   <div id="preview-live-container" class="preview-live">
     <div class="preview-live-header">
@@ -2068,6 +2498,7 @@ if ('serviceWorker' in navigator) {
       <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;">✒️ Texte riche</span>
       <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;">🖼️ Images</span>
       <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;">🎨 9 Thèmes</span>
+      <span style="background:rgba(201,168,76,0.85);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;">🆕 v3.0 : Tablette · Partage · Backup</span>
     </div>
   </div>
 
@@ -2417,7 +2848,7 @@ if ('serviceWorker' in navigator) {
         <div style="display:grid;gap:8px;font-size:12px;color:#444;">
           <div style="display:flex;justify-content:space-between;padding:8px 10px;background:#F5F7FA;border-radius:6px;">
             <span style="font-weight:600;">Version</span>
-            <span>2.11 (Février 2025)</span>
+            <span>Version 3.0 — Février 2026 (amélioré par IA)</span>
           </div>
           <div style="display:flex;justify-content:space-between;padding:8px 10px;background:#F5F7FA;border-radius:6px;">
             <span style="font-weight:600;">Type d'application</span>
@@ -2463,8 +2894,8 @@ if ('serviceWorker' in navigator) {
     <div style="text-align:center;padding:20px 12px 24px;">
       <div style="font-size:32px;margin-bottom:10px;">📋</div>
       <div style="font-weight:700;color:#1565C0;font-size:14px;margin-bottom:6px;">Générateur de Fiches Pédagogiques</div>
-      <div style="color:#666;font-size:12px;margin-bottom:4px;">© 2025 <strong style="color:#1565C0;">EZ-ZAKY AZIZ</strong></div>
-      <div style="color:#999;font-size:11px;">Tous droits réservés — Licence CC BY-NC-SA 4.0</div>
+      <div style="color:#666;font-size:12px;margin-bottom:4px;">© 2025-2026 <strong style="color:#1565C0;">EZ-ZAKY AZIZ</strong></div>
+      <div style="color:#999;font-size:11px;">Tous droits réservés — Licence CC BY-NC-SA 4.0 — v3.0</div>
       <div style="margin-top:12px;padding:10px;background:#F5F7FA;border-radius:8px;display:inline-block;">
         <div style="font-size:11px;color:#666;line-height:1.6;">
           Application 100% locale — Vos données restent sur votre appareil<br>
@@ -2477,7 +2908,175 @@ if ('serviceWorker' in navigator) {
 </div>
 
 <!-- ═══════════════════════════════════════════════════ -->
-<div class="symbol-picker" id="symbol-picker">
+<!-- PANEL : PARTAGE & SAUVEGARDE AVANCÉE (v3.0)       -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="panel" id="panel-partage">
+
+  <!-- Avertissement backup -->
+  <div class="backup-warn">
+    <span class="backup-warn-icon">⚠️</span>
+    <div>
+      <strong>Rappel important :</strong> Vos fiches sont stockées dans votre navigateur (localStorage). 
+      Si vous videz les données du navigateur ou changez d'appareil, vos fiches seront perdues. 
+      <strong>Exportez régulièrement un backup JSON</strong> pour les conserver en sécurité.
+    </div>
+  </div>
+
+  <!-- Section Export/Import -->
+  <div class="export-section">
+    <div class="export-section-header">
+      <span style="font-size:18px;">💾</span>
+      <span>SAUVEGARDE & RESTAURATION</span>
+    </div>
+    <div class="export-section-body">
+      <p style="font-size:12px;color:#555;margin-bottom:14px;line-height:1.6;">
+        Exportez toutes vos fiches dans un fichier <strong>.json</strong> que vous pouvez stocker 
+        sur votre téléphone, Google Drive, ou envoyer par email. Pour restaurer, importez ce fichier.
+      </p>
+      <div class="export-btn-grid">
+        <button class="btn-v3 btn-v3-primary" onclick="exporterToutesLesFinches()" style="width:100%;justify-content:center;">
+          📦 Exporter toutes les fiches (.json)
+        </button>
+        <button class="btn-v3 btn-v3-success" onclick="importerFichesJSON()" style="width:100%;justify-content:center;">
+          📥 Importer un backup (.json)
+        </button>
+      </div>
+      <div class="export-btn-grid">
+        <button class="btn-v3 btn-v3-ghost" onclick="exporterFicheActuelle()" style="width:100%;justify-content:center;">
+          📄 Exporter la fiche actuelle
+        </button>
+        <button class="btn-v3 btn-v3-warn" onclick="confirmerEffacerTout()" style="width:100%;justify-content:center;">
+          🗑️ Effacer toutes les fiches
+        </button>
+      </div>
+      <div id="export-status" style="display:none;margin-top:10px;padding:10px;border-radius:8px;font-size:12px;text-align:center;"></div>
+      
+      <!-- Stats du répertoire -->
+      <div style="margin-top:14px;background:#F5F8FF;border-radius:8px;padding:12px;display:flex;gap:16px;flex-wrap:wrap;">
+        <div style="text-align:center;flex:1;">
+          <div id="stat-fiches" style="font-size:24px;font-weight:700;color:var(--blue);">0</div>
+          <div style="font-size:11px;color:var(--muted);">Fiches sauvegardées</div>
+        </div>
+        <div style="text-align:center;flex:1;">
+          <div id="stat-taille" style="font-size:24px;font-weight:700;color:var(--gold);">0 Ko</div>
+          <div style="font-size:11px;color:var(--muted);">Espace utilisé</div>
+        </div>
+        <div style="text-align:center;flex:1;">
+          <div id="stat-backup" style="font-size:24px;font-weight:700;color:#2E7D32;">—</div>
+          <div style="font-size:11px;color:var(--muted);">Dernier backup</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Partage par lien / QR Code -->
+  <div class="export-section">
+    <div class="export-section-header">
+      <span style="font-size:18px;">🔗</span>
+      <span>PARTAGER CETTE FICHE</span>
+    </div>
+    <div class="export-section-body">
+      <p style="font-size:12px;color:#555;margin-bottom:14px;line-height:1.6;">
+        Choisissez votre méthode de partage selon votre situation.
+      </p>
+      
+      <div class="share-method-tabs">
+        <button class="share-method-tab active" onclick="switchShareMethod('qr', this)">🏷️ QR Résumé</button>
+        <button class="share-method-tab" onclick="switchShareMethod('code', this)">🔑 Code court</button>
+        <button class="share-method-tab" onclick="switchShareMethod('email', this)">📧 Email</button>
+      </div>
+      
+      <!-- QR Résumé (NOUVEAU - toujours fonctionne car encode seulement les infos essentielles) -->
+      <div class="share-panel active" id="share-panel-qr">
+        <div style="background:#E8F5E9;border-radius:8px;padding:10px 12px;font-size:11px;color:#2E7D32;margin-bottom:12px;line-height:1.5;">
+          ✅ <strong>Ce QR Code fonctionne toujours</strong> car il encode uniquement le <strong>résumé de la fiche</strong> 
+          (Professeur, Niveau, Module, Objectif) — pas le contenu complet. 
+          Utile pour <strong>afficher en classe</strong>, coller sur un cahier, ou partager rapidement les infos.
+        </div>
+        <button class="btn-v3 btn-v3-primary" onclick="genererQRResume()" style="width:100%;justify-content:center;margin-bottom:14px;">
+          🏷️ Générer le QR Résumé
+        </button>
+        <div class="qr-container" id="qr-container" style="display:none;">
+          <canvas id="qr-canvas" width="220" height="220"></canvas>
+          <div class="qr-info" id="qr-info-text">Le QR Code contient le résumé de la fiche.</div>
+          <div id="qr-content-preview" style="width:100%;background:#F5F8FF;border-radius:8px;border:1px solid #E3EAF6;padding:10px;font-size:10px;color:#444;line-height:1.7;font-family:monospace;max-height:100px;overflow-y:auto;"></div>
+          <button class="btn-v3 btn-v3-ghost" onclick="telechargerQR()" style="width:100%;justify-content:center;">⬇️ Télécharger QR (PNG)</button>
+        </div>
+        <div style="margin-top:14px;background:#FFF3E0;border:1px solid #FFB74D;border-radius:8px;padding:10px;font-size:11px;color:#E65100;line-height:1.5;">
+          💡 <strong>Pour partager la fiche complète</strong> (avec tout le contenu) : utilisez <strong>"🔑 Code court"</strong> 
+          (même appareil) ou <strong>"📧 Email"</strong> avec export JSON (entre appareils).
+        </div>
+      </div>
+      
+      <!-- Code court (fonctionne sur Android WebView / APK) -->
+      <div class="share-panel" id="share-panel-code">
+        <div style="background:#E8F5E9;border-radius:8px;padding:10px 12px;font-size:11px;color:#2E7D32;margin-bottom:12px;line-height:1.5;">
+          ✅ <strong>Méthode recommandée sur Android/APK.</strong> Générez un code court, envoyez-le par SMS ou WhatsApp. Votre collègue l'entre dans son application.
+        </div>
+        <button class="btn-v3 btn-v3-primary" onclick="genererCodeCourt()" style="width:100%;justify-content:center;margin-bottom:14px;">
+          🔑 Générer un code de partage
+        </button>
+        <div id="code-court-container" style="display:none;">
+          <div style="text-align:center;margin-bottom:14px;">
+            <div style="font-size:38px;font-weight:900;letter-spacing:6px;color:var(--blue);font-family:monospace;background:#E3F2FD;border-radius:12px;padding:16px;border:2px dashed var(--blue);" id="code-court-display">——</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:6px;" id="code-court-expiry"></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-v3 btn-v3-primary" onclick="copierCode()" style="flex:1;justify-content:center;">📋 Copier le code</button>
+            <button class="btn-v3 btn-v3-ghost" onclick="partagerCodeWhatsApp()" style="flex:1;justify-content:center;">💬 WhatsApp</button>
+          </div>
+        </div>
+        <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+          <div style="font-size:12px;font-weight:600;color:var(--blue-dark);margin-bottom:8px;">📥 Charger une fiche par code</div>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="code-import-input" placeholder="Code (ex: A3F7X2K9)" maxlength="12"
+              style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:monospace;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:4px;text-align:center;"
+              oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
+            <button class="btn-v3 btn-v3-success" onclick="chargerParCode()">✅ Charger</button>
+          </div>
+          <div id="code-import-status" style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center;min-height:16px;"></div>
+        </div>
+      </div>
+      
+      <!-- Email -->
+      <div class="share-panel" id="share-panel-email">
+        <p style="font-size:12px;color:#555;margin-bottom:12px;line-height:1.6;">
+          Méthode la plus fiable : exportez le fichier JSON et envoyez-le par email. Votre collègue l'importe dans son application.
+        </p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn-v3 btn-v3-primary" onclick="partagerEmail('json')" style="justify-content:center;">
+            📧 Préparer email (fichier JSON)
+          </button>
+          <button class="btn-v3 btn-v3-ghost" onclick="partagerEmailCode()" style="justify-content:center;">
+            📧 Envoyer le code par email
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Aperçu amélioré -->
+  <div class="export-section">
+    <div class="export-section-header">
+      <span style="font-size:18px;">🖨️</span>
+      <span>GÉNÉRATION RAPIDE</span>
+    </div>
+    <div class="export-section-body">
+      <div class="export-btn-grid">
+        <button class="btn-v3 btn-v3-primary" onclick="genererPDF()" style="width:100%;justify-content:center;">
+          📄 Générer PDF
+        </button>
+        <button class="btn-v3" onclick="genererDOCX()" style="width:100%;justify-content:center;background:#1B5E20;color:white;">
+          📝 Générer DOCX
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- INPUT FILE caché pour l'import JSON -->
+<input type="file" id="import-json-input" accept=".json" style="display:none" onchange="lireJSONImporte(event)">
   <div class="symbol-picker-header">
     <span>Ω Insérer un symbole</span>
     <button class="symbol-picker-close" onclick="fermerSymbolPicker()" type="button">✕</button>
@@ -5688,7 +6287,7 @@ function genererPDF() {
     // Copyright discret en bas (très petit) avec ID unique invisible
     doc.setFontSize(6);
     doc.setTextColor(180,180,180);
-    doc.text(`\u00A9 EZ-ZAKY AZIZ | App v2.11 | ${uniqueId}`, M, PH-1);
+    doc.text(`\u00A9 EZ-ZAKY AZIZ | App v3.0 | ${uniqueId}`, M, PH-1);
   }
 
   // Sauvegarde — méthode spéciale AppsGeyser WebView
@@ -7181,6 +7780,670 @@ function sauverModeleRepertoire(id) {
   showToast();
 }
 
+// ═══════════════════════════════════════════════════════════════
+// NOUVELLES FONCTIONNALITÉS v3.0
+// ═══════════════════════════════════════════════════════════════
+
+// ── EXPORT / IMPORT JSON ──────────────────────────────────────
+
+function exporterToutesLesFinches() {
+  try {
+    const fiches = lireRepertoire();
+    const autosave = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
+    const exportData = {
+      version: '3.0',
+      exportedAt: new Date().toLocaleString('fr-FR'),
+      author: 'EZ-ZAKY AZIZ',
+      fiches: fiches,
+      autosave: autosave
+    };
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const dateStr = new Date().toISOString().slice(0,10);
+    a.download = 'backup_fiches_pedagogiques_' + dateStr + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    localStorage.setItem('fp_last_backup', new Date().toLocaleString('fr-FR'));
+    afficherExportStatus('✅ Backup exporté avec succès ! (' + fiches.length + ' fiche(s))', '#2E7D32');
+    mettreAJourStatsPartage();
+  } catch(e) {
+    afficherExportStatus('❌ Erreur lors de l\'export : ' + e.message, '#C62828');
+  }
+}
+
+function exporterFicheActuelle() {
+  try {
+    const data = collecterTout();
+    data.exportedAt = new Date().toLocaleString('fr-FR');
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const nom = (data.entete && data.entete.activite) ? data.entete.activite.replace(/[^a-zA-Z0-9\u00C0-\u024F]/gi,'_').slice(0,30) : 'fiche';
+    a.download = 'fiche_' + nom + '_' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    afficherExportStatus('✅ Fiche actuelle exportée !', '#2E7D32');
+  } catch(e) {
+    afficherExportStatus('❌ Erreur lors de l\'export : ' + e.message, '#C62828');
+  }
+}
+
+function importerFichesJSON() {
+  document.getElementById('import-json-input').value = '';
+  document.getElementById('import-json-input').click();
+}
+
+function lireJSONImporte(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const raw = e.target.result;
+      const data = JSON.parse(raw);
+
+      // ── CAS 1 : Backup complet (exporterToutesLesFinches) ──
+      // Structure : { version, exportedAt, author, fiches:[], autosave }
+      if (data.fiches && Array.isArray(data.fiches)) {
+        const n = data.fiches.length;
+        const msg = n === 0
+          ? '📥 Ce backup est vide (0 fiche). Rien à importer.'
+          : '📥 Importer ' + n + ' fiche(s) depuis ce backup ?\n\nCes fiches seront AJOUTÉES à votre répertoire (vos fiches actuelles sont conservées).';
+        if (n === 0) { afficherExportStatus(msg, '#E65100'); return; }
+        if (!confirm(msg)) return;
+        const existing = lireRepertoire();
+        // Éviter les doublons par nom
+        const existingNames = new Set(existing.map(function(f) { return f.nom; }));
+        const toAdd = data.fiches.filter(function(f) { return !existingNames.has(f.nom); });
+        const dupes = data.fiches.length - toAdd.length;
+        const merged = [...toAdd, ...existing];
+        ecrireRepertoire(merged);
+        // Restaurer l'autosave si existant et utile
+        if (data.autosave && !localStorage.getItem(SAVE_KEY)) {
+          localStorage.setItem(SAVE_KEY, JSON.stringify(data.autosave));
+        }
+        mettreAJourBadgeRepertoire();
+        mettreAJourStatsPartage();
+        let msg2 = '✅ ' + toAdd.length + ' fiche(s) importée(s) !';
+        if (dupes > 0) msg2 += ' (' + dupes + ' doublon(s) ignoré(s))';
+        afficherExportStatus(msg2, '#2E7D32');
+        return;
+      }
+
+      // ── CAS 2 : Fiche individuelle (exporterFicheActuelle) ──
+      // Structure : { v, entete, etapes, params, exportedAt, nom? }
+      if (data.entete && typeof data.entete === 'object') {
+        if (!confirm('📥 Charger cette fiche dans l\'éditeur ?\n"' + (data.nom || data.entete.activite || 'Sans titre') + '"\n\nLe contenu actuel sera remplacé.')) return;
+        restaurerFiche(data);
+        showTab('entete');
+        afficherExportStatus('✅ Fiche "' + (data.nom || data.entete.activite || 'Sans titre') + '" chargée !', '#1565C0');
+        return;
+      }
+
+      // ── CAS 3 : Ancienne structure v2.x (v + entete + etapes) ──
+      if ((data.v || data.version) && data.etapes && Array.isArray(data.etapes)) {
+        if (!confirm('📥 Charger cette fiche dans l\'éditeur ?\n\nLe contenu actuel sera remplacé.')) return;
+        restaurerFiche(data);
+        showTab('entete');
+        afficherExportStatus('✅ Fiche chargée depuis le backup v2 !', '#1565C0');
+        return;
+      }
+
+      // ── Aucun format reconnu ──
+      afficherExportStatus('❌ Format non reconnu. Vérifiez que c\'est bien un fichier exporté depuis cette application.', '#C62828');
+
+    } catch(err) {
+      afficherExportStatus('❌ Fichier JSON invalide ou corrompu : ' + err.message, '#C62828');
+    }
+  };
+  reader.onerror = function() {
+    afficherExportStatus('❌ Impossible de lire le fichier.', '#C62828');
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function confirmerEffacerTout() {
+  if (!confirm('⚠️ ATTENTION !\n\nVoulez-vous vraiment supprimer TOUTES vos fiches sauvegardées ?\n\nCette action est IRRÉVERSIBLE.\n\nPensez à exporter un backup avant !')) return;
+  if (!confirm('🔴 Dernière confirmation : effacer toutes les fiches ?')) return;
+  localStorage.removeItem(REP_KEY);
+  localStorage.removeItem(SAVE_KEY);
+  mettreAJourBadgeRepertoire();
+  mettreAJourStatsPartage();
+  afficherExportStatus('🗑️ Toutes les fiches ont été supprimées.', '#E65100');
+}
+
+function afficherExportStatus(msg, color) {
+  const el = document.getElementById('export-status');
+  if (!el) return;
+  el.style.display = 'block';
+  el.style.background = color + '15';
+  el.style.border = '1px solid ' + color + '40';
+  el.style.color = color;
+  el.textContent = msg;
+  setTimeout(function() { if (el) el.style.display = 'none'; }, 4000);
+}
+
+function mettreAJourStatsPartage() {
+  const fiches = lireRepertoire();
+  const el1 = document.getElementById('stat-fiches');
+  const el2 = document.getElementById('stat-taille');
+  const el3 = document.getElementById('stat-backup');
+  if (el1) el1.textContent = fiches.length;
+  if (el2) {
+    try {
+      const totalSize = (localStorage.getItem(REP_KEY) || '').length * 2;
+      el2.textContent = totalSize > 1024 ? Math.round(totalSize/1024) + ' Ko' : totalSize + ' o';
+    } catch(e2) { if (el2) el2.textContent = '—'; }
+  }
+  if (el3) {
+    const lastBackup = localStorage.getItem('fp_last_backup');
+    el3.textContent = lastBackup ? lastBackup.split(' ')[0] : '—';
+  }
+}
+
+// ── PARTAGE PAR LIEN ET QR CODE ───────────────────────────────
+
+function switchShareMethod(method, btn) {
+  document.querySelectorAll('.share-method-tab').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.share-panel').forEach(function(p) { p.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  const panel = document.getElementById('share-panel-' + method);
+  if (panel) panel.classList.add('active');
+}
+
+function compresserFiche() {
+  const data = collecterTout();
+  const slim = {
+    v: data.v,
+    entete: data.entete,
+    etapes: data.etapes.map(function(e) { return {
+      nom: e.nom,
+      enseignant: (e.enseignant || '').replace(/src="data:image[^"]*"/g, 'src="[IMG]"'),
+      duree: e.duree
+    }; }),
+    params: data.params
+  };
+  const json = JSON.stringify(slim);
+  try { return btoa(unescape(encodeURIComponent(json))); }
+  catch(err) { return btoa(json); }
+}
+
+function genererURL() {
+  try {
+    const encoded = compresserFiche();
+    const baseUrl = window.location.href.split('?')[0].split('#')[0];
+    const url = baseUrl + '?fiche=' + encoded;
+    const urlContainer = document.getElementById('url-container');
+    const urlDisplay = document.getElementById('share-url-display');
+    const sizeInfo = document.getElementById('url-size-info');
+    if (urlContainer) urlContainer.style.display = 'block';
+    if (urlDisplay) urlDisplay.textContent = url;
+    if (sizeInfo) {
+      const kb = Math.round(url.length / 1024 * 10) / 10;
+      sizeInfo.textContent = 'Taille du lien : ' + kb + ' Ko';
+      if (url.length > 50000) {
+        sizeInfo.textContent += ' ⚠️ Lien très long — préférez l\'export JSON.';
+        sizeInfo.style.color = '#E65100';
+      } else {
+        sizeInfo.style.color = 'var(--muted)';
+      }
+    }
+  } catch(e) {
+    afficherExportStatus('❌ Erreur lors de la génération du lien : ' + e.message, '#C62828');
+  }
+}
+
+function copierURL() {
+  const urlEl = document.getElementById('share-url-display');
+  if (!urlEl) return;
+  const url = urlEl.textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(function() {
+      afficherExportStatus('✅ Lien copié dans le presse-papiers !', '#2E7D32');
+    }).catch(function() {
+      selectionnerEtCopier(urlEl);
+    });
+  } else {
+    selectionnerEtCopier(urlEl);
+  }
+}
+
+function selectionnerEtCopier(el) {
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  try {
+    document.execCommand('copy');
+    afficherExportStatus('✅ Lien copié !', '#2E7D32');
+  } catch(e) {
+    afficherExportStatus('Sélectionnez le texte manuellement et copiez-le.', '#1565C0');
+  }
+  sel.removeAllRanges();
+}
+
+function ouvrirURL() {
+  const urlEl = document.getElementById('share-url-display');
+  if (urlEl && urlEl.textContent) window.open(urlEl.textContent, '_blank');
+}
+
+function partagerEmail(mode) {
+  var entete = {};
+  try { entete = collecterEntete ? collecterEntete() : {}; } catch(e2) {}
+  const nom = (entete.activite || entete.module || 'Fiche pédagogique');
+  const sujet = encodeURIComponent('Fiche pédagogique : ' + nom);
+  const corps = encodeURIComponent('Bonjour,\n\nJe partage la fiche pédagogique "' + nom + '".\n\nVeuillez trouver le fichier JSON en pièce jointe.\nPour l\'importer :\n1. Ouvrez l\'application Fiche Pédagogique\n2. Allez dans l\'onglet "Partage"\n3. Cliquez sur "Importer un backup (.json)"\n4. Sélectionnez le fichier reçu\n\nCordialement,\n' + (entete.prof || ''));
+  afficherExportStatus('📧 Export en cours... Joignez le fichier JSON téléchargé à votre email.', '#1565C0');
+  setTimeout(function() { exporterFicheActuelle(); }, 200);
+  setTimeout(function() { window.location.href = 'mailto:?subject=' + sujet + '&body=' + corps; }, 800);
+}
+
+// ── QR RÉSUMÉ (v3.2 — fonctionne toujours car encode seulement les infos essentielles) ──
+
+function genererQRResume() {
+  try {
+    // Collecter seulement les infos essentielles de l'en-tête
+    var entete = {};
+    try { entete = collecterEntete ? collecterEntete() : {}; } catch(e2) {}
+    var etapes = [];
+    try { etapes = collecterEtapes ? collecterEtapes() : []; } catch(e2) {}
+
+    function stripHtml(html) {
+      if (!html) return '';
+      const d = document.createElement('div');
+      d.innerHTML = html;
+      return (d.textContent || d.innerText || '').trim().slice(0, 120);
+    }
+
+    // Construire un texte compact et lisible (pas de JSON, juste du texte)
+    const prof     = stripHtml(entete.prof     || '').slice(0, 40);
+    const niveau   = stripHtml(entete.niveau   || '').slice(0, 20);
+    const module_  = stripHtml(entete.module   || '').slice(0, 60);
+    const sequence = stripHtml(entete.sequence || '').slice(0, 60);
+    const activite = stripHtml(entete.activite || '').slice(0, 60);
+    const objectif = stripHtml(entete.objectif || '').slice(0, 150);
+    const dureeTotal = etapes.reduce(function(s, e) {
+      const m = (e.duree || '').match(/(\d+[\.,]?\d*)/);
+      return s + (m ? parseFloat(m[1].replace(',','.')) : 0);
+    }, 0);
+
+    // Construire les lignes du résumé
+    const lines = [];
+    lines.push('=== FICHE PÉDAGOGIQUE ===');
+    if (prof)     lines.push('Prof : ' + prof);
+    if (niveau)   lines.push('Niveau : ' + niveau);
+    if (module_)  lines.push('Module : ' + module_);
+    if (sequence) lines.push('Séquence : ' + sequence);
+    if (activite) lines.push('Activité : ' + activite);
+    if (objectif) lines.push('Objectif : ' + objectif);
+    if (etapes.length > 0) {
+      lines.push('---');
+      lines.push('Étapes (' + etapes.length + ')' + (dureeTotal > 0 ? ' · ' + dureeTotal + ' min' : '') + ' :');
+      etapes.forEach(function(et, i) {
+        const nom = stripHtml(et.nom || '').slice(0, 30) || ('Étape ' + (i+1));
+        lines.push((i+1) + '. ' + nom + (et.duree ? ' (' + et.duree + ')' : ''));
+      });
+    }
+    lines.push('---');
+    lines.push('App : Fiche Pédagogique v3.2');
+    lines.push('© EZ-ZAKY AZIZ');
+
+    const qrText = lines.join('\n');
+
+    // Vérification de taille — ce texte sera toujours court
+    const preview = document.getElementById('qr-content-preview');
+    if (preview) preview.textContent = qrText;
+
+    const container = document.getElementById('qr-container');
+    const canvas    = document.getElementById('qr-canvas');
+    const infoEl    = document.getElementById('qr-info-text');
+    const ctx       = canvas.getContext('2d');
+
+    // Appel à l'API QR (texte court = QR simple, toujours lisible)
+    const qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&ecc=M&margin=10&data='
+                   + encodeURIComponent(qrText);
+
+    // Afficher un loader pendant le chargement
+    ctx.fillStyle = '#F5F8FF';
+    ctx.fillRect(0, 0, 220, 220);
+    ctx.fillStyle = '#1565C0';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Génération…', 110, 115);
+    if (container) container.style.display = 'flex';
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function() {
+      ctx.clearRect(0, 0, 220, 220);
+      ctx.drawImage(img, 0, 0, 220, 220);
+      if (infoEl) infoEl.textContent = 
+        'Résumé : ' + (prof || '—') + ' · ' + (niveau || '—') + 
+        (activite ? ' · ' + activite.slice(0,30) : '') +
+        ' · ' + etapes.length + ' étape(s)' +
+        (dureeTotal > 0 ? ' · ' + dureeTotal + ' min' : '');
+      afficherExportStatus('✅ QR Résumé généré ! À imprimer ou afficher en classe.', '#2E7D32');
+    };
+    img.onerror = function() {
+      // Hors ligne — dessiner un QR factice avec message
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, 220, 220);
+      // Bordure bleue
+      ctx.strokeStyle = '#1565C0';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(4, 4, 212, 212);
+      // Coins de QR
+      [
+        [10,10],[170,10],[10,170]
+      ].forEach(function(pos) {
+        ctx.fillStyle = '#1565C0';
+        ctx.fillRect(pos[0], pos[1], 40, 40);
+        ctx.fillStyle = 'white';
+        ctx.fillRect(pos[0]+6, pos[1]+6, 28, 28);
+        ctx.fillStyle = '#1565C0';
+        ctx.fillRect(pos[0]+12, pos[1]+12, 16, 16);
+      });
+      // Message centré
+      ctx.fillStyle = '#1565C0';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Connexion requise', 110, 90);
+      ctx.font = '10px sans-serif';
+      ctx.fillStyle = '#555';
+      ctx.fillText('pour générer le QR.', 110, 106);
+      ctx.fillText('Reconnectez-vous', 110, 126);
+      ctx.fillText('puis réessayez.', 110, 142);
+      if (infoEl) infoEl.textContent = '⚠️ Connexion internet requise pour générer le QR Code.';
+      if (container) container.style.display = 'flex';
+      afficherExportStatus('⚠️ QR non disponible hors ligne. Utilisez "🔑 Code court" à la place.', '#E65100');
+    };
+    img.src = qrApiUrl;
+
+  } catch(e) {
+    afficherExportStatus('❌ Erreur : ' + e.message, '#C62828');
+  }
+}
+
+// Garder la compatibilité si genererQRCode est appelé ailleurs
+function genererQRCode() { genererQRResume(); }
+
+function telechargerQR() {
+  const canvas = document.getElementById('qr-canvas');
+  if (!canvas) return;
+  try {
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    const entete = {};
+    try { Object.assign(entete, collecterEntete ? collecterEntete() : {}); } catch(e2) {}
+    const nom = (entete.activite || entete.niveau || 'fiche').replace(/[^a-zA-Z0-9]/gi,'_').slice(0,20);
+    a.download = 'QR_resume_' + nom + '.png';
+    a.click();
+    afficherExportStatus('✅ QR téléchargé !', '#2E7D32');
+  } catch(e) {
+    afficherExportStatus('❌ Téléchargement impossible : ' + e.message, '#C62828');
+  }
+}
+
+// ── CODE COURT DE PARTAGE (fonctionne sur Android WebView) ───────
+
+// Le code est stocké dans localStorage avec une clé unique.
+// Votre collègue entre le code dans son application sur le même appareil
+// ou transfère le fichier JSON manuellement.
+// Note : localStorage n'est pas partagé entre appareils.
+// Le "code" est donc un raccourci pour sauvegarder/retrouver une fiche
+// sur le MÊME appareil, ou via copier-coller du code + import.
+
+const CODE_PREFIX = 'fp_share_code_';
+
+function genererCodeCourt() {
+  try {
+    const data = collecterTout();
+    // Générer un code de 8 caractères alphanumériques
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // sans I, O, 0, 1 pour éviter confusion
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    // Stocker dans localStorage avec expiration 48h
+    const expiry = Date.now() + 48 * 60 * 60 * 1000;
+    const payload = { data: data, code: code, expiry: expiry, createdAt: new Date().toLocaleString('fr-FR') };
+    localStorage.setItem(CODE_PREFIX + code, JSON.stringify(payload));
+    
+    // Afficher le code
+    const display = document.getElementById('code-court-display');
+    const expiryEl = document.getElementById('code-court-expiry');
+    const container = document.getElementById('code-court-container');
+    if (display) display.textContent = code;
+    if (expiryEl) expiryEl.textContent = 'Valide 48h sur cet appareil · Créé le ' + new Date().toLocaleString('fr-FR');
+    if (container) container.style.display = 'block';
+    
+    // Nettoyer les anciens codes expirés
+    nettoyerCodesExpires();
+    
+  } catch(e) {
+    afficherExportStatus('❌ Erreur génération code : ' + e.message, '#C62828');
+  }
+}
+
+function nettoyerCodesExpires() {
+  try {
+    const keys = Object.keys(localStorage).filter(function(k) { return k.startsWith(CODE_PREFIX); });
+    keys.forEach(function(k) {
+      try {
+        const p = JSON.parse(localStorage.getItem(k));
+        if (p && p.expiry && p.expiry < Date.now()) localStorage.removeItem(k);
+      } catch(e2) { localStorage.removeItem(k); }
+    });
+  } catch(e) {}
+}
+
+function copierCode() {
+  const display = document.getElementById('code-court-display');
+  if (!display) return;
+  const code = display.textContent;
+  if (!code || code === '——') return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(function() {
+      afficherExportStatus('✅ Code "' + code + '" copié !', '#2E7D32');
+    }).catch(function() {
+      afficherExportStatus('Code : ' + code + ' (copiez-le manuellement)', '#1565C0');
+    });
+  } else {
+    afficherExportStatus('Votre code : ' + code, '#1565C0');
+  }
+}
+
+function partagerCodeWhatsApp() {
+  const display = document.getElementById('code-court-display');
+  if (!display) return;
+  const code = display.textContent;
+  if (!code || code === '——') { afficherExportStatus('Générez d\'abord un code.', '#E65100'); return; }
+  const entete = {};
+  try { Object.assign(entete, collecterEntete ? collecterEntete() : {}); } catch(e2) {}
+  const nom = entete.activite || entete.module || 'Fiche pédagogique';
+  const msg = 'Bonjour ! Je partage la fiche "' + nom + '".\n\nCode de partage : *' + code + '*\n\nOuvrez l\'application → onglet Partage → Code court → entrez ce code.\n\n(Valide 48h sur cet appareil)';
+  window.location.href = 'whatsapp://send?text=' + encodeURIComponent(msg);
+}
+
+function chargerParCode() {
+  const input = document.getElementById('code-import-input');
+  const statusEl = document.getElementById('code-import-status');
+  if (!input || !statusEl) return;
+  const code = (input.value || '').trim().toUpperCase();
+  if (!code || code.length < 4) {
+    statusEl.style.color = '#E65100';
+    statusEl.textContent = '⚠️ Entrez un code valide.';
+    return;
+  }
+  
+  nettoyerCodesExpires();
+  
+  try {
+    const stored = localStorage.getItem(CODE_PREFIX + code);
+    if (!stored) {
+      statusEl.style.color = '#C62828';
+      statusEl.textContent = '❌ Code introuvable ou expiré. Vérifiez le code ou demandez-en un nouveau.';
+      return;
+    }
+    const payload = JSON.parse(stored);
+    if (!payload || !payload.data) {
+      statusEl.style.color = '#C62828';
+      statusEl.textContent = '❌ Données corrompues.';
+      return;
+    }
+    if (payload.expiry && payload.expiry < Date.now()) {
+      localStorage.removeItem(CODE_PREFIX + code);
+      statusEl.style.color = '#E65100';
+      statusEl.textContent = '⏱️ Ce code a expiré. Demandez un nouveau code.';
+      return;
+    }
+    if (!confirm('📥 Charger la fiche associée au code "' + code + '" ?\n\nLe contenu actuel sera remplacé.')) return;
+    restaurerFiche(payload.data);
+    showTab('entete');
+    statusEl.style.color = '#2E7D32';
+    statusEl.textContent = '✅ Fiche chargée !';
+    input.value = '';
+    afficherStatutSauvegarde('📥 Fiche chargée via code "' + code + '"', '#1565C0');
+  } catch(e) {
+    statusEl.style.color = '#C62828';
+    statusEl.textContent = '❌ Erreur : ' + e.message;
+  }
+}
+
+function partagerEmailCode() {
+  const display = document.getElementById('code-court-display');
+  const code = display ? display.textContent : '';
+  var entete = {};
+  try { Object.assign(entete, collecterEntete ? collecterEntete() : {}); } catch(e2) {}
+  const nom = entete.activite || entete.module || 'Fiche pédagogique';
+  const sujet = encodeURIComponent('Code de partage - Fiche : ' + nom);
+  const corps = encodeURIComponent(
+    'Bonjour,\n\nJe partage la fiche pédagogique "' + nom + '".\n\n' +
+    'Code de partage : ' + (code && code !== '——' ? code : '(générez d\'abord un code)') + '\n\n' +
+    'Pour charger la fiche :\n' +
+    '1. Ouvrez l\'application Fiche Pédagogique\n' +
+    '2. Allez dans l\'onglet "Partage"\n' +
+    '3. Cliquez sur "🔑 Code court"\n' +
+    '4. Entrez le code ci-dessus\n\n' +
+    'Note : le code est valide 48h.\n\nCordialement,\n' + (entete.prof || '')
+  );
+  if (!code || code === '——') {
+    afficherExportStatus('⚠️ Générez d\'abord un code via "🔑 Générer un code de partage".', '#E65100');
+    return;
+  }
+  window.location.href = 'mailto:?subject=' + sujet + '&body=' + corps;
+}
+
+// ── CHARGEMENT DEPUIS URL ─────────────────────────────────────
+
+function chargerDepuisURL() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const encoded = params.get('fiche');
+    if (!encoded) return;
+    const json = decodeURIComponent(escape(atob(encoded)));
+    const data = JSON.parse(json);
+    if (data && (data.entete || data.v)) {
+      setTimeout(function() {
+        if (confirm('📥 Un lien de partage a été détecté.\n\nVoulez-vous charger la fiche partagée ?')) {
+          restaurerFiche(data);
+          showTab('entete');
+          const cleanUrl = window.location.href.split('?')[0];
+          if (window.history && window.history.replaceState) {
+            window.history.replaceState({}, document.title, cleanUrl);
+          }
+          afficherStatutSauvegarde('📥 Fiche chargée depuis un lien de partage !', '#1565C0');
+        }
+      }, 1200);
+    }
+  } catch(e) {
+    // URL invalide, ignorer
+  }
+}
+
+// ── APERÇU PDF SIMULÉ ─────────────────────────────────────────
+
+function genererPreviewSimulee() {
+  const container = document.getElementById('pdf-preview-container');
+  if (!container) return;
+  try {
+    var entete = {};
+    var etapes = [];
+    try { entete = collecterEntete ? collecterEntete() : {}; } catch(e2) {}
+    try { etapes = collecterEtapes ? collecterEtapes() : []; } catch(e2) {}
+    const mainColor = (document.getElementById('p-color-main') || {}).value || '#1565C0';
+    function stripHtml(html) {
+      if (!html) return '';
+      const d = document.createElement('div');
+      d.innerHTML = html;
+      return (d.textContent || d.innerText || '').trim();
+    }
+    // Labels des colonnes
+    const etapesLabel = (document.getElementById('label-col-etapes') || {}).value || 'Étapes';
+    const deroulLabel = (document.getElementById('label-col-deroulement') || {}).value || 'Déroulement de la séance';
+    const dureeLabel = (document.getElementById('label-col-duree') || {}).value || 'Durée';
+    // Labels de l'en-tête
+    const getLabel = function(selector, fallback) {
+      const els = document.querySelectorAll(selector);
+      const el = els[0];
+      return el ? (el.textContent || '').trim() || fallback : fallback;
+    };
+    const profLabel = getLabel('#fgrp-ligne1 .label-text', 'Professeur');
+    const niveauLabel = (document.querySelectorAll('#fgrp-ligne1 .label-text')[1] || {textContent: 'Niveau'}).textContent.trim() || 'Niveau';
+    const moduleLabel = getLabel('#fgrp-module .label-text', 'Module');
+    const sequenceLabel = getLabel('#fgrp-sequence .label-text', 'Séquence');
+    const activiteLabel = getLabel('#fgrp-activite .label-text', 'Activité');
+    const supportLabel = getLabel('#fgrp-support .label-text', 'Support');
+    const objectifLabel = getLabel('#fgrp-objectif .label-text', 'Objectif');
+    const lbl = 'background:' + mainColor + ';color:white;padding:4px 6px;font-size:8px;font-weight:700;min-width:60px;display:flex;align-items:center;white-space:nowrap;';
+    const val = 'padding:4px 6px;font-size:8px;flex:1;border-left:1px solid ' + mainColor + ';word-break:break-word;';
+    const borderStyle = 'border:1.5px solid ' + mainColor + ';border-radius:2px;margin-bottom:8px;overflow:hidden;font-family:Times New Roman,serif;';
+    const rowStyle = 'display:flex;border-bottom:1px solid ' + mainColor + ';';
+    let headerHtml = '<div style="' + borderStyle + '">';
+    headerHtml += '<div style="' + rowStyle + '"><span style="' + lbl + '">' + profLabel + '</span><span style="' + val + '">' + (stripHtml(entete.prof)||'—') + '</span><span style="' + lbl + '">' + niveauLabel + '</span><span style="' + val + '">' + (stripHtml(entete.niveau)||'—') + '</span></div>';
+    headerHtml += '<div style="' + rowStyle + '"><span style="' + lbl + '">' + moduleLabel + '</span><span style="' + val + 'flex:3">' + (stripHtml(entete.module)||'—') + '</span></div>';
+    headerHtml += '<div style="' + rowStyle + '"><span style="' + lbl + '">' + sequenceLabel + '</span><span style="' + val + 'flex:3">' + (stripHtml(entete.sequence)||'—') + '</span></div>';
+    headerHtml += '<div style="' + rowStyle + '"><span style="' + lbl + '">' + activiteLabel + '</span><span style="' + val + '">' + (stripHtml(entete.activite)||'—') + '</span><span style="' + lbl + '">' + supportLabel + '</span><span style="' + val + '">' + (stripHtml(entete.support)||'—') + '</span></div>';
+    headerHtml += '<div style="display:flex;min-height:30px;"><span style="' + lbl + 'align-items:flex-start;padding-top:5px;">' + objectifLabel + '</span><span style="' + val + 'flex:3;white-space:pre-wrap;">' + (stripHtml(entete.objectif)||'—') + '</span></div>';
+    headerHtml += '</div>';
+    let tableHtml = '<table style="width:100%;border-collapse:collapse;border:1px solid ' + mainColor + ';font-family:Times New Roman,serif;">';
+    tableHtml += '<thead><tr><th style="background:' + mainColor + ';color:white;padding:4px;font-size:8px;width:18%;border:1px solid rgba(255,255,255,0.3);">' + etapesLabel + '</th><th style="background:' + mainColor + ';color:white;padding:4px;font-size:8px;width:72%;border:1px solid rgba(255,255,255,0.3);">' + deroulLabel + '</th><th style="background:' + mainColor + ';color:white;padding:4px;font-size:8px;width:10%;border:1px solid rgba(255,255,255,0.3);">' + dureeLabel + '</th></tr></thead><tbody>';
+    if (etapes.length === 0) {
+      tableHtml += '<tr><td colspan="3" style="padding:10px;text-align:center;font-size:8px;color:#aaa;">Aucune étape définie</td></tr>';
+    } else {
+      etapes.forEach(function(et, i) {
+        const d = stripHtml(et.enseignant || '');
+        const dt = d.length > 180 ? d.slice(0,180) + '…' : d;
+        tableHtml += '<tr><td style="border:1px solid #ddd;padding:4px 3px;font-size:8px;font-weight:700;color:' + mainColor + ';text-align:center;">' + (stripHtml(et.nom)||(i+1)) + '</td><td style="border:1px solid #ddd;padding:4px 3px;font-size:7px;">' + dt + '</td><td style="border:1px solid #ddd;padding:4px 3px;font-size:8px;text-align:center;">' + (et.duree||'—') + '</td></tr>';
+      });
+    }
+    tableHtml += '</tbody></table>';
+    container.innerHTML = '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;">' +
+      '<button class="pdf-preview-update-btn" onclick="genererPreviewSimulee()">🔄 Actualiser</button>' +
+      '<button class="pdf-preview-update-btn" onclick="genererPDF()" style="background:#2E7D32;">📄 Générer le vrai PDF</button>' +
+      '</div>' +
+      '<div class="pdf-page-sim">' +
+      '<div style="text-align:center;font-size:9px;color:#aaa;margin-bottom:8px;">— Aperçu simulé · non contractuel —</div>' +
+      headerHtml + tableHtml +
+      '<div style="text-align:center;font-size:7px;color:#bbb;margin-top:8px;">© EZ-ZAKY AZIZ · v3.0 · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
+      '</div>' +
+      '<div class="pdf-sim-info">📐 Aperçu approximatif A4 · Le PDF réel peut légèrement différer</div>';
+  } catch(err) {
+    container.innerHTML = '<div class="pdf-sim-info" style="color:#E65100;">❌ ' + err.message + '</div>';
+  }
+}
+
+// ── INITIALISATION v3.0 ───────────────────────────────────────
+
+window.addEventListener('load', function() {
+  setTimeout(chargerDepuisURL, 600);
+  setTimeout(mettreAJourStatsPartage, 1200);
+});
+
 (function() {
   const banner = document.getElementById('offline-banner');
   let restoreTimer = null;
@@ -7233,7 +8496,7 @@ function sauverModeleRepertoire(id) {
       setTimeout(function() {
         const acceptLicense = confirm(
           '📋 BIENVENUE dans le Générateur de Fiches Pédagogiques !\n\n' +
-          '© 2025 EZ-ZAKY AZIZ — Version 2.11\n\n' +
+          '© 2025-2026 EZ-ZAKY AZIZ — Version 3.0\n\n' +
           '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' +
           'LICENCE D\'UTILISATION\n' +
           '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
@@ -7290,7 +8553,7 @@ function sauverModeleRepertoire(id) {
     © 2025 <a href="#" onclick="showTab('apropos'); return false;">EZ-ZAKY AZIZ</a> — Tous droits réservés
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
-    <span class="version-badge">v2.11</span>
+    <span class="version-badge">v3.0</span>
     <span style="color:#aaa;">|</span>
     <a href="#" onclick="showTab('apropos'); return false;">Licence CC BY-NC-SA 4.0</a>
   </div>
