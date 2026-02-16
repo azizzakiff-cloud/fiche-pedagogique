@@ -19,17 +19,22 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Fiche Pédagogique v3.0 — EZ-ZAKY AZIZ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Fiche Pédagogique</title>
 <meta name="description" content="Générateur de fiches pédagogiques PDF">
 <meta name="author" content="EZ-ZAKY AZIZ">
 <meta name="copyright" content="© 2025 EZ-ZAKY AZIZ. Tous droits réservés.">
 <meta name="license" content="CC BY-NC-SA 4.0">
+<!-- Forcer le mode plein écran (cacher la barre d'adresse) -->
 <meta name="theme-color" content="#1565C0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fiche Péda">
+<meta name="msapplication-TileColor" content="#1565C0">
+<meta name="msapplication-navbutton-color" content="#1565C0">
+<meta name="application-name" content="Fiche Pédagogique">
+<meta name="format-detection" content="telephone=no">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%231565C0'/%3E%3Crect x='28' y='36' width='136' height='10' rx='5' fill='%23C9A84C'/%3E%3Crect x='28' y='56' width='136' height='8' rx='4' fill='white' opacity='.9'/%3E%3Crect x='28' y='74' width='136' height='8' rx='4' fill='white' opacity='.7'/%3E%3Crect x='28' y='92' width='90' height='8' rx='4' fill='white' opacity='.7'/%3E%3Crect x='28' y='112' width='136' height='60' rx='6' fill='white' opacity='.15'/%3E%3Ctext x='96' y='152' font-family='serif' font-size='28' font-weight='bold' fill='%23C9A84C' text-anchor='middle'%3EPDF%3C/text%3E%3C/svg%3E">
 <link rel="manifest" id="pwa-manifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,10 +53,13 @@
     short_name: "Fiche Péda",
     description: "Générateur de fiches pédagogiques PDF",
     start_url: "./",
-    display: "standalone",
+    scope: "/",
+    display: "fullscreen",
+    display_override: ["fullscreen", "standalone", "minimal-ui"],
     background_color: "#F7F5F0",
     theme_color: "#1565C0",
     orientation: "portrait",
+    prefer_related_applications: false,
     icons: [
       {
         src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%231565C0'/%3E%3Crect x='28' y='36' width='136' height='10' rx='5' fill='%23C9A84C'/%3E%3Crect x='28' y='56' width='136' height='8' rx='4' fill='white' opacity='.9'/%3E%3Crect x='28' y='74' width='136' height='8' rx='4' fill='white' opacity='.7'/%3E%3Crect x='28' y='92' width='90' height='8' rx='4' fill='white' opacity='.7'/%3E%3Crect x='28' y='112' width='136' height='60' rx='6' fill='white' opacity='.15'/%3E%3Ctext x='96' y='152' font-family='serif' font-size='28' font-weight='bold' fill='%23C9A84C' text-anchor='middle'%3EPDF%3C/text%3E%3C/svg%3E",
@@ -173,6 +181,25 @@ if ('serviceWorker' in navigator) {
     --shadow: 0 4px 24px rgba(21,101,192,0.12);
   }
 
+  /* ═══════════════════════════════════════════════════════════════════════
+     FORCER LE MODE PLEIN ÉCRAN - CACHER LA BARRE D'ADRESSE
+     ═══════════════════════════════════════════════════════════════════════ */
+  @media all and (display-mode: fullscreen) {
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+  }
+  
+  @media all and (display-mode: standalone) {
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+  }
+
   * { margin:0; padding:0; box-sizing:border-box; }
 
   body {
@@ -181,6 +208,8 @@ if ('serviceWorker' in navigator) {
     color: var(--ink);
     min-height: 100vh;
     padding-bottom: 32px; /* Espace pour le footer fixe */
+    /* Empêcher le zoom qui fait apparaître la barre d'adresse */
+    touch-action: pan-x pan-y;
   }
 
   /* ─── HEADER ─── */
@@ -710,20 +739,35 @@ if ('serviceWorker' in navigator) {
     color: white;
   }
   
-  /* ─── SÉLECTEURS DE COULEUR COMPACTS ─── */
+  /* ─── SÉLECTEURS DE COULEUR COMPACTS - STYLE UNIFORME ─── */
   .color-picker-btn {
-    width: 32px;
-    height: 28px;
-    border: 1.5px solid var(--border);
-    border-radius: 5px;
-    cursor: pointer;
-    padding: 2px;
-    background: white;
+    width: 32px !important;
+    height: 28px !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    background: white !important;
+    vertical-align: middle !important;
+    display: inline-block !important;
   }
   .color-picker-btn:hover {
-    border-color: var(--blue);
-    box-shadow: 0 0 0 2px var(--blue-pale);
+    border-color: var(--blue) !important;
+    box-shadow: 0 0 0 2px var(--blue-pale) !important;
   }
+  /* Masquer le wrapper interne pour un affichage compact */
+  .color-picker-btn::-webkit-color-swatch-wrapper {
+    padding: 2px !important;
+  }
+  .color-picker-btn::-webkit-color-swatch {
+    border: none !important;
+    border-radius: 3px !important;
+  }
+  .color-picker-btn::-moz-color-swatch {
+    border: none !important;
+    border-radius: 3px !important;
+  }
+
 
   /* ─── CHAMPS ÉDITABLES (contenteditable) ─── */
   .editable-input {
@@ -892,116 +936,209 @@ if ('serviceWorker' in navigator) {
     color: var(--blue);
   }
 
-  /* ─── PANNEAU SÉLECTEUR DE SYMBOLES ─── */
-  .symbol-picker {
-    display: none;
+  /* ═══════════════════════════════════════════════════════════════════════
+     NOUVEAUX STYLES : Sélecteurs de couleur améliorés pour Quill
+     ═══════════════════════════════════════════════════════════════════════ */
+  
+  /* Masquer les anciens sélecteurs Quill (on utilise input color maintenant) */
+  .ql-toolbar .ql-color,
+  .ql-toolbar .ql-background {
+    display: none !important;
+  }
+
+  /* Style pour les nouveaux sélecteurs de couleur type="color" */
+  .ql-toolbar .color-picker-btn,
+  .ql-custom-toolbar-wrap .color-picker-btn {
+    width: 32px !important;
+    height: 28px !important;
+    border: 1.5px solid #ddd !important;
+    border-radius: 5px !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    margin: 0 2px !important;
+    transition: all 0.15s ease !important;
+    vertical-align: middle !important;
+    background: white !important;
+  }
+
+  .ql-toolbar .color-picker-btn:hover,
+  .ql-custom-toolbar-wrap .color-picker-btn:hover {
+    border-color: var(--blue) !important;
+    box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.1) !important;
+  }
+
+  /* Masquer le wrapper et le swatch par défaut pour un rendu plus propre */
+  .ql-toolbar .color-picker-btn::-webkit-color-swatch-wrapper,
+  .ql-custom-toolbar-wrap .color-picker-btn::-webkit-color-swatch-wrapper {
+    padding: 2px !important;
+  }
+
+  .ql-toolbar .color-picker-btn::-webkit-color-swatch,
+  .ql-custom-toolbar-wrap .color-picker-btn::-webkit-color-swatch {
+    border: none !important;
+    border-radius: 3px !important;
+  }
+
+  .ql-toolbar .color-picker-btn::-moz-color-swatch,
+  .ql-custom-toolbar-wrap .color-picker-btn::-moz-color-swatch {
+    border: none !important;
+    border-radius: 3px !important;
+  }
+
+  /* Amélioration globale de la toolbar Quill */
+  .quill-wrapper .ql-toolbar,
+  .quill-wrapper .ql-custom-toolbar-wrap {
+    background: #f8f9fa;
+    border: none;
+    border-bottom: 1.5px solid var(--border);
+    padding: 6px 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+  }
+
+  /* Espacement cohérent entre les groupes de formats */
+  .ql-toolbar .ql-formats {
+    margin-right: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+  }
+
+  /* Améliorer tous les boutons standards de Quill */
+  .ql-toolbar button {
+    background: white !important;
+    border: 1.5px solid #ddd !important;
+    border-radius: 5px !important;
+    padding: 4px 8px !important;
+    transition: all 0.15s ease !important;
+    min-width: 32px !important;
+    min-height: 28px !important;
+  }
+
+  .ql-toolbar button:hover {
+    background: #e8f0fe !important;
+    border-color: var(--blue) !important;
+  }
+
+  .ql-toolbar button.ql-active {
+    background: var(--blue-pale) !important;
+    border-color: var(--blue) !important;
+  }
+
+  .ql-toolbar button svg .ql-stroke {
+    stroke: #444 !important;
+  }
+
+  .ql-toolbar button:hover svg .ql-stroke,
+  .ql-toolbar button.ql-active svg .ql-stroke {
+    stroke: var(--blue) !important;
+  }
+
+  .ql-toolbar button svg .ql-fill {
+    fill: #444 !important;
+  }
+
+  .ql-toolbar button:hover svg .ql-fill,
+  .ql-toolbar button.ql-active svg .ql-fill {
+    fill: var(--blue) !important;
+  }
+
+  /* Améliorer les select de Quill */
+  .ql-toolbar select {
+    background: white !important;
+    border: 1.5px solid #ddd !important;
+    border-radius: 5px !important;
+    padding: 4px 24px 4px 8px !important;
+    font-size: 12px !important;
+    height: 28px !important;
+    color: #444 !important;
+    transition: all 0.15s ease !important;
+  }
+
+  .ql-toolbar select:hover {
+    border-color: var(--blue) !important;
+    background: #f8f9fa !important;
+  }
+
+  .ql-toolbar select:focus {
+    outline: none !important;
+    border-color: var(--blue) !important;
+    box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.1) !important;
+  }
+
+  /* Responsive: ajustement pour mobile */
+  @media (max-width: 600px) {
+    .ql-toolbar .ql-formats {
+      margin-right: 4px !important;
+    }
+    
+    .ql-toolbar .color-picker-btn,
+    .ql-custom-toolbar-wrap .color-picker-btn {
+      width: 28px !important;
+      height: 26px !important;
+    }
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     BOUTON FLOTTANT D'APERÇU (remplace le panneau de symboles)
+     ═══════════════════════════════════════════════════════════════════════ */
+  .floating-preview-btn {
     position: fixed;
-    z-index: 8500;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(21,101,192,0.20), 0 2px 8px rgba(0,0,0,0.10);
-    width: 300px;
-    max-width: 95vw;
-    max-height: 380px;
-    overflow: hidden;
-    flex-direction: column;
-    font-family: 'Source Serif 4', serif;
-    border: 1.5px solid var(--border);
-  }
-  .symbol-picker.show { display: flex; }
-  .symbol-picker-header {
-    background: var(--blue);
-    padding: 9px 13px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
-  .symbol-picker-header span {
+    bottom: 80px;
+    right: 20px;
+    z-index: 9000;
+    background: linear-gradient(135deg, #1565C0, #1976D2);
     color: white;
-    font-family: 'Playfair Display', serif;
-    font-size: 13px;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 24px;
+    font-size: 16px;
     font-weight: 700;
-  }
-  .symbol-picker-close {
-    background: none;
-    border: none;
-    color: rgba(255,255,255,0.8);
-    font-size: 18px;
-    cursor: pointer;
-    line-height: 1;
-    padding: 0 2px;
-  }
-  .symbol-picker-close:hover { color: white; }
-  .symbol-picker-tabs {
-    display: flex;
-    background: #f4f6fa;
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-    scrollbar-width: none;
-    flex-shrink: 0;
-  }
-  .symbol-picker-tabs::-webkit-scrollbar { display: none; }
-  .sym-tab {
-    flex-shrink: 0;
-    padding: 7px 11px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--muted);
-    background: none;
-    border: none;
-    border-bottom: 2.5px solid transparent;
-    cursor: pointer;
     font-family: 'Source Serif 4', serif;
-    white-space: nowrap;
-    transition: color 0.15s;
-  }
-  .sym-tab.active {
-    color: var(--blue);
-    border-bottom-color: var(--blue);
-    background: white;
-  }
-  .sym-tab:hover:not(.active) { color: var(--blue-light); }
-  .symbol-picker-body {
-    overflow-y: auto;
-    padding: 10px;
-    flex: 1;
-  }
-  .sym-grid {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 4px;
-  }
-  .sym-btn {
-    aspect-ratio: 1;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(21, 101, 192, 0.4);
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    background: none;
-    transition: background 0.1s, border-color 0.1s;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    min-height: 38px;
+    gap: 8px;
   }
-  .sym-btn:hover, .sym-btn:active {
-    background: var(--blue-pale);
-    border-color: var(--blue);
+  .floating-preview-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 28px rgba(21, 101, 192, 0.5);
+    background: linear-gradient(135deg, #1976D2, #2196F3);
   }
-  .sym-label {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin: 8px 0 5px;
-    padding-bottom: 3px;
-    border-bottom: 1px solid var(--border);
+  .floating-preview-btn:active {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 15px rgba(21, 101, 192, 0.4);
   }
-  .sym-label:first-child { margin-top: 0; }
+  
+  /* Animation d'entrée */
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  .floating-preview-btn {
+    animation: slideInRight 0.5s ease-out;
+  }
+  
+  /* Responsive */
+  @media (max-width: 600px) {
+    .floating-preview-btn {
+      bottom: 70px;
+      right: 15px;
+      padding: 12px 20px;
+      font-size: 14px;
+    }
+  }
 
   /* ─── MODAL INSERTION TABLEAU ─── */
   .modal-overlay {
@@ -3075,22 +3212,15 @@ if ('serviceWorker' in navigator) {
 
 </div>
 
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- BOUTON FLOTTANT : APERÇU RAPIDE                     -->
+<!-- ═══════════════════════════════════════════════════ -->
+<button class="floating-preview-btn" onclick="showTab('apercu')" title="Aperçu rapide de la fiche">
+  👁️ Aperçu
+</button>
+
 <!-- INPUT FILE caché pour l'import JSON -->
 <input type="file" id="import-json-input" accept=".json" style="display:none" onchange="lireJSONImporte(event)">
-  <div class="symbol-picker-header">
-    <span>Ω Insérer un symbole</span>
-    <button class="symbol-picker-close" onclick="fermerSymbolPicker()" type="button">✕</button>
-  </div>
-  <div class="symbol-picker-tabs" id="sym-tabs">
-    <button class="sym-tab active" onclick="showSymTab('fleches',this)" type="button">Flèches</button>
-    <button class="sym-tab" onclick="showSymTab('puces',this)" type="button">Puces</button>
-    <button class="sym-tab" onclick="showSymTab('maths',this)" type="button">Maths</button>
-    <button class="sym-tab" onclick="showSymTab('etoiles',this)" type="button">Étoiles</button>
-    <button class="sym-tab" onclick="showSymTab('ponctuation',this)" type="button">Ponctuation</button>
-    <button class="sym-tab" onclick="showSymTab('exposants',this)" type="button">Exposants</button>
-  </div>
-  <div class="symbol-picker-body" id="sym-body"></div>
-</div>
 
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- MODAL : INSERTION DE TABLEAU                       -->
@@ -3241,6 +3371,19 @@ function ajouterEtape(data) {
     }
     // Ajouter les champs colonnes supplémentaires si existantes
     rafraichirChampsEtapes();
+    // Restaurer les valeurs des colonnes supplémentaires si présentes
+    if (d.supVals) {
+      Object.keys(d.supVals).forEach(colN => {
+        const el = document.getElementById('e'+n+'-colsup-'+colN);
+        if (el && d.supVals[colN]) {
+          if (el.contentEditable === 'true') {
+            el.innerHTML = d.supVals[colN];
+          } else {
+            el.value = d.supVals[colN];
+          }
+        }
+      });
+    }
   }, 0);
 }
 
@@ -3266,6 +3409,8 @@ function initQuillEditor(wrapperId, placeholder = '') {
   toolbarCount++;
   const tbId = 'ql-tb-' + toolbarCount;
   const edId = 'ql-ed-' + toolbarCount;
+  const colorPickerId = 'color-picker-' + toolbarCount;
+  const bgPickerId = 'bg-picker-' + toolbarCount;
 
   // Vider le wrapper et y injecter toolbar + zone éditeur
   wrapper.innerHTML = `
@@ -3302,82 +3447,8 @@ function initQuillEditor(wrapperId, placeholder = '') {
         <button class="ql-underline" title="Souligné"></button>
       </span>
       <span class="ql-formats">
-        <select class="ql-color" title="Couleur du texte">
-          <option value="#000000"></option>
-          <option value="#e60000"></option>
-          <option value="#ff9900"></option>
-          <option value="#ffff00"></option>
-          <option value="#008a00"></option>
-          <option value="#0066cc"></option>
-          <option value="#9933ff"></option>
-          <option value="#ffffff"></option>
-          <option value="#facccc"></option>
-          <option value="#ffebcc"></option>
-          <option value="#ffffcc"></option>
-          <option value="#cce8cc"></option>
-          <option value="#cce0f5"></option>
-          <option value="#ebd6ff"></option>
-          <option value="#bbbbbb"></option>
-          <option value="#f06666"></option>
-          <option value="#ffc266"></option>
-          <option value="#ffff66"></option>
-          <option value="#66b966"></option>
-          <option value="#66a3e0"></option>
-          <option value="#c285ff"></option>
-          <option value="#888888"></option>
-          <option value="#a10000"></option>
-          <option value="#b26b00"></option>
-          <option value="#b2b200"></option>
-          <option value="#006100"></option>
-          <option value="#0047b2"></option>
-          <option value="#6b24b2"></option>
-          <option value="#444444"></option>
-          <option value="#5c0000"></option>
-          <option value="#663d00"></option>
-          <option value="#666600"></option>
-          <option value="#003700"></option>
-          <option value="#002966"></option>
-          <option value="#3d1466"></option>
-          <option selected></option>
-        </select>
-        <select class="ql-background" title="Couleur de surlignage">
-          <option value="#000000"></option>
-          <option value="#e60000"></option>
-          <option value="#ff9900"></option>
-          <option value="#ffff00"></option>
-          <option value="#008a00"></option>
-          <option value="#0066cc"></option>
-          <option value="#9933ff"></option>
-          <option value="#ffffff"></option>
-          <option value="#facccc"></option>
-          <option value="#ffebcc"></option>
-          <option value="#ffffcc"></option>
-          <option value="#cce8cc"></option>
-          <option value="#cce0f5"></option>
-          <option value="#ebd6ff"></option>
-          <option value="#bbbbbb"></option>
-          <option value="#f06666"></option>
-          <option value="#ffc266"></option>
-          <option value="#ffff66"></option>
-          <option value="#66b966"></option>
-          <option value="#66a3e0"></option>
-          <option value="#c285ff"></option>
-          <option value="#888888"></option>
-          <option value="#a10000"></option>
-          <option value="#b26b00"></option>
-          <option value="#b2b200"></option>
-          <option value="#006100"></option>
-          <option value="#0047b2"></option>
-          <option value="#6b24b2"></option>
-          <option value="#444444"></option>
-          <option value="#5c0000"></option>
-          <option value="#663d00"></option>
-          <option value="#666600"></option>
-          <option value="#003700"></option>
-          <option value="#002966"></option>
-          <option value="#3d1466"></option>
-          <option selected></option>
-        </select>
+        <input type="color" id="${colorPickerId}" class="color-picker-btn" title="Couleur du texte" value="#000000">
+        <input type="color" id="${bgPickerId}" class="color-picker-btn" title="Couleur de surlignage" value="#FFFF00">
       </span>
       <span class="ql-formats">
         <button class="ql-list" value="ordered" title="Liste numérotée"></button>
@@ -3386,7 +3457,6 @@ function initQuillEditor(wrapperId, placeholder = '') {
       <span class="ql-formats">
         <button class="ql-custom-image"  title="Insérer une image"   type="button" onclick="(function(){ activeQuillWrapper='${wrapperId}'; ouvrirSelecteurImage('${wrapperId}'); })(); return false;">🖼</button>
         <button class="ql-custom-table"  title="Insérer un tableau"  type="button" onclick="(function(){ activeQuillWrapper='${wrapperId}'; ouvrirModalTableau(); })(); return false;">⊞</button>
-        <button class="ql-custom-symbol" title="Insérer un symbole"  type="button" id="sym-btn-${wrapperId}" onclick="(function(btn){ activeQuillWrapper='${wrapperId}'; ouvrirSymbolPicker(btn); })(this); return false;">Ω</button>
       </span>
       <span class="ql-formats">
         <button class="ql-clean" title="Effacer le formatage"></button>
@@ -3403,6 +3473,40 @@ function initQuillEditor(wrapperId, placeholder = '') {
     },
     placeholder: placeholder
   });
+
+  // ── Connecter les sélecteurs de couleur personnalisés ──
+  const colorPicker = document.getElementById(colorPickerId);
+  const bgPicker = document.getElementById(bgPickerId);
+  
+  if (colorPicker) {
+    colorPicker.addEventListener('change', function() {
+      const range = quill.getSelection();
+      if (range) {
+        if (range.length === 0) {
+          // Pas de sélection : appliquer au prochain caractère
+          quill.format('color', this.value);
+        } else {
+          // Il y a une sélection : appliquer à la sélection
+          quill.formatText(range.index, range.length, 'color', this.value);
+        }
+      }
+    });
+  }
+  
+  if (bgPicker) {
+    bgPicker.addEventListener('change', function() {
+      const range = quill.getSelection();
+      if (range) {
+        if (range.length === 0) {
+          // Pas de sélection : appliquer au prochain caractère
+          quill.format('background', this.value);
+        } else {
+          // Il y a une sélection : appliquer à la sélection
+          quill.formatText(range.index, range.length, 'background', this.value);
+        }
+      }
+    });
+  }
 
   // Déclencher updateLivePreview quand le contenu change
   quill.on('text-change', function() {
@@ -4288,10 +4392,16 @@ function collecterEtapes() {
     const enseignantHTML = getQuillHTML('e'+id+'-enseignant-wrapper');
     const enseignant = getQuillText('e'+id+'-enseignant-wrapper');
     const duree = (document.getElementById('e'+id+'-duree')?.value || '').trim();
-    // Collecter les valeurs des colonnes supplémentaires
+    // Collecter les valeurs des colonnes supplémentaires (maintenant contenteditable)
     const supVals = {};
     colsSup.forEach(col => {
-      supVals[col.n] = (document.getElementById('e'+id+'-colsup-'+col.n)?.value || '').trim();
+      const el = document.getElementById('e'+id+'-colsup-'+col.n);
+      // Lire innerHTML si c'est un contenteditable, sinon value pour rétrocompatibilité
+      if (el) {
+        supVals[col.n] = (el.contentEditable === 'true' ? el.innerHTML : el.value || '').trim();
+      } else {
+        supVals[col.n] = '';
+      }
     });
     if (nom || enseignant) {
       etapes.push({ nom, enseignant: enseignantHTML || enseignant, duree, supVals });
@@ -4810,9 +4920,16 @@ function rafraichirChampsEtapes() {
     colsSup.forEach(col => {
       const div = document.createElement('div');
       div.className = 'field col-sup-field';
+      const fieldId = `e${id}-colsup-${col.n}`;
       div.innerHTML = `
         <label>${col.label}</label>
-        <input type="text" id="e${id}-colsup-${col.n}" placeholder="Contenu pour « ${col.label} »…">
+        <div style="display:flex;gap:4px;margin-bottom:4px;flex-wrap:wrap;">
+          <button type="button" class="format-btn" onclick="toggleFormat('${fieldId}', 'bold')" title="Gras"><b>B</b></button>
+          <button type="button" class="format-btn" onclick="toggleFormat('${fieldId}', 'italic')" title="Italique"><i>I</i></button>
+          <input type="color" class="color-picker-btn" onchange="applyColorToContentEditable('${fieldId}', this.value)" title="Couleur du texte" value="#000000">
+          <input type="color" class="color-picker-btn" onchange="applyBackgroundToContentEditable('${fieldId}', this.value)" title="Couleur de surlignage" value="#FFFFFF">
+        </div>
+        <div id="${fieldId}" contenteditable="true" class="editable-input" data-placeholder="Contenu pour « ${col.label} »…"></div>
       `;
       if (dureeField) {
         body.insertBefore(div, dureeField);
