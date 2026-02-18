@@ -13,7 +13,7 @@
 ║  ✓ Partagez vos modifications sous la même licence                           ║
 ║                                                                               ║
 ║  Application créée avec ❤️ pour les enseignants                              ║
-║  Version 3.0 — Février 2026                                                   ║
+║  Version 4.4 — Février 2026                                                   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 -->
 <html lang="fr">
@@ -1468,19 +1468,148 @@ if ('serviceWorker' in navigator) {
   .repertoire-card-actions {
     display: flex;
     gap: 6px;
-    padding: 0 14px 10px;
+    padding: 0 14px 12px;
     flex-wrap: wrap;
   }
   .btn-rep {
-    border: none;
+    border: 1.5px solid transparent;
     border-radius: 6px;
-    padding: 5px 12px;
+    padding: 7px 12px;
     font-size: 11px;
     font-weight: 600;
     cursor: pointer;
+    font-family: 'Source Serif 4', serif;
+    transition: all 0.15s;
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
   }
-  .btn-rep-ouvrir  { background: #1565C0; color: #fff; }
-  .btn-rep-suppr   { background: #FFEBEE; color: #C62828; border: 1px solid #FFCDD2; }
+  .btn-rep:active { opacity: 0.8; }
+  .btn-rep-ouvrir  { background: #1565C0; color: #fff; border-color: #1565C0; }
+  .btn-rep-ouvrir:hover { background: #0D47A1; }
+  .btn-rep-dupliquer { background: #E8F5E9; color: #2E7D32; border-color: #C8E6C9; }
+  .btn-rep-dupliquer:hover { background: #C8E6C9; }
+  .btn-rep-suppr   { background: #FFEBEE; color: #C62828; border-color: #FFCDD2; }
+  .btn-rep-suppr:hover { background: #FFCDD2; }
+  .btn-rep-hist    { background: #F3E5F5; color: #6A1B9A; border-color: #CE93D8; }
+  .btn-rep-hist:hover { background: #CE93D8; }
+
+  /* ── Modal Historique ── */
+  #hist-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 99998;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  #hist-modal-overlay.show { display: flex; }
+  #hist-modal-box {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 520px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+    overflow: hidden;
+    transform: translateY(16px);
+    transition: transform 0.25s;
+  }
+  #hist-modal-overlay.show #hist-modal-box { transform: translateY(0); }
+  #hist-modal-header {
+    background: linear-gradient(135deg, #6A1B9A, #8E24AA);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  #hist-modal-header h3 { color: #fff; font-size: 15px; margin: 0; }
+  #hist-modal-close {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: #fff;
+    border-radius: 50%;
+    width: 28px; height: 28px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #hist-modal-body { overflow-y: auto; padding: 16px; flex: 1; }
+  .hist-version-card {
+    border: 1.5px solid #E1BEE7;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .hist-version-card:hover { box-shadow: 0 4px 16px rgba(106,27,154,0.15); }
+  .hist-version-header {
+    background: linear-gradient(90deg, #F3E5F5, #EDE7F6);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .hist-version-label { font-size: 12px; font-weight: 700; color: #6A1B9A; }
+  .hist-version-date  { font-size: 11px; color: #888; }
+  .hist-version-body  { padding: 10px 12px; font-size: 11px; background: #FAFAFA; line-height: 1.6; }
+  .hist-version-actions { padding: 8px 12px; display: flex; gap: 8px; border-top: 1px solid #F3E5F5; background: #fff; }
+  .btn-hist-restore {
+    flex: 1; padding: 7px; border-radius: 8px;
+    background: #6A1B9A; color: #fff; border: none;
+    font-family: 'Source Serif 4', serif; font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .btn-hist-restore:hover { background: #4A148C; }
+  .btn-hist-delete {
+    padding: 7px 12px; border-radius: 8px;
+    background: #FFEBEE; color: #C62828; border: 1px solid #FFCDD2;
+    font-family: 'Source Serif 4', serif; font-size: 12px;
+    cursor: pointer;
+  }
+  .btn-hist-delete:hover { background: #FFCDD2; }
+  .hist-empty { text-align: center; padding: 30px; color: #aaa; }
+
+  body.dark-mode #hist-modal-box { background: #1E2233; color: #E8EAF0; }
+  body.dark-mode .hist-version-header { background: linear-gradient(90deg, #2A1A3E, #231A40); }
+  body.dark-mode .hist-version-body   { background: #252B3B; color: #B0BEC5; }
+  body.dark-mode .hist-version-actions{ background: #1E2233; border-top-color: #2A2F3D; }
+  body.dark-mode .hist-version-card   { border-color: #3A2850; }
+  body.dark-mode .btn-hist-delete { background: #2A1010; border-color: #5A2020; color: #EF9A9A; }
+
+  /* ─── DRAG AND DROP — tablette/desktop uniquement ─── */
+  @media (max-width: 767px) {
+    .etape-card[draggable="true"] { cursor: default !important; }
+    .drag-handle { display: none !important; }
+  }
+  @media (min-width: 768px) {
+    .drag-handle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      color: var(--muted);
+      font-size: 16px;
+      padding: 0 6px;
+      border-radius: 4px;
+      transition: background 0.15s;
+      user-select: none;
+    }
+    .drag-handle:hover { background: var(--blue-pale); color: var(--blue); }
+    .drag-handle:active { cursor: grabbing; }
+    .etape-card.drag-over {
+      border: 2px dashed var(--blue) !important;
+      background: var(--blue-pale) !important;
+      transform: scale(1.01);
+      box-shadow: 0 4px 16px rgba(21,101,192,0.2);
+    }
+  }
   .repertoire-empty {
     text-align: center;
     padding: 40px 20px;
@@ -1693,7 +1822,7 @@ if ('serviceWorker' in navigator) {
   #img-resize-panel .rp-cancel { background: var(--off-white); color: var(--muted); border: 1px solid var(--border); font-weight: 400; }
 
   /* ═══════════════════════════════════════════════════
-     NOUVELLES FONCTIONNALITÉS v3.0
+     NOUVELLES FONCTIONNALITÉS v4.4
   ═══════════════════════════════════════════════════ */
 
   /* ─── LAYOUT TABLETTE (≥768px) ─── */
@@ -2052,7 +2181,39 @@ if ('serviceWorker' in navigator) {
   }
   .backup-warn-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
 
-  /* ─── PARTAGE ─── */
+  /* ─── DRAG AND DROP — géré dans le media query ci-dessus ─── */
+  .etape-card[draggable="true"] { user-select: none; }
+
+  /* ─── INFO SUB-TABS ─── */
+  #panel-info { display: none; }
+  #panel-info.active { display: block; }
+  #panel-apropos { display: block !important; }
+  #panel-partage { display: block !important; }
+
+  /* ─── RECHERCHE RÉPERTOIRE ─── */
+  .rep-search-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 14px;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 12px;
+    box-shadow: 0 2px 8px rgba(21,101,192,0.06);
+  }
+  .rep-search-bar input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: 'Source Serif 4', serif;
+    font-size: 13px;
+    color: var(--ink);
+    background: transparent;
+  }
+  .rep-search-bar .search-icon { font-size: 16px; color: var(--muted); }
+
+
   .share-method-tabs {
     display: flex;
     gap: 6px;
@@ -2079,14 +2240,399 @@ if ('serviceWorker' in navigator) {
   .share-panel { display: none; }
   .share-panel.active { display: block; }
 
+  /* ═══════════════════════════════════════════════════
+     EXPORT GROUPÉ — v4.4
+     ═══════════════════════════════════════════════════ */
+  .rep-select-bar {
+    display: none;
+    background: linear-gradient(90deg, #0D47A1, #1565C0);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .rep-select-bar.active { display: flex; }
+  .rep-select-bar-info { color: #fff; font-size: 12px; font-weight: 700; }
+  .rep-select-bar-info span { background: rgba(255,255,255,0.25); border-radius: 10px; padding: 2px 9px; margin-left:6px; }
+  .btn-export-groupe {
+    background: #C9A84C;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+  }
+  .btn-export-groupe:hover { background: #B8962E; }
+  .btn-export-groupe:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-cancel-select {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Source Serif 4', serif;
+  }
+  .btn-cancel-select:hover { background: rgba(255,255,255,0.25); }
+
+  /* Checkbox sélection sur les cartes */
+  .rep-card-checkbox {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    accent-color: #1565C0;
+    cursor: pointer;
+    z-index: 2;
+  }
+  .repertoire-card { position: relative; }
+  .repertoire-card.selected {
+    border-color: #1565C0 !important;
+    box-shadow: 0 0 0 2px rgba(21,101,192,0.3);
+  }
+
+  body.dark-mode .rep-select-bar { background: linear-gradient(90deg, #0A1628, #0D2B55); }
+  body.dark-mode .btn-cancel-select { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+  body.dark-mode .repertoire-card.selected { border-color: #64B5F6 !important; box-shadow: 0 0 0 2px rgba(100,181,246,0.25); }
+
+  /* Progress overlay export groupé */
+  #export-groupe-progress {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+  }
+  #export-groupe-progress.show { display: flex; }
+  #export-groupe-progress-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 32px;
+    text-align: center;
+    max-width: 320px;
+    width: 90%;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+  }
+  body.dark-mode #export-groupe-progress-box { background: #1E2233; color: #E8EAF0; }
+  #export-groupe-progress-bar-wrap {
+    background: #E3EAF6;
+    border-radius: 10px;
+    height: 10px;
+    margin: 14px 0 8px;
+    overflow: hidden;
+  }
+  body.dark-mode #export-groupe-progress-bar-wrap { background: #2A2F3D; }
+  #export-groupe-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #1565C0, #C9A84C);
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+     ═══════════════════════════════════════════════════ */
+
+  /* Bouton bascule flottant */
+  #dark-toggle {
+    position: fixed;
+    bottom: 36px;
+    right: 12px;
+    z-index: 9999;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(21,101,192,0.3);
+    background: #fff;
+    color: #1565C0;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.18);
+    transition: all 0.25s;
+  }
+  #dark-toggle:hover { transform: scale(1.1); box-shadow: 0 5px 20px rgba(0,0,0,0.25); }
+
+  /* ── Variables sombre ── */
+  body.dark-mode {
+    --off-white: #12151C;
+    --ink: #E8EAF0;
+    --muted: #8892A4;
+    --border: #2A2F3D;
+    --blue-pale: #1A2540;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    background: #12151C;
+    color: #E8EAF0;
+  }
+
+  /* Header */
+  body.dark-mode .app-header {
+    background: linear-gradient(135deg, #0A1628 0%, #0D2B55 100%);
+    border-bottom: 1px solid #1E3A6E;
+  }
+
+  /* Tab bar */
+  body.dark-mode .tab-bar {
+    background: #1A1F2E;
+    border-bottom: 1px solid #2A2F3D;
+  }
+  body.dark-mode .tab-btn {
+    color: #8892A4;
+    background: transparent;
+  }
+  body.dark-mode .tab-btn.active {
+    color: #64B5F6;
+    border-bottom-color: #64B5F6;
+    background: rgba(100,181,246,0.08);
+  }
+  body.dark-mode .tab-btn:hover:not(.active) {
+    background: rgba(255,255,255,0.05);
+    color: #B0BEC5;
+  }
+
+  /* Cards */
+  body.dark-mode .card {
+    background: #1E2233;
+    border: 1.5px solid #2A2F3D;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+  body.dark-mode .card-header {
+    background: linear-gradient(90deg, #0D1F44, #122155);
+    border-bottom: 1px solid #1E3A6E;
+  }
+  body.dark-mode .card-body {
+    background: #1E2233;
+  }
+
+  /* Inputs & editable */
+  body.dark-mode input[type="text"],
+  body.dark-mode input[type="number"],
+  body.dark-mode input[type="color"],
+  body.dark-mode select,
+  body.dark-mode textarea {
+    background: #252B3B;
+    border-color: #3A4155;
+    color: #E8EAF0;
+  }
+  body.dark-mode input[type="text"]::placeholder,
+  body.dark-mode textarea::placeholder { color: #4A5568; }
+  body.dark-mode input[type="text"]:focus,
+  body.dark-mode input[type="number"]:focus,
+  body.dark-mode select:focus {
+    border-color: #64B5F6;
+    background: #2A3148;
+  }
+
+  body.dark-mode .editable-input {
+    background: #252B3B;
+    border-color: #3A4155;
+    color: #E8EAF0;
+  }
+  body.dark-mode .editable-input:hover { background: #2A3148; border-color: #4A5568; }
+  body.dark-mode .editable-input:focus { background: #2A3148; border-color: #64B5F6; }
+  body.dark-mode .editable-input:empty:before { color: #4A5568; }
+
+  /* Quill editor */
+  body.dark-mode .quill-wrapper { border-color: #3A4155; background: #252B3B; }
+  body.dark-mode .quill-wrapper:focus-within { border-color: #64B5F6; }
+  body.dark-mode .quill-wrapper .ql-toolbar,
+  body.dark-mode .quill-wrapper .ql-custom-toolbar-wrap {
+    background: #1A1F2E;
+    border-color: #3A4155;
+  }
+  body.dark-mode .quill-wrapper .ql-container { border-color: #3A4155; }
+  body.dark-mode .quill-wrapper .ql-editor {
+    background: #252B3B;
+    color: #E8EAF0;
+  }
+  body.dark-mode .quill-wrapper .ql-editor.ql-blank::before { color: #4A5568; }
+  body.dark-mode .ql-toolbar .ql-stroke { stroke: #8892A4; }
+  body.dark-mode .ql-toolbar .ql-fill { fill: #8892A4; }
+  body.dark-mode .ql-toolbar .ql-picker-label { color: #8892A4; }
+  body.dark-mode .ql-toolbar button:hover .ql-stroke,
+  body.dark-mode .ql-toolbar button.ql-active .ql-stroke { stroke: #64B5F6; }
+  body.dark-mode .ql-toolbar button:hover .ql-fill,
+  body.dark-mode .ql-toolbar button.ql-active .ql-fill { fill: #64B5F6; }
+  body.dark-mode .ql-picker-options {
+    background: #252B3B;
+    border-color: #3A4155;
+    color: #E8EAF0;
+  }
+
+  /* Étape cards */
+  body.dark-mode .etape-card {
+    background: #1E2233;
+    border-color: #2A2F3D;
+  }
+  body.dark-mode .etape-header {
+    background: #252B3B;
+    border-bottom-color: #3A4155;
+  }
+  body.dark-mode .etape-header:hover { background: #2A3148; }
+
+  /* Param items */
+  body.dark-mode .param-item label { color: #8892A4; }
+  body.dark-mode .param-section-title { color: #64B5F6; border-bottom-color: #2A2F3D; }
+
+  /* Boutons principaux */
+  body.dark-mode .btn-generate {
+    background: linear-gradient(135deg, #1565C0, #1976D2);
+  }
+  body.dark-mode .btn-add-etape {
+    background: transparent;
+    border-color: #3A4155;
+    color: #64B5F6;
+  }
+  body.dark-mode .btn-add-etape:hover { background: #1A2540; }
+
+  /* Export buttons */
+  body.dark-mode .btn-export-pdf   { background: linear-gradient(135deg,#1565C0,#1976D2); }
+  body.dark-mode .btn-export-docx  { background: linear-gradient(135deg,#1A3E6B,#1E4D85); }
+  body.dark-mode .btn-export-save  { background: linear-gradient(135deg,#1B4E20,#2E7D32); }
+
+  /* Répertoire */
+  body.dark-mode .repertoire-card {
+    background: #1E2233;
+    border-color: #2A2F3D;
+  }
+  body.dark-mode .repertoire-card-header { border-bottom-color: #2A2F3D; }
+  body.dark-mode .repertoire-card-title { color: #E8EAF0; }
+  body.dark-mode .repertoire-card-date  { color: #8892A4; }
+  body.dark-mode .repertoire-card-body  { background: #252B3B; }
+  body.dark-mode .rep-search-bar {
+    background: #1E2233;
+    border-color: #3A4155;
+  }
+  body.dark-mode .rep-search-bar input {
+    background: transparent;
+    color: #E8EAF0;
+  }
+  body.dark-mode #rep-stats-panel {
+    background: #1E2233;
+    border-color: #2A2F3D;
+  }
+
+  /* Modèles */
+  body.dark-mode .modele-card {
+    background: #1E2233;
+    border-color: #2A2F3D;
+  }
+  body.dark-mode .modele-card-body { background: #1E2233; color: #B0BEC5; }
+
+  /* Preview live */
+  body.dark-mode .preview-live { background: #1E2233; border-color: #2A2F3D; }
+  body.dark-mode .preview-info { background: #1A2540; color: #64B5F6; border-color: #1E3A6E; }
+
+  /* Modals */
+  body.dark-mode #modal-custom-box {
+    background: #1E2233;
+    border: 1px solid #2A2F3D;
+    color: #E8EAF0;
+  }
+  body.dark-mode #modal-custom-overlay { background: rgba(0,0,0,0.75); }
+  body.dark-mode #modal-custom-title { color: #E8EAF0; }
+  body.dark-mode #modal-custom-body  { color: #B0BEC5; }
+
+  /* Footer */
+  body.dark-mode .app-footer {
+    background: rgba(18,21,28,0.98);
+    border-top: 1px solid #2A2F3D;
+    color: #555;
+  }
+  body.dark-mode .app-footer a { color: #64B5F6; }
+  body.dark-mode .version-badge {
+    background: rgba(100,181,246,0.15);
+    color: #64B5F6;
+  }
+
+  /* Tablet toolbar */
+  body.dark-mode .tablet-toolbar {
+    background: rgba(18,21,28,0.97);
+    border-bottom: 1px solid #2A2F3D;
+  }
+
+  /* Save bar */
+  body.dark-mode #save-bar { background: #1A2E1A; border-bottom-color: #2E5E2E; color: #81C784; }
+
+  /* Offline banner */
+  body.dark-mode #offline-banner { background: #3E1A00; }
+
+  /* Aperçu PDF simulé */
+  body.dark-mode .pdf-page-sim { background: #E8E6E0; color: #111; } /* garder blanc pour fidélité PDF */
+  body.dark-mode .pdf-preview-container { background: #1A1F2E; }
+
+  /* Panel background */
+  body.dark-mode .panel { background: transparent; }
+
+  /* Titres et textes secondaires */
+  body.dark-mode h2, body.dark-mode h3 { color: #E8EAF0; }
+  body.dark-mode .duree-totale-badge { background: #1A2540; color: #64B5F6; border-color: #1E3A6E; }
+
+  /* Dark toggle actif */
+  body.dark-mode #dark-toggle {
+    background: #1E2233;
+    color: #C9A84C;
+    border-color: #C9A84C;
+  }
+
+  /* Scrollbar sombre */
+  body.dark-mode ::-webkit-scrollbar { width: 7px; height: 7px; }
+  body.dark-mode ::-webkit-scrollbar-track { background: #1A1F2E; }
+  body.dark-mode ::-webkit-scrollbar-thumb { background: #3A4155; border-radius: 4px; }
+  body.dark-mode ::-webkit-scrollbar-thumb:hover { background: #4A5568; }
+
 </style>
 </head>
 <body>
 
+<!-- ── BOUTON MODE SOMBRE ── -->
+<button id="dark-toggle" onclick="toggleDarkMode()" title="Basculer mode sombre / clair">🌙</button>
+
+<!-- ── PROGRESS OVERLAY EXPORT GROUPÉ ── -->
+<div id="export-groupe-progress">
+
+<!-- ── MODAL HISTORIQUE DES VERSIONS ── -->
+<div id="hist-modal-overlay" onclick="fermerHistModal(event)">
+  <div id="hist-modal-box">
+    <div id="hist-modal-header">
+      <h3>🕐 Historique des versions</h3>
+      <button id="hist-modal-close" onclick="fermerHistModal()">✕</button>
+    </div>
+    <div id="hist-modal-body">
+      <div class="hist-empty">Chargement…</div>
+    </div>
+  </div>
+</div>
+  <div id="export-groupe-progress-box">
+    <div style="font-size:36px;margin-bottom:10px;">📦</div>
+    <div style="font-weight:700;font-size:15px;margin-bottom:4px;">Génération du dossier PDF…</div>
+    <div id="export-groupe-progress-label" style="font-size:12px;color:#666;margin-bottom:2px;">Préparation…</div>
+    <div id="export-groupe-progress-bar-wrap">
+      <div id="export-groupe-progress-bar"></div>
+    </div>
+    <div id="export-groupe-progress-count" style="font-size:11px;color:#888;">0 / 0</div>
+  </div>
+</div>
+
 <div class="app-header">
   <div class="logo">📋</div>
-  <h1>Fiche Pédagogique
-    <span>EZ-ZAKY AZIZ — v3.0 · PDF · Tablette · Partage</span>
+  <h1 id="app-title-h1">Fiche Pédagogique
+    <span id="app-dynamic-subtitle">EZ-ZAKY AZIZ</span>
   </h1>
   <button onclick="nouvelleFiche()" title="Effacer et recommencer une nouvelle fiche" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.5);color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;">
     🔄 Nouvelle fiche
@@ -2118,11 +2664,8 @@ if ('serviceWorker' in navigator) {
   <button class="tab-btn" onclick="showTab('guide')" id="tab-guide">
     <span class="tab-icon">📖</span>Guide
   </button>
-  <button class="tab-btn" onclick="showTab('apropos')" id="tab-apropos">
-    <span class="tab-icon">ℹ️</span>À propos
-  </button>
-  <button class="tab-btn" onclick="showTab('partage')" id="tab-partage">
-    <span class="tab-icon">🔗</span>Partage
+  <button class="tab-btn" onclick="showTab('info')" id="tab-info">
+    <span class="tab-icon">ℹ️</span>Info
   </button>
 </div>
 
@@ -2172,6 +2715,41 @@ if ('serviceWorker' in navigator) {
     </div>
   </div>
 
+  <!-- Logo établissement -->
+  <div class="card">
+    <div class="card-header">
+      <h2>LOGO ÉTABLISSEMENT</h2>
+      <span class="badge">Optionnel</span>
+    </div>
+    <div class="card-body">
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <!-- Zone preview logo -->
+        <div id="logo-preview-zone" style="width:90px;height:90px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--off-white);flex-shrink:0;overflow:hidden;cursor:pointer;" onclick="document.getElementById('logo-input').click()" title="Cliquer pour choisir un logo">
+          <span id="logo-placeholder" style="font-size:28px;color:var(--muted);">🏫</span>
+          <img id="logo-img-preview" src="" alt="Logo" style="display:none;width:100%;height:100%;object-fit:contain;">
+        </div>
+        <div style="flex:1;min-width:180px;">
+          <input type="file" id="logo-input" accept="image/*" style="display:none;" onchange="chargerLogo(this)">
+          <button type="button" onclick="document.getElementById('logo-input').click()" style="width:100%;padding:10px;background:var(--blue);color:white;border:none;border-radius:8px;font-family:'Source Serif 4',serif;font-size:13px;cursor:pointer;margin-bottom:8px;">
+            📁 Choisir un logo
+          </button>
+          <button type="button" id="logo-remove-btn" onclick="supprimerLogo()" style="display:none;width:100%;padding:8px;background:white;color:#C62828;border:1px solid #FFCDD2;border-radius:8px;font-family:'Source Serif 4',serif;font-size:12px;cursor:pointer;margin-bottom:8px;">
+            🗑️ Supprimer le logo
+          </button>
+          <div style="font-size:11px;color:var(--muted);font-style:italic;">PNG, JPG, SVG — affiché en haut à gauche de l'entête dans le PDF et Word.</div>
+          <!-- Position -->
+          <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
+            <label style="font-size:11px;font-weight:600;color:var(--blue-dark);text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap;">Position :</label>
+            <select id="logo-position" onchange="updateLivePreview()" style="flex:1;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;background:var(--off-white);">
+              <option value="left">Gauche</option>
+              <option value="right">Droite</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Champs fixes (labels editables) -->
   <div class="card">
     <div class="card-header" style="justify-content:space-between;">
@@ -2184,6 +2762,15 @@ if ('serviceWorker' in navigator) {
     <div class="card-body" id="fixed-fields-container">
 
       <!-- Ligne 1 : Prof + Niveau (côte à côte) -->
+      <!-- Champ date (auto-rempli) -->
+      <div class="fixed-row-group" id="fgrp-date" style="margin-bottom:10px;">
+        <div class="fgrp-title">Date de séance <span style="font-style:italic;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">(pré-remplie automatiquement)</span></div>
+        <div class="field">
+          <input type="text" id="date-seance" placeholder="Ex : 17/02/2026" oninput="updateLivePreview();updateDynamicTitle();" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Source Serif 4',serif;font-size:14px;color:var(--ink);background:var(--off-white);-webkit-appearance:none;">
+          <div class="field-hint">Modifiable librement. Ce champ apparaît dans l'en-tête du PDF si renseigné.</div>
+        </div>
+      </div>
+
       <div class="fixed-row-group" id="fgrp-ligne1">
         <div class="fgrp-title">Ligne 1 — Identification</div>
         <div class="field-row">
@@ -2199,7 +2786,7 @@ if ('serviceWorker' in navigator) {
               <input type="color" class="color-picker-btn" onchange="applyBackgroundToContentEditable('prof', this.value)" title="Couleur de surlignage" value="#FFFFFF">
               <button type="button" class="format-btn" onclick="removeColorFromContentEditable('prof')" title="Supprimer les couleurs" style="font-size:11px;">🚫</button>
             </div>
-            <div id="prof" contenteditable="true" class="editable-input" oninput="updateLivePreview()">EZ-ZAKY AZIZ</div>
+            <div id="prof" contenteditable="true" class="editable-input" oninput="updateLivePreview()" data-placeholder="Nom du professeur…"></div>
           </div>
           <div class="field editable-field-wrap">
             <label class="editable-label" ondblclick="editLabel(this)" title="Double-clic pour modifier">
@@ -2356,6 +2943,9 @@ if ('serviceWorker' in navigator) {
     <button class="btn-export btn-export-docx" onclick="genererDOCX()">
       📘 Exporter en Word (.docx)
     </button>
+    <button class="btn-export" onclick="imprimerDirectement()" style="background:linear-gradient(135deg,#E65100,#F57C00);color:white;border-color:#E65100;">
+      🖨️ Imprimer directement
+    </button>
   </div>
 </div>
 <!-- ═══════════════════════════════════════════════════ -->
@@ -2369,8 +2959,22 @@ if ('serviceWorker' in navigator) {
   </div>
 
   <div class="card">
-    <div class="card-header"><h2>MISE EN PAGE — MARGES</h2></div>
+    <div class="card-header"><h2>MISE EN PAGE — MARGES & FORMAT</h2></div>
     <div class="card-body">
+      <div class="param-grid" style="margin-bottom:12px;">
+        <div class="param-item" style="grid-column:1/-1;">
+          <label>Orientation du PDF</label>
+          <div style="display:flex;gap:8px;margin-top:4px;">
+            <button id="btn-portrait" onclick="setOrientation('portrait')" style="flex:1;padding:8px;border:2px solid #1565C0;border-radius:8px;background:#1565C0;color:white;font-family:'Source Serif 4',serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+              📄 Portrait (A4 vertical)
+            </button>
+            <button id="btn-landscape" onclick="setOrientation('landscape')" style="flex:1;padding:8px;border:2px solid #ddd;border-radius:8px;background:#f5f5f5;color:#555;font-family:'Source Serif 4',serif;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+              🖼️ Paysage (A4 horizontal)
+            </button>
+          </div>
+          <div id="orientation-hint" style="font-size:11px;color:#888;margin-top:5px;font-style:italic;">✅ Format portrait sélectionné (recommandé pour 1-2 colonnes)</div>
+        </div>
+      </div>
       <div class="param-grid">
         <div class="param-item">
           <label>Marge (pts)</label>
@@ -2575,6 +3179,17 @@ if ('serviceWorker' in navigator) {
 
 
 
+  <!-- Option sauvegarde auto après PDF -->
+  <div style="background:#E8F5E9;border:1.5px solid #C8E6C9;border-radius:10px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:flex-start;gap:12px;">
+    <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;flex:1;">
+      <input type="checkbox" id="chk-auto-save-rep" onchange="_autoSaveToRep=this.checked;" style="width:18px;height:18px;margin-top:1px;accent-color:#2E7D32;flex-shrink:0;">
+      <div>
+        <div style="font-weight:700;color:#1B5E20;font-size:12px;margin-bottom:2px;">📁 Archiver automatiquement dans le répertoire après génération PDF</div>
+        <div style="font-size:11px;color:#388E3C;line-height:1.4;">La fiche sera automatiquement sauvegardée dans le répertoire à chaque fois que vous générez un PDF, évitant toute perte de données.</div>
+      </div>
+    </label>
+  </div>
+
   <button class="btn-generate" onclick="genererPDF()">
     📄 Générer la Fiche PDF
   </button>
@@ -2633,6 +3248,9 @@ if ('serviceWorker' in navigator) {
     <button class="btn-export btn-export-docx" onclick="genererDOCX()">
       📘 Exporter en Word (.docx)
     </button>
+    <button class="btn-export" onclick="imprimerDirectement()" style="background:linear-gradient(135deg,#E65100,#F57C00);color:white;border-color:#E65100;">
+      🖨️ Imprimer directement
+    </button>
   </div>
 </div>
 
@@ -2646,6 +3264,45 @@ if ('serviceWorker' in navigator) {
       <div style="color:rgba(255,255,255,0.8);font-size:11px;margin-top:2px;">Fiches enregistrées manuellement sur cet appareil</div>
     </div>
     <span id="rep-compteur" style="background:rgba(255,255,255,0.2);color:#fff;border-radius:20px;padding:3px 12px;font-size:12px;font-weight:700;">0 fiche</span>
+  </div>
+
+  <!-- Barre de tri -->
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
+    <span style="font-size:11px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap;">Trier par :</span>
+    <button class="rep-sort-btn active" id="sort-btn-date" onclick="setSortRepertoire('date',this)" style="padding:5px 12px;border-radius:20px;border:1.5px solid #1565C0;background:#1565C0;color:white;font-size:11px;font-weight:600;cursor:pointer;font-family:'Source Serif 4',serif;">📅 Date</button>
+    <button class="rep-sort-btn" id="sort-btn-nom" onclick="setSortRepertoire('nom',this)" style="padding:5px 12px;border-radius:20px;border:1.5px solid #ddd;background:#f5f5f5;color:#555;font-size:11px;font-weight:600;cursor:pointer;font-family:'Source Serif 4',serif;">🔤 Nom</button>
+    <button class="rep-sort-btn" id="sort-btn-niveau" onclick="setSortRepertoire('niveau',this)" style="padding:5px 12px;border-radius:20px;border:1.5px solid #ddd;background:#f5f5f5;color:#555;font-size:11px;font-weight:600;cursor:pointer;font-family:'Source Serif 4',serif;">🎓 Niveau</button>
+    <button class="rep-sort-btn" id="sort-btn-module" onclick="setSortRepertoire('module',this)" style="padding:5px 12px;border-radius:20px;border:1.5px solid #ddd;background:#f5f5f5;color:#555;font-size:11px;font-weight:600;cursor:pointer;font-family:'Source Serif 4',serif;">📚 Module</button>
+    <button id="sort-order-btn" onclick="toggleSortOrder()" title="Inverser l'ordre" style="padding:5px 10px;border-radius:20px;border:1.5px solid #ddd;background:#fff;color:#555;font-size:13px;cursor:pointer;margin-left:auto;">⬇️</button>
+    <button onclick="activerModeSelection()" id="btn-mode-select" title="Sélectionner plusieurs fiches pour export groupé" style="padding:5px 12px;border-radius:20px;border:1.5px solid #C9A84C;background:#FFFDE7;color:#795548;font-size:11px;font-weight:600;cursor:pointer;font-family:'Source Serif 4',serif;">☑️ Sélectionner</button>
+  </div>
+
+  <!-- Barre de sélection groupée (apparaît en mode sélection) -->
+  <div class="rep-select-bar" id="rep-select-bar">
+    <div class="rep-select-bar-info">
+      Mode sélection — <span id="rep-select-count">0</span> fiche(s) cochée(s)
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <button class="btn-export-groupe" onclick="exporterGroupePDF()" id="btn-export-groupe" disabled>
+        📦 Exporter en PDF groupé
+      </button>
+      <button class="btn-cancel-select" onclick="desactiverModeSelection()">✕ Annuler</button>
+    </div>
+  </div>
+
+  <!-- Panneau statistiques -->
+  <div id="rep-stats-panel" style="background:#fff;border:1.5px solid #E3EAF6;border-radius:12px;padding:12px 14px;margin-bottom:12px;display:none;">
+    <div style="font-weight:700;color:#1565C0;font-size:13px;margin-bottom:10px;">📊 Statistiques d'usage</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;" id="rep-stats-cards"></div>
+    <div id="rep-stats-details" style="font-size:11px;color:#555;"></div>
+  </div>
+  <button onclick="toggleStatsPanel()" style="width:100%;padding:7px;border:1.5px dashed #C9A84C;border-radius:8px;background:#FFFDE7;color:#795548;font-size:11px;font-weight:600;cursor:pointer;font-family:'Source Serif 4',serif;margin-bottom:10px;">
+    📊 Afficher / Masquer les statistiques
+  </button>
+
+  <div class="rep-search-bar">
+    <span class="search-icon">🔍</span>
+    <input type="text" placeholder="Rechercher par module, niveau, activité…" oninput="rechercheRepertoire(this.value)" id="rep-search-input">
   </div>
   <div id="repertoire-liste">
     <div class="repertoire-empty">
@@ -2672,11 +3329,13 @@ if ('serviceWorker' in navigator) {
       <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:14px;padding:3px 10px;font-size:10px;font-weight:600;">📖 Français</span>
       <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:14px;padding:3px 10px;font-size:10px;font-weight:600;">📐 Maths</span>
       <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:14px;padding:3px 10px;font-size:10px;font-weight:600;">🔬 SVT · 🏛️ Histoire · ⚗️ Physique · 🇬🇧 Anglais</span>
-      <span style="background:rgba(201,168,76,0.85);color:#fff;border-radius:14px;padding:3px 10px;font-size:10px;font-weight:700;">7 modèles</span>
+      <span style="background:rgba(201,168,76,0.85);color:#fff;border-radius:14px;padding:3px 10px;font-size:10px;font-weight:700;">10 modèles</span>
     </div>
   </div>
   <div class="modeles-filter-bar">
     <button class="modele-filter-btn active" onclick="filtrerModeles('all',this)">📋 Tous</button>
+    <button class="modele-filter-btn" onclick="filtrerModeles('primaire',this)">🌱 Primaire</button>
+    <button class="modele-filter-btn" onclick="filtrerModeles('college',this)">🏫 Collège</button>
     <button class="modele-filter-btn" onclick="filtrerModeles('francais',this)">📖 Français</button>
     <button class="modele-filter-btn" onclick="filtrerModeles('maths',this)">📐 Maths</button>
     <button class="modele-filter-btn" onclick="filtrerModeles('svt',this)">🔬 SVT</button>
@@ -2704,7 +3363,7 @@ if ('serviceWorker' in navigator) {
       <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;">✒️ Texte riche</span>
       <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;">🖼️ Images</span>
       <span style="background:rgba(255,255,255,0.18);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;">🎨 9 Thèmes</span>
-      <span style="background:rgba(201,168,76,0.85);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;">🆕 v3.0 : Tablette · Partage · Backup</span>
+      <span style="background:rgba(201,168,76,0.85);color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;">🆕 v4.4 : Paysage · Impression · Tri · Stats</span>
     </div>
   </div>
 
@@ -2953,9 +3612,17 @@ if ('serviceWorker' in navigator) {
 </div>
 
 <!-- ═══════════════════════════════════════════════════ -->
-<!-- PANEL : À PROPOS (COPYRIGHT & LICENCE)             -->
+<!-- PANEL : INFO (À PROPOS + PARTAGE fusionnés)        -->
 <!-- ═══════════════════════════════════════════════════ -->
-<div class="panel" id="panel-apropos">
+<div class="panel" id="panel-info">
+
+<!-- Sous-onglets internes Info -->
+<div style="display:flex;gap:8px;margin-bottom:16px;background:#fff;border-radius:12px;padding:8px;box-shadow:0 2px 8px rgba(21,101,192,0.08);">
+  <button onclick="switchInfoTab('apropos',this)" id="info-tab-apropos" style="flex:1;padding:9px 8px;background:#1565C0;color:white;border:none;border-radius:8px;font-family:'Source Serif 4',serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;">ℹ️ À propos</button>
+  <button onclick="switchInfoTab('partage',this)" id="info-tab-partage" style="flex:1;padding:9px 8px;background:transparent;color:#6B7280;border:1.5px solid #DDD8CE;border-radius:8px;font-family:'Source Serif 4',serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;">🔗 Partage & Backup</button>
+</div>
+<div id="info-subtab-apropos">
+<div id="panel-apropos">
   <div id="apropos-content">
 
     <!-- ── HERO À PROPOS ── -->
@@ -3054,7 +3721,7 @@ if ('serviceWorker' in navigator) {
         <div style="display:grid;gap:8px;font-size:12px;color:#444;">
           <div style="display:flex;justify-content:space-between;padding:8px 10px;background:#F5F7FA;border-radius:6px;">
             <span style="font-weight:600;">Version</span>
-            <span>Version 3.0 — Février 2026 (amélioré par IA)</span>
+            <span>Version 4.4 — Février 2026 (amélioré par IA)</span>
           </div>
           <div style="display:flex;justify-content:space-between;padding:8px 10px;background:#F5F7FA;border-radius:6px;">
             <span style="font-weight:600;">Type d'application</span>
@@ -3101,7 +3768,7 @@ if ('serviceWorker' in navigator) {
       <div style="font-size:32px;margin-bottom:10px;">📋</div>
       <div style="font-weight:700;color:#1565C0;font-size:14px;margin-bottom:6px;">Générateur de Fiches Pédagogiques</div>
       <div style="color:#666;font-size:12px;margin-bottom:4px;">© 2025-2026 <strong style="color:#1565C0;">EZ-ZAKY AZIZ</strong></div>
-      <div style="color:#999;font-size:11px;">Tous droits réservés — Licence CC BY-NC-SA 4.0 — v3.0</div>
+      <div style="color:#999;font-size:11px;">Tous droits réservés — Licence CC BY-NC-SA 4.0 — v4.4</div>
       <div style="margin-top:12px;padding:10px;background:#F5F7FA;border-radius:8px;display:inline-block;">
         <div style="font-size:11px;color:#666;line-height:1.6;">
           Application 100% locale — Vos données restent sur votre appareil<br>
@@ -3113,8 +3780,10 @@ if ('serviceWorker' in navigator) {
   </div>
 </div>
 
+</div><!-- end info-subtab-apropos -->
+<div id="info-subtab-partage" style="display:none;">
 <!-- ═══════════════════════════════════════════════════ -->
-<!-- PANEL : PARTAGE & SAUVEGARDE AVANCÉE (v3.0)       -->
+<!-- PANEL : PARTAGE & SAUVEGARDE AVANCÉE (v4.4)       -->
 <!-- ═══════════════════════════════════════════════════ -->
 <div class="panel" id="panel-partage">
 
@@ -3264,6 +3933,31 @@ if ('serviceWorker' in navigator) {
   <!-- Section Aperçu amélioré -->
   <div class="export-section">
     <div class="export-section-header">
+      <span style="font-size:18px;">👁️</span>
+      <span>VERSION LECTURE SEULE (HTML)</span>
+    </div>
+    <div class="export-section-body">
+      <p style="font-size:12px;color:#555;margin-bottom:12px;line-height:1.6;">
+        Générez une <strong>page HTML autonome</strong> — lisible dans n'importe quel navigateur, sans pouvoir modifier le contenu. Idéal pour partager avec des parents, l'administration, ou des collègues.
+      </p>
+      <div style="display:grid;gap:6px;font-size:11px;margin-bottom:12px;">
+        <div style="background:#E8F5E9;border-radius:6px;padding:7px 10px;color:#2E7D32;">✅ Fonctionne hors ligne · aucune installation requise</div>
+        <div style="background:#E3F2FD;border-radius:6px;padding:7px 10px;color:#1565C0;">📱 Compatible mobile, tablette, PC</div>
+        <div style="background:#FFF3E0;border-radius:6px;padding:7px 10px;color:#E65100;">🔒 Lecture seule — aucune modification possible</div>
+      </div>
+      <button class="btn-v3 btn-v3-primary" onclick="exporterHtmlLectureSeule()" style="width:100%;justify-content:center;">
+        👁️ Générer la version lecture seule (.html)
+      </button>
+      <div style="margin-top:10px;">
+        <button class="btn-v3 btn-v3-ghost" onclick="partagerHtmlLectureSeule()" style="width:100%;justify-content:center;">
+          📧 Envoyer par email (lien ou pièce jointe)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="export-section">
+    <div class="export-section-header">
       <span style="font-size:18px;">🖨️</span>
       <span>GÉNÉRATION RAPIDE</span>
     </div>
@@ -3280,6 +3974,8 @@ if ('serviceWorker' in navigator) {
   </div>
 
 </div>
+</div><!-- end info-subtab-partage -->
+</div><!-- end panel-info -->
 
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- BOUTON FLOTTANT : APERÇU RAPIDE                     -->
@@ -3351,6 +4047,18 @@ if ('serviceWorker' in navigator) {
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- MODAL CUSTOM (remplace alert/confirm natifs)        -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="modal-custom-overlay" style="display:none;position:fixed;inset:0;background:rgba(13,71,161,0.45);z-index:19000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);">
+  <div id="modal-custom-box" style="background:#fff;border-radius:18px;box-shadow:0 16px 48px rgba(21,101,192,0.28);padding:28px 24px 20px;max-width:460px;width:100%;transform:translateY(20px);transition:transform 0.25s;font-family:'Source Serif 4',serif;">
+    <div id="modal-custom-icon" style="font-size:40px;text-align:center;margin-bottom:10px;"></div>
+    <div id="modal-custom-title" style="font-family:'Playfair Display',serif;font-size:18px;font-weight:800;color:#0D47A1;text-align:center;margin-bottom:12px;"></div>
+    <div id="modal-custom-body" style="font-size:13px;color:#444;line-height:1.7;margin-bottom:20px;max-height:55vh;overflow-y:auto;"></div>
+    <div id="modal-custom-actions" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;"></div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast">✅ PDF généré et téléchargé !</div>
 
@@ -3377,10 +4085,217 @@ function showTab(name) {
   var tab   = document.getElementById('tab-'   + name);
   if (panel) panel.classList.add('active');
   if (tab)   tab.classList.add('active');
+  // Compatibility: apropos/partage now redirect to info
+  if (name === 'apropos') { showTab('info'); switchInfoTab('apropos', document.getElementById('info-tab-apropos')); return; }
+  if (name === 'partage') { showTab('info'); switchInfoTab('partage', document.getElementById('info-tab-partage')); return; }
+  if (name === 'info') {
+    var infoPanel = document.getElementById('panel-info');
+    if (infoPanel) infoPanel.classList.add('active');
+    mettreAJourStatsPartage();
+  }
   if (name === 'apercu')    { rafraichirApercu(); genererPreviewLive(); }
   if (name === 'repertoire') afficherRepertoire();
   if (name === 'modeles')    rendreTousLesModeles();
 }
+
+// ─── INFO SUB-TABS ─────────────────────────────────────
+function switchInfoTab(tabName, btn) {
+  document.getElementById('info-subtab-apropos').style.display = tabName === 'apropos' ? 'block' : 'none';
+  document.getElementById('info-subtab-partage').style.display = tabName === 'partage' ? 'block' : 'none';
+  // Style buttons
+  ['apropos','partage'].forEach(function(t) {
+    var b = document.getElementById('info-tab-' + t);
+    if (!b) return;
+    if (t === tabName) {
+      b.style.background = '#1565C0';
+      b.style.color = 'white';
+      b.style.border = 'none';
+    } else {
+      b.style.background = 'transparent';
+      b.style.color = '#6B7280';
+      b.style.border = '1.5px solid #DDD8CE';
+    }
+  });
+}
+
+// ─── DYNAMIC TITLE ──────────────────────────────────────
+function updateDynamicTitle() {
+  var module = (document.getElementById('module') && document.getElementById('module').innerText.trim()) || '';
+  var sequence = (document.getElementById('sequence') && document.getElementById('sequence').innerText.trim()) || '';
+  var niveau = (document.getElementById('niveau') && document.getElementById('niveau').innerText.trim()) || '';
+  var subtitle = document.getElementById('app-dynamic-subtitle');
+  var parts = [];
+  if (sequence) parts.push(sequence);
+  if (module) parts.push(module);
+  if (niveau) parts.push(niveau);
+  if (subtitle) {
+    subtitle.textContent = parts.length > 0 ? parts.join(' — ') : 'EZ-ZAKY AZIZ';
+  }
+  // Update browser tab title
+  var pageParts = [];
+  if (sequence) pageParts.push(sequence);
+  if (niveau) pageParts.push(niveau);
+  document.title = pageParts.length > 0 ? pageParts.join(' — ') + ' | Fiche Péda' : 'Fiche Pédagogique';
+}
+
+// Hook into existing updateLivePreview
+var _origUpdateLivePreview = null;
+
+// ─── AUTO-REFRESH APERÇU PDF avec debounce ───────────────
+var _autoRefreshTimer = null;
+function scheduleAutoRefresh() {
+  clearTimeout(_autoRefreshTimer);
+  _autoRefreshTimer = setTimeout(function() {
+    var panel = document.getElementById('panel-apercu');
+    if (panel && panel.classList.contains('active')) {
+      genererPreviewSimulee();
+    }
+  }, 1500);
+}
+
+// ─── RACCOURCIS CLAVIER ─────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    enregistrerDansRepertoire();
+    showToast('💾 Fiche sauvegardée !');
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+    e.preventDefault();
+    genererPDF();
+  }
+});
+
+// ─── RECHERCHE DANS LE RÉPERTOIRE ────────────────────────
+var _repSearchTerm = '';
+function rechercheRepertoire(val) {
+  _repSearchTerm = val.toLowerCase();
+  afficherRepertoire();
+}
+
+// ─── DUPLICATION DE FICHE ────────────────────────────────
+function dupliquerFiche(id) {
+  var fiches = JSON.parse(localStorage.getItem('fp_fiches') || '[]');
+  var idx = fiches.findIndex(function(f) { return f.id === id; });
+  if (idx === -1) return;
+  var original = fiches[idx];
+  var copie = JSON.parse(JSON.stringify(original));
+  copie.id = 'fiche_' + Date.now();
+  copie.titre = (original.titre || 'Fiche') + ' — Copie';
+  copie.date = new Date().toISOString();
+  fiches.splice(idx + 1, 0, copie);
+  localStorage.setItem('fp_fiches', JSON.stringify(fiches));
+  afficherRepertoire();
+  showToast('📋 Fiche dupliquée !');
+}
+
+// ─── DRAG AND DROP ÉTAPES (tablette/desktop uniquement) ──────────────────────
+var _dragSrcEl = null;
+
+function activerDragDrop() {
+  // Ne pas activer sur mobile
+  if (window.innerWidth < 768) return;
+  
+  var container = document.getElementById('etapes-container');
+  if (!container) return;
+  container.querySelectorAll('.etape-card').forEach(function(card) {
+    card.setAttribute('draggable', true);
+    
+    // Ajouter un handle visuel si pas encore présent
+    var header = card.querySelector('.etape-header');
+    if (header && !header.querySelector('.drag-handle')) {
+      var handle = document.createElement('span');
+      handle.className = 'drag-handle';
+      handle.title = 'Glisser pour réordonner';
+      handle.innerHTML = '⠿';
+      handle.style.cssText = 'font-size:18px;letter-spacing:-2px;';
+      header.insertBefore(handle, header.firstChild);
+    }
+
+    card.addEventListener('dragstart', function(e) {
+      _dragSrcEl = card;
+      card.style.opacity = '0.4';
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', function() {
+      card.style.opacity = '1';
+      container.querySelectorAll('.etape-card').forEach(function(c) {
+        c.classList.remove('drag-over');
+      });
+    });
+    card.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (card !== _dragSrcEl) {
+        container.querySelectorAll('.etape-card').forEach(function(c) { c.classList.remove('drag-over'); });
+        card.classList.add('drag-over');
+      }
+    });
+    card.addEventListener('drop', function(e) {
+      e.preventDefault();
+      if (_dragSrcEl && _dragSrcEl !== card) {
+        var all = Array.from(container.querySelectorAll('.etape-card'));
+        var srcIdx = all.indexOf(_dragSrcEl);
+        var tgtIdx = all.indexOf(card);
+        if (srcIdx < tgtIdx) {
+          container.insertBefore(_dragSrcEl, card.nextSibling);
+        } else {
+          container.insertBefore(_dragSrcEl, card);
+        }
+      }
+      card.classList.remove('drag-over');
+    });
+  });
+}
+
+// ─── CHAMP DATE AUTO ─────────────────────────────────────
+function prefillDateSeance() {
+  var dateEl = document.getElementById('date-seance');
+  if (dateEl && !dateEl.value) {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear();
+    dateEl.value = dd + '/' + mm + '/' + yyyy;
+  }
+}
+
+// ─── PATCHING de updateLivePreview pour déclencher titre + auto-refresh ─
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    // Intercepter les inputs des champs d'en-tête pour mettre à jour le titre
+    ['module','sequence','niveau','prof','activite','support'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', function() {
+          updateDynamicTitle();
+          scheduleAutoRefresh();
+        });
+      }
+    });
+    // Observer les changements dans etapes-container pour auto-refresh
+    var etapesContainer = document.getElementById('etapes-container');
+    if (etapesContainer) {
+      var observer = new MutationObserver(function() {
+        scheduleAutoRefresh();
+        setTimeout(activerDragDrop, 200);
+      });
+      observer.observe(etapesContainer, { childList: true, subtree: false });
+    }
+    // Auto-refresh sur changement dans Quill (objectif)
+    document.addEventListener('input', function(e) {
+      if (e.target.closest('.ql-editor')) {
+        scheduleAutoRefresh();
+      }
+    });
+    prefillDateSeance();
+    activerDragDrop();
+    // Réactiver si redimensionnement (mobile → tablette)
+    window.addEventListener('resize', function() {
+      activerDragDrop();
+    });
+  }, 800);
+});
 
 // ═══════════════════════════════════════════════════
 // GESTION DES ÉTAPES
@@ -3582,6 +4497,49 @@ function initQuillEditor(wrapperId, placeholder = '') {
     if (wrapperId === 'objectif-wrapper') {
       updateLivePreview();
     }
+  });
+
+  // ── Raccourcis clavier ──
+  // Ctrl+K → insérer un lien
+  quill.keyboard.addBinding({ key: 'k', shortKey: true }, function(range) {
+    var url = prompt('🔗 URL du lien (ex: https://…) :');
+    if (!url) return;
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    if (range && range.length > 0) {
+      quill.formatText(range.index, range.length, 'link', url);
+    } else {
+      var txt = url;
+      quill.insertText(range ? range.index : quill.getLength(), txt, 'link', url);
+    }
+  });
+
+  // Ctrl+Shift+X → effacer le formatage (alias de ql-clean)
+  quill.keyboard.addBinding({ key: 'X', shortKey: true, shiftKey: true }, function(range) {
+    if (range && range.length > 0) {
+      quill.removeFormat(range.index, range.length);
+    }
+  });
+
+  // Ctrl+Shift+L → liste à puces
+  quill.keyboard.addBinding({ key: 'L', shortKey: true, shiftKey: true }, function(range) {
+    var current = quill.getFormat(range);
+    quill.format('list', current.list === 'bullet' ? false : 'bullet');
+  });
+
+  // Ctrl+Shift+O → liste numérotée
+  quill.keyboard.addBinding({ key: 'O', shortKey: true, shiftKey: true }, function(range) {
+    var current = quill.getFormat(range);
+    quill.format('list', current.list === 'ordered' ? false : 'ordered');
+  });
+
+  // Tab dans une liste → indenter ; Shift+Tab → désindenter
+  quill.keyboard.addBinding({ key: 'Tab' }, { collapsed: true, format: { list: true } }, function(range) {
+    quill.format('indent', '+1');
+    return false;
+  });
+  quill.keyboard.addBinding({ key: 'Tab', shiftKey: true }, { collapsed: true, format: { list: true } }, function(range) {
+    quill.format('indent', '-1');
+    return false;
   });
 
   quillInstances[wrapperId] = quill;
@@ -4130,6 +5088,78 @@ function sauvegarderAutomatique() {
   } catch(e) { /* silencieux */ }
 }
 
+// ══════════════════════════════════════════════════════
+// MODALS CUSTOM (remplace alert/confirm natifs)
+// ══════════════════════════════════════════════════════
+function afficherModal(opts) {
+  // opts: { icon, title, body, buttons: [{text, style, onClick}], onClose }
+  var overlay = document.getElementById('modal-custom-overlay');
+  var box = document.getElementById('modal-custom-box');
+  if (!overlay || !box) return;
+  document.getElementById('modal-custom-icon').textContent = opts.icon || '📋';
+  document.getElementById('modal-custom-title').innerHTML = opts.title || '';
+  document.getElementById('modal-custom-body').innerHTML = opts.body || '';
+  var actions = document.getElementById('modal-custom-actions');
+  actions.innerHTML = '';
+  (opts.buttons || []).forEach(function(btn) {
+    var b = document.createElement('button');
+    b.innerHTML = btn.text;
+    b.style.cssText = 'padding:10px 20px;border-radius:9px;border:none;font-family:"Source Serif 4",serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;' + (btn.style || 'background:#1565C0;color:white;');
+    b.onclick = function() {
+      fermerModal();
+      if (btn.onClick) btn.onClick();
+    };
+    actions.appendChild(b);
+  });
+  overlay.style.display = 'flex';
+  setTimeout(function() { box.style.transform = 'translateY(0)'; }, 10);
+}
+
+function fermerModal() {
+  var overlay = document.getElementById('modal-custom-overlay');
+  var box = document.getElementById('modal-custom-box');
+  if (!overlay) return;
+  box.style.transform = 'translateY(20px)';
+  setTimeout(function() { overlay.style.display = 'none'; }, 220);
+}
+
+// Fermer modal en cliquant l'overlay
+document.addEventListener('click', function(e) {
+  var overlay = document.getElementById('modal-custom-overlay');
+  if (e.target === overlay) fermerModal();
+});
+
+function afficherModalLicence() {
+  afficherModal({
+    icon: '📋',
+    title: 'Bienvenue dans le Générateur de Fiches Pédagogiques',
+    body: '<div style="background:#E3F2FD;border-left:3px solid #1565C0;padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:14px;font-size:12px;color:#1565C0;font-weight:600;">© 2025-2026 EZ-ZAKY AZIZ — Version 4.4 — Licence CC BY-NC-SA 4.0</div>' +
+      '<p style="margin-bottom:10px;">Cette application est <strong>gratuite</strong> et distribuée sous licence Creative Commons BY-NC-SA 4.0.</p>' +
+      '<div style="display:grid;gap:6px;font-size:12px;">' +
+      '<div style="background:#E8F5E9;border-radius:8px;padding:8px 12px;">✅ <strong>Vous pouvez</strong> utiliser, partager et modifier l\'application</div>' +
+      '<div style="background:#FFF3E0;border-radius:8px;padding:8px 12px;">⚠️ <strong>Vous devez</strong> créditer l\'auteur et partager sous la même licence</div>' +
+      '<div style="background:#FFEBEE;border-radius:8px;padding:8px 12px;">❌ <strong>Interdit</strong> usage commercial et suppression des crédits</div>' +
+      '</div>',
+    buttons: [
+      { text: '✅ J\'accepte', style: 'background:#2E7D32;color:white;', onClick: function() {
+        localStorage.setItem('fp_welcome_seen', 'true');
+        localStorage.setItem('fp_license_accepted', new Date().toISOString());
+        setTimeout(function() {
+          afficherModal({
+            icon: '🎉',
+            title: 'Merci et bienvenue !',
+            body: '<p>Consultez l\'onglet <strong>📖 Guide</strong> pour découvrir toutes les fonctionnalités.<br><br>Bonne création de fiches pédagogiques ! 📚</p>',
+            buttons: [{ text: '🚀 Commencer', style: 'background:#1565C0;color:white;', onClick: function() {} }]
+          });
+        }, 300);
+      }},
+      { text: '❌ Refuser', style: 'background:#f5f5f5;color:#666;border:1px solid #ddd;', onClick: function() {
+        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;text-align:center;padding:20px;"><div><div style="font-size:60px;margin-bottom:16px;">📋</div><h2 style="color:#1565C0;">Licence non acceptée</h2><p style="color:#666;">Vous devez accepter les conditions d\'utilisation<br>pour utiliser cette application.</p><button onclick="location.reload()" style="margin-top:20px;padding:12px 24px;background:#1565C0;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;">🔄 Recharger et accepter</button></div></div>';
+      }}
+    ]
+  });
+}
+
 function afficherStatutSauvegarde(msg, color) {
   const bar = document.getElementById('save-bar');
   const st  = document.getElementById('save-status');
@@ -4186,7 +5216,9 @@ function collecterTout() {
       labelColDerou:   document.getElementById('label-col-deroulement')?.value || 'Déroulement de la séance',
       labelColDuree:   document.getElementById('label-col-duree')?.value || 'Durée'
     },
-    savedAt: new Date().toLocaleString('fr-FR')
+    savedAt: new Date().toLocaleString('fr-FR'),
+    logo: logoBase64 || null,
+    logoPosition: document.getElementById('logo-position')?.value || 'left',
   };
 }
 
@@ -4228,6 +5260,20 @@ function restaurerFiche(data) {
   setVal('label-col-etapes', p.labelColEtapes); setVal('label-col-deroulement', p.labelColDerou);
   setVal('label-col-duree', p.labelColDuree);
   if (p.colorMain) applyThemePreview();
+  // Logo
+  if (data.logo) {
+    logoBase64 = data.logo;
+    const img = document.getElementById('logo-img-preview');
+    const placeholder = document.getElementById('logo-placeholder');
+    const removeBtn = document.getElementById('logo-remove-btn');
+    if (img) { img.src = logoBase64; img.style.display = 'block'; }
+    if (placeholder) placeholder.style.display = 'none';
+    if (removeBtn) removeBtn.style.display = 'block';
+  }
+  if (data.logoPosition) {
+    const sel = document.getElementById('logo-position');
+    if (sel) sel.value = data.logoPosition;
+  }
   updateLivePreview();
   calculerDureeTotale();
 }
@@ -4247,25 +5293,32 @@ function ecrireRepertoire(fiches) {
   localStorage.setItem(REP_KEY, JSON.stringify(fiches));
 }
 
-function enregistrerDansRepertoire() {
+function enregistrerDansRepertoire(silencieux) {
   const entete   = collecterEntete();
   const etapes   = collecterEtapes();
   const activite = entete.activite || entete.module || 'Sans titre';
   const niveau   = entete.niveau   || '';
 
-  // Demander un nom pour la fiche
+  // Demander un nom pour la fiche (sauf en mode silencieux)
   const nomSuggere = [activite, niveau].filter(Boolean).join(' — ');
-  const nom = prompt('💾 Nom de la fiche à enregistrer :', nomSuggere);
-  if (nom === null) return; // annulé
-  const nomFinal = nom.trim() || nomSuggere || 'Fiche sans titre';
+  var nomFinal;
+  if (silencieux) {
+    nomFinal = nomSuggere || 'Fiche sans titre';
+  } else {
+    const nom = prompt('💾 Nom de la fiche à enregistrer :', nomSuggere);
+    if (nom === null) return; // annulé
+    nomFinal = nom.trim() || nomSuggere || 'Fiche sans titre';
+  }
 
   const fiches = lireRepertoire();
 
   // Vérifier si une fiche avec ce nom existe déjà
   const existant = fiches.findIndex(f => f.nom === nomFinal);
   if (existant !== -1) {
-    if (!confirm(`⚠️ Une fiche nommée "${nomFinal}" existe déjà.\nVoulez-vous la remplacer ?`)) return;
-    fiches.splice(existant, 1);
+    if (!silencieux && !confirm(`⚠️ Une fiche nommée "${nomFinal}" existe déjà.\nVoulez-vous la remplacer ?`)) return;
+    // ── Sauvegarder l'ancienne version dans l'historique AVANT écrasement ──
+    _sauvegarderVersionHistorique(fiches[existant]);
+    if (existant !== -1) fiches.splice(existant, 1);
   }
 
   const data = collecterTout();
@@ -4285,16 +5338,30 @@ function enregistrerDansRepertoire() {
   ecrireRepertoire(fiches);
 
   // Feedback
-  afficherStatutSauvegarde(`✅ Fiche "${nomFinal}" enregistrée dans le répertoire !`, '#2E7D32');
+  if (silencieux) {
+    afficherStatutSauvegarde(`✅ Archivée automatiquement : "${nomFinal}"`, '#2E7D32');
+  } else {
+    afficherStatutSauvegarde(`✅ Fiche "${nomFinal}" enregistrée dans le répertoire !`, '#2E7D32');
+  }
   // Badge onglet
   mettreAJourBadgeRepertoire();
 }
 
 function afficherRepertoire() {
-  const fiches  = lireRepertoire();
-  const liste   = document.getElementById('repertoire-liste');
-  const compteur = document.getElementById('rep-compteur');
+  var fiches  = lireRepertoire();
+  var liste   = document.getElementById('repertoire-liste');
+  var compteur = document.getElementById('rep-compteur');
   if (!liste) return;
+
+  // ── Tri ──
+  var fichesTried = trierFiches(fiches);
+
+  // ── Filtrage par recherche ──
+  var term = _repSearchTerm || '';
+  var fichesFiltrees = term ? fichesTried.filter(function(f) {
+    var haystack = [(f.nom||''), (f.niveau||''), (f.module||''), (f.resume||''), (f.activite||'')].join(' ').toLowerCase();
+    return haystack.indexOf(term) !== -1;
+  }) : fichesTried;
 
   if (compteur) compteur.textContent = fiches.length + ' fiche' + (fiches.length > 1 ? 's' : '');
 
@@ -4307,34 +5374,80 @@ function afficherRepertoire() {
     return;
   }
 
-  liste.innerHTML = fiches.map((f, i) => `
-    <div class="repertoire-card">
+  if (fichesFiltrees.length === 0) {
+    liste.innerHTML = `<div class="repertoire-empty">
+      <div style="font-size:32px;margin-bottom:8px;">🔍</div>
+      <div>Aucun résultat pour "<strong>${term}</strong>"</div>
+      <div style="font-size:12px;margin-top:6px;color:#bbb;">Essayez un autre mot-clé.</div>
+    </div>`;
+    return;
+  }
+
+  // Trouver les indices réels dans le tableau ORIGINAL (non trié) pour les actions
+  liste.innerHTML = fichesFiltrees.map(function(f) {
+    var realIdx = fiches.indexOf(f);
+    // Miniature de l'en-tête
+    var prof    = (f.entete && f.entete.prof)    ? stripHtmlSimple(f.entete.prof) : (f.prof || '—');
+    var niveau  = (f.niveau || '—').substring(0, 20);
+    var module  = (f.module || '—').substring(0, 50);
+    var activite = (f.entete && f.entete.activite) ? stripHtmlSimple(f.entete.activite) : (f.activite || '—');
+    activite = activite.substring(0, 60);
+    var nbEtapes = (f.etapes || []).length;
+    var colorMain = (f.params && f.params.colorMain) || '#1565C0';
+
+    var miniature = `<div style="background:linear-gradient(135deg,${colorMain}15,#fff);border:1.5px solid ${colorMain}33;border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:10.5px;line-height:1.6;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;margin-bottom:4px;">
+        <div><span style="color:${colorMain};font-weight:700;">👤 </span><span style="color:#333;">${prof}</span></div>
+        <div><span style="color:${colorMain};font-weight:700;">🎓 </span><span style="color:#333;">${niveau}</span></div>
+      </div>
+      <div style="color:#444;margin-bottom:2px;"><span style="color:${colorMain};font-weight:700;">📚 </span>${module}</div>
+      <div style="color:#555;"><span style="color:${colorMain};font-weight:700;">🎯 </span>${activite}</div>
+      <div style="margin-top:4px;display:flex;gap:6px;align-items:center;">
+        <span style="background:${colorMain};color:white;border-radius:10px;padding:1px 8px;font-size:10px;font-weight:700;">${nbEtapes} étape${nbEtapes>1?'s':''}</span>
+        <span style="color:#aaa;font-size:10px;">${f.resume || ''}</span>
+      </div>
+    </div>`;
+
+    return `<div class="repertoire-card${_modeSelection && _selectedFiches.has(realIdx) ? ' selected' : ''}" id="rep-card-${realIdx}">
+      ${_modeSelection ? `<input type="checkbox" class="rep-card-checkbox" ${_selectedFiches.has(realIdx) ? 'checked' : ''} onchange="toggleSelectFiche(${realIdx}, this.checked)" title="Sélectionner cette fiche">` : ''}
       <div class="repertoire-card-header">
-        <div class="repertoire-card-title">📋 ${f.nom || 'Fiche ' + (i+1)}</div>
+        <div class="repertoire-card-title">📋 ${f.nom || 'Fiche ' + (realIdx+1)}</div>
         <div class="repertoire-card-date">🕐 ${f.savedAt || '—'}</div>
       </div>
       <div class="repertoire-card-body">
-        ${f.niveau ? `<span style="background:#E3F2FD;color:#1565C0;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:600;margin-right:6px;">${f.niveau}</span>` : ''}
-        ${f.module ? `<span style="color:#555;">${f.module}</span>` : ''}
-        <br><span style="color:#888;font-size:11px;">${f.resume || ''}</span>
+        ${miniature}
       </div>
       <div class="repertoire-card-actions">
-        <button class="btn-rep btn-rep-ouvrir" onclick="ouvrirFicheRepertoire(${i})">📂 Ouvrir</button>
-        <button class="btn-rep" onclick="dupliquerFicheRepertoire(${i})" style="background:#E8F5E9;color:#2E7D32;border:1px solid #C8E6C9;">📋 Dupliquer</button>
-        <button class="btn-rep btn-rep-suppr" onclick="supprimerFicheRepertoire(${i})">🗑️ Supprimer</button>
+        ${_modeSelection
+          ? `<button class="btn-rep btn-rep-ouvrir" onclick="toggleSelectFiche(${realIdx}, !document.querySelector('#rep-card-${realIdx} .rep-card-checkbox').checked); document.querySelector('#rep-card-${realIdx} .rep-card-checkbox').checked = _selectedFiches.has(${realIdx});" style="background:#E3F2FD;color:#1565C0;border-color:#BBDEFB;">${_selectedFiches.has(realIdx) ? '✅ Sélectionnée' : '☐ Sélectionner'}</button>`
+          : `<button class="btn-rep btn-rep-ouvrir" onclick="ouvrirFicheRepertoire(${realIdx})">📂 Ouvrir</button>
+        <button class="btn-rep btn-rep-hist" onclick="ouvrirHistorique(${realIdx})" title="Voir les versions précédentes">🕐 Historique</button>
+        <button class="btn-rep" onclick="exporterHtmlFicheRepertoire(${realIdx})" style="background:#E8F5E9;color:#2E7D32;border-color:#C8E6C9;font-size:10px;">👁️ HTML</button>
+        <button class="btn-rep btn-rep-dupliquer" onclick="dupliquerFicheRepertoire(${realIdx})">📋 Dupliquer</button>
+        <button class="btn-rep btn-rep-suppr" onclick="supprimerFicheRepertoire(${realIdx})">🗑️ Supprimer</button>`
+        }
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function ouvrirFicheRepertoire(index) {
   const fiches = lireRepertoire();
   const f = fiches[index];
   if (!f) return;
-  if (!confirm(`📂 Ouvrir la fiche "${f.nom}" ?\nLe contenu actuel sera remplacé.`)) return;
-  restaurerFiche(f);
-  showTab('etapes');
-  afficherStatutSauvegarde(`📂 Fiche "${f.nom}" ouverte`, '#1565C0');
+  afficherModal({
+    icon: '📂',
+    title: 'Ouvrir la fiche',
+    body: '<p>Voulez-vous ouvrir la fiche <strong>"' + (f.nom || 'Fiche') + '"</strong> ?<br><span style="color:#E65100;font-size:12px;">⚠️ Le contenu actuel sera remplacé.</span></p>',
+    buttons: [
+      { text: '📂 Ouvrir', style: 'background:#1565C0;color:white;', onClick: function() {
+        restaurerFiche(f);
+        showTab('etapes');
+        afficherStatutSauvegarde('📂 Fiche "' + f.nom + '" ouverte', '#1565C0');
+      }},
+      { text: 'Annuler', style: 'background:#f5f5f5;color:#666;border:1px solid #ddd;', onClick: function() {} }
+    ]
+  });
 }
 
 function dupliquerFicheRepertoire(index) {
@@ -4351,11 +5464,21 @@ function dupliquerFicheRepertoire(index) {
 function supprimerFicheRepertoire(index) {
   const fiches = lireRepertoire();
   const f = fiches[index];
-  if (!confirm(`🗑️ Supprimer la fiche "${f.nom}" ?\nCette action est irréversible.`)) return;
-  fiches.splice(index, 1);
-  ecrireRepertoire(fiches);
-  afficherRepertoire();
-  mettreAJourBadgeRepertoire();
+  afficherModal({
+    icon: '🗑️',
+    title: 'Supprimer la fiche',
+    body: '<p>Êtes-vous sûr de vouloir supprimer <strong>"' + (f.nom || 'Fiche') + '"</strong> ?<br><span style="color:#C62828;font-size:12px;">Cette action est irréversible.</span></p>',
+    buttons: [
+      { text: '🗑️ Supprimer', style: 'background:#C62828;color:white;', onClick: function() {
+        fiches.splice(index, 1);
+        ecrireRepertoire(fiches);
+        _supprimerHistoriqueFiche(f.nom); // nettoyer l'historique lié
+        afficherRepertoire();
+        mettreAJourBadgeRepertoire();
+      }},
+      { text: 'Annuler', style: 'background:#f5f5f5;color:#666;border:1px solid #ddd;', onClick: function() {} }
+    ]
+  });
 }
 
 function mettreAJourBadgeRepertoire() {
@@ -4376,38 +5499,37 @@ function mettreAJourBadgeRepertoire() {
 
 // ── NOUVELLE FICHE (remise à zéro complète) ──
 function nouvelleFiche() {
-  if (!confirm('🔄 Commencer une nouvelle fiche ?\n\nLe contenu actuel sera effacé.\n⚠️ Pensez à l\'enregistrer dans le répertoire si vous voulez le conserver.')) return;
-
-  // Réinitialiser les champs de l'en-tête (sauf le prof)
-  ['niveau','module','sequence','activite','support'].forEach(id => {
-    var el = document.getElementById(id);
-    if (!el) return;
-    if (el.contentEditable === 'true') el.innerHTML = '';
-    else el.value = '';
+  afficherModal({
+    icon: '🔄',
+    title: 'Nouvelle fiche',
+    body: '<p>Commencer une nouvelle fiche ?<br><span style="color:#E65100;font-size:12px;">⚠️ Le contenu actuel sera effacé. Pensez à l\'enregistrer dans le répertoire si vous voulez le conserver.</span></p>',
+    buttons: [
+      { text: '🔄 Nouvelle fiche', style: 'background:#1565C0;color:white;', onClick: function() {
+        // Réinitialiser les champs de l'en-tête (sauf le prof)
+        ['niveau','module','sequence','activite','support'].forEach(id => {
+          var el = document.getElementById(id);
+          if (!el) return;
+          if (el.contentEditable === 'true') el.innerHTML = '';
+          else el.value = '';
+        });
+        setQuillHTML('objectif-wrapper', '');
+        document.getElementById('etapes-container').innerHTML = '';
+        etapeCount = 0;
+        ajouterEtape({ nom:'Mise en route', enseignant:'', duree:'5 min' });
+        ajouterEtape({ nom:'Présentation',  enseignant:'', duree:'15 min' });
+        ajouterEtape({ nom:'Entraînement',  enseignant:'', duree:'20 min' });
+        ajouterEtape({ nom:'Production',    enseignant:'', duree:'10 min' });
+        ajouterEtape({ nom:'Clôture',       enseignant:'', duree:'5 min' });
+        setTimeout(calculerDureeTotale, 300);
+        try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
+        updateLivePreview();
+        updateDynamicTitle();
+        showTab('entete');
+        afficherStatutSauvegarde('🔄 Nouvelle fiche — contenu réinitialisé', '#1565C0');
+      }},
+      { text: 'Annuler', style: 'background:#f5f5f5;color:#666;border:1px solid #ddd;', onClick: function() {} }
+    ]
   });
-  // Vider l'objectif
-  setQuillHTML('objectif-wrapper', '');
-
-  // Supprimer toutes les étapes et repartir sur les étapes par défaut
-  document.getElementById('etapes-container').innerHTML = '';
-  etapeCount = 0;
-  ajouterEtape({ nom:'Mise en route', enseignant:'', duree:'5 min' });
-  ajouterEtape({ nom:'Présentation',  enseignant:'', duree:'15 min' });
-  ajouterEtape({ nom:'Entraînement',  enseignant:'', duree:'20 min' });
-  ajouterEtape({ nom:'Production',    enseignant:'', duree:'10 min' });
-  ajouterEtape({ nom:'Clôture',       enseignant:'', duree:'5 min' });
-  setTimeout(calculerDureeTotale, 300);
-
-  // Effacer la sauvegarde automatique
-  try { localStorage.removeItem(SAVE_KEY); } catch(e) {}
-
-  // Mettre à jour l'aperçu live de l'en-tête
-  updateLivePreview();
-
-  // Retourner sur l'onglet En-tête
-  showTab('entete');
-
-  afficherStatutSauvegarde('🔄 Nouvelle fiche — contenu réinitialisé', '#1565C0');
 }
 
 // ── PARAMÈTRES PAR DÉFAUT ──
@@ -4721,6 +5843,8 @@ function collecterLignesLibres() {
 // APERÇU LIVE DE L'EN-TÊTE
 // ═══════════════════════════════════════════════════
 function updateLivePreview() {
+  updateDynamicTitle();
+  scheduleAutoRefresh();
   const entete = collecterEntete();
   const lignesLibres = collecterLignesLibres();
   const container = document.getElementById('entete-live-preview');
@@ -4882,13 +6006,49 @@ function removeColorFromContentEditable(fieldId) {
 // ═══════════════════════════════════════════════════
 // COLLECTE DES DONNÉES
 // ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+// LOGO ÉTABLISSEMENT
+// ═══════════════════════════════════════════════════
+let logoBase64 = null; // stockage global de l'image en base64
+
+function chargerLogo(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    logoBase64 = e.target.result; // data:image/...;base64,...
+    // Afficher la preview
+    const img = document.getElementById('logo-img-preview');
+    const placeholder = document.getElementById('logo-placeholder');
+    const removeBtn = document.getElementById('logo-remove-btn');
+    if (img) { img.src = logoBase64; img.style.display = 'block'; }
+    if (placeholder) placeholder.style.display = 'none';
+    if (removeBtn) removeBtn.style.display = 'block';
+    updateLivePreview();
+  };
+  reader.readAsDataURL(file);
+  // reset input pour permettre de recharger le même fichier
+  input.value = '';
+}
+
+function supprimerLogo() {
+  logoBase64 = null;
+  const img = document.getElementById('logo-img-preview');
+  const placeholder = document.getElementById('logo-placeholder');
+  const removeBtn = document.getElementById('logo-remove-btn');
+  if (img) { img.src = ''; img.style.display = 'none'; }
+  if (placeholder) placeholder.style.display = 'block';
+  if (removeBtn) removeBtn.style.display = 'none';
+  updateLivePreview();
+}
+
 function collecterEntete() {
   const objectifHTML = getQuillHTML('objectif-wrapper');
   const objectifText = getQuillText('objectif-wrapper');
   
   return {
     // Valeurs récupérées depuis les champs contenteditable (avec HTML pour le formatage)
-    prof:       document.getElementById('prof')?.innerHTML.trim() || 'EZ-ZAKY AZIZ',
+    prof:       document.getElementById('prof')?.innerHTML.trim() || '',
     niveau:     document.getElementById('niveau')?.innerHTML.trim() || '',
     module:     document.getElementById('module')?.innerHTML.trim() || '',
     sequence:   document.getElementById('sequence')?.innerHTML.trim() || '',
@@ -4905,6 +6065,9 @@ function collecterEntete() {
     labelObjectif:  getFixedLabel('fgrp-objectif', 0)   || 'OBJECTIF(S)',
     // Lignes libres
     lignesLibres: collecterLignesLibres(),
+    // Logo
+    logo: logoBase64 || null,
+    logoPosition: document.getElementById('logo-position')?.value || 'left',
   };
 }
 
@@ -5412,7 +6575,7 @@ function htmlToRichSegments(html) {
       segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize, prefix: '' });
       return;
     }
-    if (tag === 'p' || tag === 'h1' || tag === 'h2' || tag === 'h3') {
+    if (tag === 'p' || tag === 'div' || tag === 'h1' || tag === 'h2' || tag === 'h3') {
       Array.from(node.childNodes).forEach(ch => walk(ch, c));
       segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize, prefix: '' });
       return;
@@ -5503,7 +6666,7 @@ function genererPDF() {
 
   try {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4', putOnlyUsedFonts: true });
+    const doc = new jsPDF({ orientation: _pdfOrientation || 'portrait', unit: 'pt', format: 'a4', putOnlyUsedFonts: true });
 
     const PW = doc.internal.pageSize.width;   // 595.28
     const PH = doc.internal.pageSize.height;  // 841.89
@@ -5731,13 +6894,7 @@ function genererPDF() {
   function drawRichTextSegments(segments, x, startY, maxW, baseFontSize, defaultColor) {
     if (!segments || segments.length === 0) return 0;
     const lineH = baseFontSize * 1.35;
-    let curX = x;
     let curY = startY;
-
-    // Découper les segments texte en lignes en respectant maxW
-    const lines = [];
-    let curLine = [];
-    let curLineW = 0;
 
     // Accumulateur mixte : { type:'text-line', items } | { type:'image', src } | { type:'table', tableData }
     const blocks = [];
@@ -5745,18 +6902,16 @@ function genererPDF() {
     let pendingLineW = 0;
 
     function flushPendingLine() {
-      if (pendingLine.length > 0) {
-        blocks.push({ type: 'text-line', items: pendingLine });
-        pendingLine = [];
-        pendingLineW = 0;
-      }
+      blocks.push({ type: 'text-line', items: pendingLine });
+      pendingLine = [];
+      pendingLineW = 0;
     }
 
     segments.forEach(seg => {
       // Segments spéciaux (image, table)
       if (seg.type === 'image') {
         flushPendingLine();
-        blocks.push({ type: 'image', src: seg.src });
+        blocks.push({ type: 'image', src: seg.src, w: seg.w, h: seg.h });
         return;
       }
       if (seg.type === 'table') {
@@ -5765,6 +6920,7 @@ function genererPDF() {
         return;
       }
       if (seg.text === '\n') {
+        // Toujours flush la ligne courante (même vide) pour créer un saut de ligne
         flushPendingLine();
         return;
       }
@@ -5787,14 +6943,15 @@ function genererPDF() {
           italic: seg.italic, 
           underline: seg.underline, 
           fontSize: fs, 
-          font: seg.font || 'times',
+          font: fontFace,
           color: seg.color || null,
           background: seg.background || null
         });
         pendingLineW += wW;
       });
     });
-    flushPendingLine();
+    // Flush la dernière ligne seulement si elle a du contenu
+    if (pendingLine.length > 0) flushPendingLine();
 
     // Dessiner les blocs
     blocks.forEach(block => {
@@ -5973,20 +7130,14 @@ function genererPDF() {
     const lineH = baseFontSize * 1.35;
     let totalH = 0;
     let curLineW = 0;
-    let lineCount = 0;
-
-    function flushLines() {
-      if (lineCount > 0 || curLineW > 0) {
-        totalH += (lineCount + (curLineW > 0 ? 1 : 0)) * lineH;
-        lineCount = 0;
-        curLineW = 0;
-      }
-    }
+    let lineCount = 0; // lignes complètes (terminées par \n ou wrap)
 
     segments.forEach(seg => {
       if (seg.type === 'image') {
-        flushLines();
-        // Estimation hauteur image : taille user en pt ou 120pt par défaut
+        // Flush la ligne en cours
+        lineCount++;
+        curLineW = 0;
+        // Estimation hauteur image
         if (seg.w && seg.h && seg.w > 0) {
           const maxW2 = maxW || 160;
           const imgW2 = Math.min(maxW2, seg.w * 0.75);
@@ -5998,8 +7149,8 @@ function genererPDF() {
         return;
       }
       if (seg.type === 'table') {
-        flushLines();
-        // Estimer la hauteur du tableau
+        lineCount++;
+        curLineW = 0;
         const tdata = seg.tableData || [];
         const nCols = Math.max(1, ...tdata.map(r => r.length));
         const colW = maxW / nCols;
@@ -6037,8 +7188,10 @@ function genererPDF() {
         curLineW += wW;
       });
     });
-    flushLines();
+    // Flush la dernière ligne si elle a du contenu
+    if (curLineW > 0) lineCount++;
 
+    totalH += lineCount * lineH;
     return Math.max(totalH, lineH);
   }
 
@@ -6067,6 +7220,33 @@ function genererPDF() {
 
   let hy = M;
 
+  // ── LOGO (si présent) — zone blanche au-dessus de l'entête bleue
+  const LOGO_H = 48; // hauteur de la zone logo en pt
+  const LOGO_SIZE = LOGO_H - 6; // taille carrée du logo
+  if (entete.logo) {
+    try {
+      // Fond blanc pour la zone logo
+      doc.setFillColor(255, 255, 255);
+      doc.rect(M, hy, UW, LOGO_H, 'F');
+      // Titre "FICHE PÉDAGOGIQUE" centré dans la zone logo
+      doc.setFont('times', 'bold');
+      doc.setFontSize(P.fontEnteteLabel + 1);
+      doc.setTextColor(er, eg, eb);
+      doc.text('FICHE PÉDAGOGIQUE', M + UW / 2, hy + LOGO_H * 0.62, { align: 'center' });
+      // Dessiner le logo
+      const logoX = entete.logoPosition === 'right' ? (endX - LOGO_SIZE - 4) : (M + 4);
+      let logoFmt = 'PNG';
+      if (entete.logo.includes('image/jpeg') || entete.logo.includes('image/jpg')) logoFmt = 'JPEG';
+      else if (entete.logo.includes('image/gif')) logoFmt = 'GIF';
+      else if (entete.logo.includes('image/webp')) logoFmt = 'WEBP';
+      doc.addImage(entete.logo, logoFmt, logoX, hy + 3, LOGO_SIZE, LOGO_SIZE);
+      hy += LOGO_H;
+    } catch(e) {
+      // Si erreur logo, on ignore et continue
+      hy += 0;
+    }
+  }
+
   // ── Ligne 1 (h = l1h) — Prof + Niveau avec labels personnalisés
   const L1H = P.l1h;
   setBlue();
@@ -6074,8 +7254,10 @@ function genererPDF() {
   doc.setDrawColor(255,255,255); doc.setLineWidth(0.5);
   doc.line(sep1, hy, sep1, hy+L1H);
   doc.line(sep2, hy, sep2, hy+L1H);
-  // Titre centré à gauche
-  drawTextWhite('FICHE PEDAGOGIQUE', M+5, hy + L1H*0.65, P.fontEnteteLabel, true);
+  // Titre centré à gauche (seulement si pas de logo — sinon déjà dans la zone logo)
+  if (!entete.logo) {
+    drawTextWhite('FICHE PEDAGOGIQUE', M+5, hy + L1H*0.65, P.fontEnteteLabel, true);
+  }
   // Prof label + valeur avec formatage HTML
   const profLabel = normaliserTexte(entete.labelProf || 'PROF');
   drawTextWhite(profLabel + ' : ', sep1+5, hy + L1H*0.65, P.fontEnteteLabel, true);
@@ -6169,33 +7351,83 @@ function genererPDF() {
     entete.lignesLibres.forEach(ll => {
       if (ll.type === 'simple') {
         const llLabel = normaliserTexte(ll.label || 'Champ');
-        const llVal = ll.val1 || '';
+        const llVal   = ll.val1 || '';
+
+        // Mesurer la largeur dispo pour le contenu
+        doc.setFontSize(P.fontEnteteLabel); doc.setFont('times','bold');
+        const llLabelW  = doc.getTextWidth(llLabel + ' :') + 4;
+        const boxX      = M + llLabelW + 8;
+        const boxW      = endX - boxX - 4;
+
+        // Mesurer la hauteur nécessaire (word-wrap + sauts de ligne)
+        const llSegs    = htmlToRichSegments(llVal);
+        const neededH   = Math.max(L234H, measureRichTextSegments(llSegs, boxW - 4, P.fontEnteteContent) + 8);
+
+        // Fond bleu
         setBlue();
-        doc.rect(M, hy, UW, L234H, 'F');
-        drawTextWhite(llLabel + ' :', M+5, hy + L234H*0.65, P.fontEnteteLabel, true);
-        const llLabelW = doc.getTextWidth(llLabel + ' :') + 4;
-        drawInputBox(M+llLabelW+8, hy+3, endX-(M+llLabelW+8)-4, L234H-6, llVal, P.fontEnteteContent);
-        hy += L234H;
+        doc.rect(M, hy, UW, neededH, 'F');
+        drawTextWhite(llLabel + ' :', M+5, hy + P.fontEnteteLabel * 1.1 + 3, P.fontEnteteLabel, true);
+
+        // Case blanche flexible
+        doc.setFillColor(255,255,255);
+        setBlueStroke(0.5);
+        doc.rect(boxX, hy + 3, boxW, neededH - 6, 'FD');
+
+        // Texte riche avec wrap et sauts de ligne
+        if (llSegs.length > 0) {
+          drawRichTextSegments(llSegs, boxX + 2, hy + P.fontEnteteContent * 0.85 + 4, boxW - 4, P.fontEnteteContent, [0,0,0]);
+        }
+        hy += neededH;
+
       } else {
-        // Double
+        // Double — chaque case flexible indépendamment
         const ll1 = normaliserTexte(ll.label1 || 'Champ A');
         const ll2 = normaliserTexte(ll.label2 || 'Champ B');
-        setBlue();
-        doc.rect(M, hy, UW, L234H, 'F');
-        // Séparateur au milieu
-        const midX = M + UW/2;
-        doc.setDrawColor(255,255,255); doc.setLineWidth(0.5);
-        doc.line(midX, hy, midX, hy+L234H);
-        // Gauche
-        const ll1Y = hy + L234H * 0.65;
-        drawTextWhite(ll1 + ' :', M+5, ll1Y, P.fontEnteteLabel, true);
+        const midX = M + UW / 2;
+
+        doc.setFontSize(P.fontEnteteLabel); doc.setFont('times','bold');
         const ll1W = doc.getTextWidth(ll1 + ' :') + 4;
-        drawInputBox(M+ll1W+8, hy+3, midX-(M+ll1W+8)-2, L234H-6, ll.val1||'', P.fontEnteteContent);
-        // Droite
-        drawTextWhite(ll2 + ' :', midX+5, ll1Y, P.fontEnteteLabel, true);
         const ll2W = doc.getTextWidth(ll2 + ' :') + 4;
-        drawInputBox(midX+ll2W+8, hy+3, endX-(midX+ll2W+8)-4, L234H-6, ll.val2||'', P.fontEnteteContent);
-        hy += L234H;
+
+        const box1X = M + ll1W + 8;
+        const box1W = midX - box1X - 2;
+        const box2X = midX + ll2W + 8;
+        const box2W = endX - box2X - 4;
+
+        const segs1    = htmlToRichSegments(ll.val1 || '');
+        const segs2    = htmlToRichSegments(ll.val2 || '');
+        const needed1  = Math.max(L234H, measureRichTextSegments(segs1, box1W - 4, P.fontEnteteContent) + 8);
+        const needed2  = Math.max(L234H, measureRichTextSegments(segs2, box2W - 4, P.fontEnteteContent) + 8);
+        const rowH     = Math.max(needed1, needed2);
+
+        // Fond bleu
+        setBlue();
+        doc.rect(M, hy, UW, rowH, 'F');
+
+        // Séparateur blanc au milieu
+        doc.setDrawColor(255,255,255); doc.setLineWidth(0.5);
+        doc.line(midX, hy, midX, hy + rowH);
+
+        const labelY = hy + P.fontEnteteLabel * 1.1 + 3;
+
+        // Gauche
+        drawTextWhite(ll1 + ' :', M+5, labelY, P.fontEnteteLabel, true);
+        doc.setFillColor(255,255,255); setBlueStroke(0.5);
+        doc.rect(box1X, hy + 3, box1W, needed1 - 6, 'FD');
+        if (segs1.length > 0) {
+          drawRichTextSegments(segs1, box1X + 2, hy + P.fontEnteteContent * 0.85 + 4, box1W - 4, P.fontEnteteContent, [0,0,0]);
+        }
+
+        // Droite
+        setBlue();
+        drawTextWhite(ll2 + ' :', midX+5, labelY, P.fontEnteteLabel, true);
+        doc.setFillColor(255,255,255); setBlueStroke(0.5);
+        doc.rect(box2X, hy + 3, box2W, needed2 - 6, 'FD');
+        if (segs2.length > 0) {
+          drawRichTextSegments(segs2, box2X + 2, hy + P.fontEnteteContent * 0.85 + 4, box2W - 4, P.fontEnteteContent, [0,0,0]);
+        }
+
+        hy += rowH;
       }
     });
   }
@@ -6411,14 +7643,11 @@ function genererPDF() {
     let supX = M + w0 + w1;
     colsSup.forEach((col, ci) => {
       const wSup = colWidths[2 + ci];
-      const supVal = (etape.supVals && etape.supVals[col.n]) ? normaliserTexte(etape.supVals[col.n]) : '';
-      doc.setFont('times','normal');
-      doc.setTextColor(0,0,0);
-      doc.setFontSize(P.fontTableContent);
-      const supLines = wrapText(supVal, wSup, P.fontTableContent);
-      supLines.forEach((line, li) => {
-        doc.text(line, supX + 2, blockStart + P.fontTableContent * (0.85 + li * 1.3) + 3);
-      });
+      const supHtml = (etape.supVals && etape.supVals[col.n]) ? etape.supVals[col.n] : '';
+      const supSegments = htmlToRichSegments(supHtml);
+      if (supSegments.length > 0) {
+        drawRichTextSegments(supSegments, supX + 2, blockStart + P.fontTableContent * 0.85 + 3, wSup - 4, P.fontTableContent, [0,0,0]);
+      }
       supX += wSup;
     });
 
@@ -6473,15 +7702,45 @@ function genererPDF() {
     // Copyright discret en bas (très petit) avec ID unique invisible
     doc.setFontSize(6);
     doc.setTextColor(180,180,180);
-    doc.text(`\u00A9 EZ-ZAKY AZIZ | App v3.0 | ${uniqueId}`, M, PH-1);
+    doc.text(`\u00A9 EZ-ZAKY AZIZ | App v4.4 | ${uniqueId}`, M, PH-1);
   }
 
   // Sauvegarde — méthode spéciale AppsGeyser WebView
   const safeName = (entete.activite || 'fiche').replace(/[^a-zA-Z0-9\u00C0-\u024F]/gi,'_').slice(0,40);
   const pdfFileName = `FichePedagogique_${safeName}_${entete.niveau || 'N'}.pdf`;
   
-  // Téléchargement direct en un clic
-  doc.save(pdfFileName);
+  if (_autoPrintMode) {
+    // Mode impression directe : ouvrir dans une nouvelle fenêtre et imprimer
+    try {
+      const blobUrl = doc.output('bloburl');
+      const printWin = window.open(blobUrl, '_blank');
+      if (printWin) {
+        printWin.addEventListener('load', function() {
+          setTimeout(function() { printWin.print(); }, 500);
+        });
+      } else {
+        // Fallback si popup bloqué
+        doc.save(pdfFileName);
+        alert('ℹ️ Les popups sont bloquées. Le PDF a été téléchargé.\nOuvrez-le et utilisez Ctrl+P pour imprimer.');
+      }
+    } catch(e) {
+      doc.save(pdfFileName);
+    }
+    _autoPrintMode = false;
+  } else {
+    // Téléchargement direct normal
+    doc.save(pdfFileName);
+  }
+
+  // Sauvegarde automatique dans le répertoire si option activée
+  if (_autoSaveToRep) {
+    setTimeout(function() {
+      enregistrerDansRepertoire(true);
+    }, 300);
+  }
+
+  // Vérification orientation auto si colonnes supplémentaires
+  verifierOrientationAuto();
 
   showToast();
   
@@ -6581,10 +7840,11 @@ buildThemeGrid();
 applyThemePreview();
 
 
-function showToast() {
+function showToast(msg) {
   const t = document.getElementById('toast');
+  if (msg && t) t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  setTimeout(() => { t.classList.remove('show'); if (msg && t) t.textContent = '✅ PDF généré avec succès !'; }, 3500);
 }
 
 // ═══════════════════════════════════════════════════
@@ -7202,6 +8462,9 @@ function genererDOCX() {
           if (currentParagraph.length > 0) {
             output += `<w:p><w:pPr><w:spacing w:before="0" w:after="30"/></w:pPr>${currentParagraph.join('')}</w:p>`;
             currentParagraph = [];
+          } else {
+            // Ligne vide explicite : émettre un paragraphe vide pour préserver le saut de ligne
+            output += `<w:p><w:pPr><w:spacing w:before="0" w:after="30"/></w:pPr></w:p>`;
           }
         } else {
           const txt = x(seg.text);
@@ -7337,7 +8600,7 @@ function genererDOCX() {
         segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize });
         return;
       }
-      if (tag === 'p' || tag === 'h1' || tag === 'h2' || tag === 'h3') {
+      if (tag === 'p' || tag === 'div' || tag === 'h1' || tag === 'h2' || tag === 'h3') {
         Array.from(node.childNodes).forEach(ch => walk(ch, c));
         segments.push({ text: '\n', bold: false, italic: false, underline: false, fontSize: c.fontSize });
         return;
@@ -7452,9 +8715,30 @@ function genererDOCX() {
   if (entete.lignesLibres && entete.lignesLibres.length > 0) {
     entete.lignesLibres.forEach(ll => {
       if (ll.type === 'simple') {
-        llXML += rowFull(ll.label || 'Champ', ll.val1 || '');
+        // rowFullRich pour supporter HTML riche + sauts de ligne + word-wrap
+        llXML += rowFullRich(x(ll.label || 'Champ'), ll.val1 || '');
       } else {
-        llXML += rowDbl(ll.label1||'A', ll.val1||'', ll.label2||'B', ll.val2||'');
+        // Double : deux cellules avec HTML riche chacune
+        llXML += `<w:tr>
+          ${cell(x(ll.label1||'Champ A'),true,true,LBL2_W,false,false)}
+          <w:tc>
+            <w:tcPr>
+              <w:tcW w:w="${VAL2_W}" w:type="dxa"/>
+              <w:shd w:val="clear" w:color="auto" w:fill="FFFFFF"/>
+              ${BDR(rawColor)}${CELL_MAR}
+            </w:tcPr>
+            ${htmlToWParagraphs(ll.val1||'', 18)}
+          </w:tc>
+          ${cell(x(ll.label2||'Champ B'),true,true,LBL2_W,false,false)}
+          <w:tc>
+            <w:tcPr>
+              <w:tcW w:w="${VAL2_W}" w:type="dxa"/>
+              <w:shd w:val="clear" w:color="auto" w:fill="FFFFFF"/>
+              ${BDR(rawColor)}${CELL_MAR}
+            </w:tcPr>
+            ${htmlToWParagraphs(ll.val2||'', 18)}
+          </w:tc>
+        </w:tr>`;
       }
     });
   }
@@ -7508,13 +8792,7 @@ function genererDOCX() {
         ${BDR(rawColor)}${CELL_MAR}
         <w:vAlign w:val="top"/>
       </w:tcPr>
-      <w:p>
-        <w:pPr><w:spacing w:before="40" w:after="40"/></w:pPr>
-        <w:r>
-          <w:rPr><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>
-          <w:t xml:space="preserve">${x((e.supVals && e.supVals[col.n]) || '')}</w:t>
-        </w:r>
-      </w:p>
+      ${htmlToWParagraphs((e.supVals && e.supVals[col.n]) || '', 18)}
     </w:tc>`).join('');
 
     return `<w:tr>
@@ -7557,6 +8835,68 @@ function genererDOCX() {
   </w:tr>`;
   }).join('');
 
+  // ── Logo Word (si présent) ──
+  let logoWordXml = '';
+  if (entete.logo) {
+    try {
+      // Convertir base64 en données pour Word
+      const logoExt = entete.logo.includes('image/jpeg') || entete.logo.includes('image/jpg') ? 'jpeg' :
+                      entete.logo.includes('image/gif') ? 'gif' : 'png';
+      docxImageCounter++;
+      const logoId = docxImageCounter;
+      const logoRId = `rId${logoId + 1}`;
+      // Dimensions : 48pt ≈ logo carré
+      const LOGO_EMU = 640000; // ~1.7cm
+      docxImages.push({ id: logoId, rId: logoRId, src: entete.logo, ext: logoExt });
+
+      const logoImgXml = `<w:drawing>
+        <wp:inline>
+          <wp:extent cx="${LOGO_EMU}" cy="${LOGO_EMU}"/>
+          <wp:docPr id="${logoId}" name="Logo"/>
+          <a:graphic>
+            <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+              <pic:pic>
+                <pic:nvPicPr>
+                  <pic:cNvPr id="${logoId}" name="Logo"/>
+                  <pic:cNvPicPr/>
+                </pic:nvPicPr>
+                <pic:blipFill>
+                  <a:blip r:embed="${logoRId}"/>
+                  <a:stretch><a:fillRect/></a:stretch>
+                </pic:blipFill>
+                <pic:spPr>
+                  <a:xfrm><a:off x="0" y="0"/><a:ext cx="${LOGO_EMU}" cy="${LOGO_EMU}"/></a:xfrm>
+                  <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+                </pic:spPr>
+              </pic:pic>
+            </a:graphicData>
+          </a:graphic>
+        </wp:inline>
+      </w:drawing>`;
+
+      const isRight = entete.logoPosition === 'right';
+      // Ligne avec logo + titre côte à côte
+      logoWordXml = `<w:p>
+        <w:pPr>
+          <w:jc w:val="${isRight ? 'left' : 'left'}"/>
+          <w:spacing w:before="0" w:after="60"/>
+        </w:pPr>
+        ${!isRight ? `<w:r><w:rPr></w:rPr>${logoImgXml}</w:r>` : ''}
+        <w:r>
+          <w:rPr>
+            <w:b/><w:color w:val="${rawColor}"/>
+            <w:sz w:val="24"/><w:szCs w:val="24"/>
+          </w:rPr>
+          <w:tab/>
+          <w:t xml:space="preserve">    FICHE PÉDAGOGIQUE</w:t>
+        </w:r>
+        ${isRight ? `<w:r><w:rPr></w:rPr><w:tab/>${logoImgXml}</w:r>` : ''}
+      </w:p>`;
+    } catch(e) {
+      logoWordXml = '';
+    }
+  }
+
   const etapesTable = `<w:tbl>
     ${TBL_PR()}
     ${headerEtapes}
@@ -7567,7 +8907,7 @@ function genererDOCX() {
   const documentXML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
   <w:body>
-    <w:p>
+    ${entete.logo ? logoWordXml : `<w:p>
       <w:pPr>
         <w:jc w:val="center"/>
         <w:spacing w:before="0" w:after="100"/>
@@ -7579,7 +8919,7 @@ function genererDOCX() {
         </w:rPr>
         <w:t>FICHE PÉDAGOGIQUE</w:t>
       </w:r>
-    </w:p>
+    </w:p>`}
     ${enteteTable}
     <w:p><w:pPr><w:spacing w:before="0" w:after="60"/></w:pPr></w:p>
     ${etapesTable}
@@ -7878,6 +9218,78 @@ const MODELES_FICHES = [
 
 ];
 
+// ─── MODÈLES SUPPLÉMENTAIRES (Primaire / Collège / Lycée) ───────────────────
+const MODELES_EXTRA = [
+  {
+    id:'primaire-lecture',
+    icon:'📗',
+    titre:'Lecture compréhension',
+    soustitre:'Primaire · Français',
+    description:'Séance de lecture guidée avec identification des personnages, lieux et événements principaux.',
+    tags:['primaire','francais'],
+    niveau:'CE2 / CM1',
+    data:{
+      entete:{prof:'',niveau:'CM1',module:'Lecture et compréhension',sequence:'Séquence 1 — Lire et comprendre un texte narratif',activite:'Lecture guidée',support:'Album jeunesse — extrait',
+        objectif:'<ul><li>Identifier les personnages principaux et secondaires</li><li>Situer l\'action dans le temps et l\'espace</li><li>Comprendre les actions des personnages</li><li>Répondre à des questions de compréhension</li></ul>'},
+      etapes:[
+        {nom:'Découverte',enseignant:'<p><strong>🖼️ Mise en situation</strong></p><p>• Afficher la couverture du livre — observer l\'image</p><p>• Questions : <em>"Qui voit-on ? Où se passe l\'histoire ? Que va-t-il se passer ?"</em></p><p>• Hypothèses des élèves notées au tableau</p>',duree:'5 min'},
+        {nom:'Lecture',enseignant:'<p><strong>📖 Lecture individuelle silencieuse</strong></p><p>• Distribution du texte</p><p>• Lecture individuelle et silencieuse</p><p>• Identification des mots difficiles (souligner)</p>',duree:'10 min'},
+        {nom:'Compréhension',enseignant:'<p><strong>💬 Questions de compréhension</strong></p><p>• Qui ? Quoi ? Où ? Quand ? Comment ? Pourquoi ?</p><p>• Correction collective orale</p>',duree:'15 min'},
+        {nom:'Trace écrite',enseignant:'<p><strong>✍️ Bilan collectif</strong></p><p>• Remplissage d\'une fiche personnages / lieux / événements</p><p>• Reformulation de l\'histoire en 3 phrases</p>',duree:'10 min'}
+      ],
+      params:{marge:'8.5',gap:'5',fontEnteteLabel:'11',fontEnteteContent:'10',fontTableHeader:'10',fontTableContent:'9',rowHeight:'8',tableHeaderH:'18',headerH:'100',l1h:'22',l234h:'18',l5h:'40',sep1:'32',sep2:'60',col1:'20',col2:'65',colorMain:'#2E7D32',colorAccent:'#C9A84C',colorGrid:'#AAAAAA',colorEtapeText:'#2E7D32',labelColEtapes:'Étapes',labelColDerou:'Déroulement de la séance',labelColDuree:'Durée'},
+      resume:'4 étapes · 40 min',niveau:'CM1',module:'Lecture et compréhension'
+    }
+  },
+  {
+    id:'college-grammaire',
+    icon:'📘',
+    titre:'Leçon de grammaire',
+    soustitre:'Collège · Français',
+    description:'Construction d\'une règle grammaticale par observation puis application structurée.',
+    tags:['college','francais'],
+    niveau:'5ème / 4ème',
+    data:{
+      entete:{prof:'',niveau:'5ème',module:'Grammaire — La phrase complexe',sequence:'Séquence 2 — La proposition subordonnée relative',activite:'Leçon découverte',support:'Corpus de phrases extraites de textes littéraires',
+        objectif:'<ul><li>Identifier la proposition subordonnée relative dans une phrase complexe</li><li>Reconnaître les pronoms relatifs (qui, que, dont, où)</li><li>Construire des phrases complexes avec relative</li><li>Enrichir ses écrits par l\'emploi de relatives</li></ul>'},
+      etapes:[
+        {nom:'Observation',enseignant:'<p><strong>🔍 Phase d\'observation</strong></p><p>• Distribution du corpus de phrases</p><p>• Souligner les groupes de mots qui en disent plus sur le nom</p><p>• Mise en commun — tableau : phrase simple vs phrase avec relative</p>',duree:'10 min'},
+        {nom:'Analyse',enseignant:'<p><strong>📐 Analyse guidée</strong></p><p>• Identifier l\'antécédent et le pronom relatif</p><p>• Exercice de classement : qui / que / dont / où</p><p>• Rôle syntaxique de chaque pronom</p>',duree:'15 min'},
+        {nom:'Règle',enseignant:'<p><strong>📌 Construction de la règle</strong></p><p>• Formulation collective de la règle</p><p>• Copie dans le cahier de grammaire</p><p>• Exemples complémentaires</p>',duree:'5 min'},
+        {nom:'Application',enseignant:'<p><strong>✏️ Exercices d\'application</strong></p><p>• Relier deux phrases simples avec un pronom relatif</p><p>• Compléter des phrases lacunaires</p><p>• Rédiger 5 phrases complexes originales</p>',duree:'15 min'},
+        {nom:'Correction',enseignant:'<p><strong>✅ Correction collective</strong></p><p>• Mise en commun des productions</p><p>• Identification et correction des erreurs fréquentes</p><p>• Bilan auto-évaluation</p>',duree:'5 min'}
+      ],
+      params:{marge:'8.5',gap:'5',fontEnteteLabel:'11',fontEnteteContent:'10',fontTableHeader:'10',fontTableContent:'9',rowHeight:'8',tableHeaderH:'18',headerH:'100',l1h:'22',l234h:'18',l5h:'40',sep1:'32',sep2:'60',col1:'20',col2:'65',colorMain:'#4A148C',colorAccent:'#C9A84C',colorGrid:'#AAAAAA',colorEtapeText:'#4A148C',labelColEtapes:'Étapes',labelColDerou:'Déroulement de la séance',labelColDuree:'Durée'},
+      resume:'5 étapes · 50 min',niveau:'5ème',module:'Grammaire — La phrase complexe'
+    }
+  },
+  {
+    id:'college-sciences',
+    icon:'🔭',
+    titre:'Séance Sciences physiques',
+    soustitre:'Collège · Physique-Chimie',
+    description:'Démarche expérimentale : hypothèse, protocole, expérience, résultats et conclusion.',
+    tags:['college','physique'],
+    niveau:'4ème / 3ème',
+    data:{
+      entete:{prof:'',niveau:'4ème',module:'Lumières et images',sequence:'Séquence 1 — La propagation rectiligne de la lumière',activite:'Activité expérimentale',support:'Laser, boîte noire, obstacles',
+        objectif:'<ul><li>Vérifier expérimentalement la propagation rectiligne de la lumière</li><li>Mettre en œuvre un protocole expérimental</li><li>Analyser les résultats et formuler une conclusion</li><li>Rédiger un compte-rendu d\'expérience</li></ul>'},
+      etapes:[
+        {nom:'Mise en situation',enseignant:'<p><strong>❓ Questionnement initial</strong></p><p>• Observation : un faisceau laser éclaire-t-il en ligne droite ?</p><p>• Question : comment se propage la lumière ?</p><p>• Hypothèses notées des élèves</p>',duree:'5 min'},
+        {nom:'Protocole',enseignant:'<p><strong>🔬 Protocole expérimental</strong></p><p>• Distribution du matériel : laser, cartons percés, règle</p><p>• Conception du protocole par groupes</p><p>• Validation par le professeur</p>',duree:'10 min'},
+        {nom:'Expérience',enseignant:'<p><strong>⚗️ Réalisation de l\'expérience</strong></p><p>• Expérimentation par groupes de 3</p><p>• Mesures et observations consignées</p><p>• Schéma légendé du dispositif</p>',duree:'15 min'},
+        {nom:'Résultats',enseignant:'<p><strong>📊 Analyse des résultats</strong></p><p>• Mise en commun des observations</p><p>• Confrontation avec les hypothèses initiales</p><p>• Formulation collective de la loi</p>',duree:'10 min'},
+        {nom:'Conclusion',enseignant:'<p><strong>✅ Rédaction de la conclusion</strong></p><p>• Rédaction individuelle du compte-rendu</p><p>• Bilan : la lumière se propage en ligne droite dans un milieu homogène</p>',duree:'10 min'}
+      ],
+      params:{marge:'8.5',gap:'5',fontEnteteLabel:'11',fontEnteteContent:'10',fontTableHeader:'10',fontTableContent:'9',rowHeight:'8',tableHeaderH:'18',headerH:'100',l1h:'22',l234h:'18',l5h:'40',sep1:'32',sep2:'60',col1:'20',col2:'65',colorMain:'#1B5E20',colorAccent:'#C9A84C',colorGrid:'#AAAAAA',colorEtapeText:'#1B5E20',labelColEtapes:'Étapes',labelColDerou:'Déroulement de la séance',labelColDuree:'Durée'},
+      resume:'5 étapes · 50 min',niveau:'4ème',module:'Lumières et images'
+    }
+  }
+];
+
+// Fusion avec les modèles principaux
+MODELES_FICHES.push.apply(MODELES_FICHES, MODELES_EXTRA);
+
 var filtreModeleActif = 'all';
 
 function rendreTousLesModeles() { renderModeles(MODELES_FICHES); }
@@ -7967,7 +9379,7 @@ function sauverModeleRepertoire(id) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// NOUVELLES FONCTIONNALITÉS v3.0
+// NOUVELLES FONCTIONNALITÉS v4.4
 // ═══════════════════════════════════════════════════════════════
 
 // ── EXPORT / IMPORT JSON ──────────────────────────────────────
@@ -8615,7 +10027,7 @@ function genererPreviewSimulee() {
       '<div class="pdf-page-sim">' +
       '<div style="text-align:center;font-size:9px;color:#aaa;margin-bottom:8px;">— Aperçu simulé · non contractuel —</div>' +
       headerHtml + tableHtml +
-      '<div style="text-align:center;font-size:7px;color:#bbb;margin-top:8px;">© EZ-ZAKY AZIZ · v3.0 · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
+      '<div style="text-align:center;font-size:7px;color:#bbb;margin-top:8px;">© EZ-ZAKY AZIZ · v4.4 · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
       '</div>' +
       '<div class="pdf-sim-info">📐 Aperçu approximatif A4 · Le PDF réel peut légèrement différer</div>';
   } catch(err) {
@@ -8623,7 +10035,1214 @@ function genererPreviewSimulee() {
   }
 }
 
-// ── INITIALISATION v3.0 ───────────────────────────────────────
+// ═══════════════════════════════════════════════════
+// ★ HISTORIQUE DES VERSIONS — v4.4 ★
+// ═══════════════════════════════════════════════════
+
+const HIST_KEY     = 'fiche_ped_historique'; // { [nomFiche]: [version1, version2, ...] }
+const HIST_MAX     = 5;   // versions max par fiche
+var   _histCurrent = null; // nom de la fiche dont on affiche l'historique
+
+function _lireHistorique() {
+  try { return JSON.parse(localStorage.getItem(HIST_KEY) || '{}'); } catch(e) { return {}; }
+}
+function _ecrireHistorique(hist) {
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(hist)); } catch(e) {
+    // Si localStorage est plein, supprimer les plus vieilles versions
+    _nettoyerHistorique();
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(hist)); } catch(e2) {}
+  }
+}
+
+function _sauvegarderVersionHistorique(ficheData) {
+  if (!ficheData || !ficheData.nom) return;
+  var hist = _lireHistorique();
+  var nom  = ficheData.nom;
+  if (!hist[nom]) hist[nom] = [];
+  // Créer un snapshot léger : on garde tout sauf les images en base64 dans les étapes (pour économiser l'espace)
+  var snapshot = JSON.parse(JSON.stringify(ficheData));
+  snapshot._versionAt = ficheData.savedAt || new Date().toLocaleString('fr-FR');
+  snapshot._versionId = Date.now();
+  // Limiter à HIST_MAX versions, garder les plus récentes
+  hist[nom].unshift(snapshot);
+  if (hist[nom].length > HIST_MAX) hist[nom] = hist[nom].slice(0, HIST_MAX);
+  _ecrireHistorique(hist);
+}
+
+function _nettoyerHistorique() {
+  // Supprimer la version la plus ancienne de chaque fiche pour libérer de l'espace
+  var hist = _lireHistorique();
+  Object.keys(hist).forEach(function(nom) {
+    if (hist[nom].length > 1) hist[nom] = hist[nom].slice(0, hist[nom].length - 1);
+    else delete hist[nom];
+  });
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(hist)); } catch(e) {}
+}
+
+function ouvrirHistorique(index) {
+  var fiches = lireRepertoire();
+  var f = fiches[index];
+  if (!f) return;
+  _histCurrent = { nom: f.nom, index: index };
+  var hist  = _lireHistorique();
+  var versions = hist[f.nom] || [];
+
+  var overlay = document.getElementById('hist-modal-overlay');
+  var body    = document.getElementById('hist-modal-body');
+  var header  = document.getElementById('hist-modal-header').querySelector('h3');
+  if (!overlay || !body) return;
+  header.textContent = '🕐 Historique — ' + (f.nom || 'Fiche').substring(0, 30);
+
+  if (versions.length === 0) {
+    body.innerHTML = '<div class="hist-empty">' +
+      '<div style="font-size:36px;margin-bottom:10px;">🕐</div>' +
+      '<div style="font-weight:600;color:#6A1B9A;margin-bottom:6px;">Aucune version antérieure</div>' +
+      '<div style="font-size:12px;color:#aaa;line-height:1.6;">L\'historique se construit automatiquement<br>chaque fois que vous écrasez une fiche existante.</div>' +
+    '</div>';
+  } else {
+    body.innerHTML = '<div style="font-size:11px;color:#888;margin-bottom:12px;padding:8px 10px;background:#F3E5F5;border-radius:8px;">' +
+      '💡 <strong>' + versions.length + ' version' + (versions.length > 1 ? 's' : '') + ' sauvegardée' + (versions.length > 1 ? 's' : '') + '</strong> · Max ' + HIST_MAX + ' versions conservées · Les plus anciennes sont supprimées automatiquement' +
+    '</div>' +
+    versions.map(function(v, i) {
+      var nbEtapes = (v.etapes || []).length;
+      var entV     = v.entete || {};
+      var colorV   = (v.params && v.params.colorMain) || '#6A1B9A';
+      var resume   = v.resume || (nbEtapes + ' étape' + (nbEtapes > 1 ? 's' : ''));
+      var module   = stripHtmlSimple(entV.module || v.module || '—').substring(0, 60);
+      var activite = stripHtmlSimple(entV.activite || '—').substring(0, 60);
+      var objectif = stripHtmlSimple(entV.objectif || '—').substring(0, 100);
+
+      return '<div class="hist-version-card">' +
+        '<div class="hist-version-header">' +
+          '<div>' +
+            '<span class="hist-version-label">Version ' + (versions.length - i) + (i === 0 ? ' <span style="background:#6A1B9A;color:white;border-radius:10px;padding:1px 7px;font-size:9px;margin-left:4px;">La plus récente</span>' : '') + '</span>' +
+          '</div>' +
+          '<span class="hist-version-date">🕐 ' + (v._versionAt || '—') + '</span>' +
+        '</div>' +
+        '<div class="hist-version-body">' +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-bottom:6px;">' +
+            '<div><span style="color:' + colorV + ';font-weight:700;">📚 </span>' + module + '</div>' +
+            '<div><span style="color:' + colorV + ';font-weight:700;">🎯 </span>' + activite + '</div>' +
+          '</div>' +
+          '<div style="color:#555;margin-bottom:4px;"><span style="color:' + colorV + ';font-weight:700;">✏️ </span>' + objectif + '</div>' +
+          '<div style="margin-top:4px;">' +
+            '<span style="background:' + colorV + ';color:white;border-radius:10px;padding:1px 8px;font-size:10px;font-weight:700;">' + nbEtapes + ' étape' + (nbEtapes > 1 ? 's' : '') + '</span>' +
+            '<span style="color:#aaa;font-size:10px;margin-left:6px;">' + resume + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="hist-version-actions">' +
+          '<button class="btn-hist-restore" onclick="restaurerVersion(\'' + f.nom.replace(/'/g, "\\'") + '\',' + i + ')">↩️ Restaurer cette version</button>' +
+          '<button class="btn-hist-delete" onclick="supprimerVersion(\'' + f.nom.replace(/'/g, "\\'") + '\',' + i + ')">🗑️</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  overlay.classList.add('show');
+}
+
+function fermerHistModal(e) {
+  if (e && e.target !== document.getElementById('hist-modal-overlay')) return;
+  document.getElementById('hist-modal-overlay').classList.remove('show');
+  _histCurrent = null;
+}
+
+function restaurerVersion(nomFiche, versionIndex) {
+  var hist = _lireHistorique();
+  var versions = hist[nomFiche] || [];
+  var v = versions[versionIndex];
+  if (!v) return;
+
+  afficherModal({
+    icon: '↩️',
+    title: 'Restaurer cette version ?',
+    body: '<p style="margin-bottom:10px;">La version du <strong>' + (v._versionAt || '?') + '</strong> va être restaurée dans le répertoire.</p>' +
+      '<p style="font-size:12px;color:#E65100;">⚠️ La version actuelle de <strong>"' + nomFiche + '"</strong> sera d\'abord sauvegardée dans l\'historique avant d\'être remplacée.</p>',
+    buttons: [
+      { text: '↩️ Restaurer', style: 'background:#6A1B9A;color:white;', onClick: function() {
+        var fiches = lireRepertoire();
+        var idx    = fiches.findIndex(function(f){ return f.nom === nomFiche; });
+        // Sauvegarder la version courante dans l'historique
+        if (idx !== -1) _sauvegarderVersionHistorique(fiches[idx]);
+        // Supprimer la version restaurée de l'historique
+        hist[nomFiche].splice(versionIndex, 1);
+        if (hist[nomFiche].length === 0) delete hist[nomFiche];
+        _ecrireHistorique(hist);
+        // Reconstruire la fiche restaurée
+        var restored     = JSON.parse(JSON.stringify(v));
+        restored.savedAt = new Date().toLocaleString('fr-FR');
+        restored._versionAt = undefined;
+        restored._versionId = undefined;
+        if (idx !== -1) { fiches[idx] = restored; }
+        else { fiches.unshift(restored); }
+        ecrireRepertoire(fiches);
+        afficherRepertoire();
+        fermerHistModal();
+        showToast('↩️ Version restaurée avec succès !');
+      }},
+      { text: 'Annuler', style: 'background:#f5f5f5;color:#666;border:1px solid #ddd;', onClick: function(){} }
+    ]
+  });
+}
+
+function supprimerVersion(nomFiche, versionIndex) {
+  afficherModal({
+    icon: '🗑️',
+    title: 'Supprimer cette version ?',
+    body: '<p>Cette version sera définitivement supprimée de l\'historique.<br><span style="color:#C62828;font-size:12px;">Action irréversible.</span></p>',
+    buttons: [
+      { text: '🗑️ Supprimer', style: 'background:#C62828;color:white;', onClick: function() {
+        var hist = _lireHistorique();
+        if (hist[nomFiche]) {
+          hist[nomFiche].splice(versionIndex, 1);
+          if (hist[nomFiche].length === 0) delete hist[nomFiche];
+          _ecrireHistorique(hist);
+        }
+        // Rafraîchir le modal
+        var fiches = lireRepertoire();
+        var idx    = fiches.findIndex(function(f){ return f.nom === nomFiche; });
+        if (idx !== -1) ouvrirHistorique(idx);
+        else fermerHistModal();
+      }},
+      { text: 'Annuler', style: 'background:#f5f5f5;color:#666;border:1px solid #ddd;', onClick: function(){} }
+    ]
+  });
+}
+
+// Nettoyer l'historique quand on supprime une fiche du répertoire
+function _supprimerHistoriqueFiche(nomFiche) {
+  var hist = _lireHistorique();
+  if (hist[nomFiche]) {
+    delete hist[nomFiche];
+    _ecrireHistorique(hist);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// ★ FIN HISTORIQUE DES VERSIONS ★
+// ═══════════════════════════════════════════════════
+
+// ── Helper HTML strip simple ──
+function stripHtmlSimple(html) {
+  if (!html) return '';
+  return html.replace(/<[^>]+>/g, '').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ').trim();
+}
+
+// ═══════════════════════════════════════════════════
+// ★ EXPORT GROUPÉ — v4.4 ★
+// ═══════════════════════════════════════════════════
+
+var _modeSelection  = false;
+var _selectedFiches = new Set(); // indices dans lireRepertoire()
+
+function activerModeSelection() {
+  _modeSelection = true;
+  _selectedFiches.clear();
+  var bar = document.getElementById('rep-select-bar');
+  var btn = document.getElementById('btn-mode-select');
+  if (bar) bar.classList.add('active');
+  if (btn) btn.style.display = 'none';
+  _majCompteurSelection();
+  afficherRepertoire();
+}
+
+function desactiverModeSelection() {
+  _modeSelection = false;
+  _selectedFiches.clear();
+  var bar = document.getElementById('rep-select-bar');
+  var btn = document.getElementById('btn-mode-select');
+  if (bar) bar.classList.remove('active');
+  if (btn) btn.style.display = '';
+  afficherRepertoire();
+}
+
+function toggleSelectFiche(idx, checked) {
+  if (checked) {
+    _selectedFiches.add(idx);
+  } else {
+    _selectedFiches.delete(idx);
+  }
+  // Mettre à jour visuellement la carte
+  var card = document.getElementById('rep-card-' + idx);
+  if (card) {
+    card.classList.toggle('selected', _selectedFiches.has(idx));
+    var cb = card.querySelector('.rep-card-checkbox');
+    if (cb) cb.checked = _selectedFiches.has(idx);
+    var btnSel = card.querySelector('.btn-rep-ouvrir');
+    if (btnSel && _modeSelection) btnSel.textContent = _selectedFiches.has(idx) ? '✅ Sélectionnée' : '☐ Sélectionner';
+  }
+  _majCompteurSelection();
+}
+
+function _majCompteurSelection() {
+  var n = _selectedFiches.size;
+  var span = document.getElementById('rep-select-count');
+  if (span) span.textContent = n;
+  var btnExp = document.getElementById('btn-export-groupe');
+  if (btnExp) btnExp.disabled = n < 1;
+}
+
+// ── Moteur de rendu d'une fiche sur un doc jsPDF existant ──
+function _rendreFicheSurDoc(doc, ficheData, isFirstPage) {
+  // Reconstruire les paramètres depuis ficheData.params
+  var p = ficheData.params || {};
+  var entete = ficheData.entete || {};
+  var etapes  = ficheData.etapes  || [];
+
+  // Paramètres de mise en page
+  var marge  = parseFloat(p.marge)  || 8.5;
+  var gap    = parseFloat(p.gap)    || 5;
+
+  var fontEL  = parseFloat(p.fontEnteteLabel)   || 11;
+  var fontEC  = parseFloat(p.fontEnteteContent) || 10;
+  var fontTH  = parseFloat(p.fontTableHeader)   || 10;
+  var fontTC  = parseFloat(p.fontTableContent)  || 9;
+  var rowH    = parseFloat(p.rowHeight)         || 8;
+  var tblHH   = parseFloat(p.tableHeaderH)      || 18;
+
+  var l1h     = parseFloat(p.l1h)   || 22;
+  var l234h   = parseFloat(p.l234h) || 18;
+  var l5h     = parseFloat(p.l5h)   || 40;
+  var sep1    = (parseFloat(p.sep1) || 32) / 100;
+  var sep2    = (parseFloat(p.sep2) || 60) / 100;
+
+  var col1pct = (parseFloat(p.col1) || 20) / 100;
+  var col2Raw = parseFloat(p.col2) || 65;
+  var colsSup = p.colsSup || [];
+  var totalSupPct = colsSup.reduce(function(s,c){ return s + (c.width||0); }, 0);
+  var col2pct = Math.max(10, col2Raw - totalSupPct) / 100;
+  var col3pct = (100 - (parseFloat(p.col1)||20) - col2Raw) / 100;
+
+  var colorMain   = p.colorMain   || '#1565C0';
+  var colorGrid   = p.colorGrid   || '#AAAAAA';
+  var colorEtape  = p.colorEtapeText || colorMain;
+  var colorAccent = p.colorAccent || '#C9A84C';
+
+  var labelEtapes  = p.labelColEtapes      || 'Étapes';
+  var labelDerou   = p.labelColDerou || p.labelColDeroulement || 'Déroulement de la séance';
+  var labelDuree   = p.labelColDuree       || 'Durée';
+
+  var PW = doc.internal.pageSize.width;
+  var PH = doc.internal.pageSize.height;
+  var M  = marge;
+  var UW = PW - 2 * M;
+
+  if (!isFirstPage) doc.addPage();
+
+  var [mr, mg, mb] = hexToRgb(colorMain);
+  var [gr, gg, gb] = hexToRgb(colorGrid);
+  var [er, eg, eb] = hexToRgb(colorEtape);
+
+  function setBlue()  { doc.setFillColor(mr,mg,mb); doc.setDrawColor(mr,mg,mb); }
+  function setWhite() { doc.setFillColor(255,255,255); doc.setDrawColor(255,255,255); }
+  function setGray()  { doc.setDrawColor(gr,gg,gb); }
+
+  var normaliser = typeof normaliserTexte === 'function' ? normaliserTexte : function(t){ return t||''; };
+  var htmlToRuns = typeof htmlToColoredRuns === 'function' ? htmlToColoredRuns : function(h){ return [{text: stripHtmlSimple(h), bold:false, italic:false, color:null, background:null, size:null}]; };
+  var drawRichLine = typeof dessinerLigneRiche === 'function' ? dessinerLigneRiche : null;
+
+  // ── EN-TÊTE simple (version compacte robuste) ──
+  var y = M;
+  var lineH = l1h;
+
+  // Logo éventuel
+  var logoB64 = ficheData.logo || null;
+  var logoPos = ficheData.logoPosition || 'left';
+  var logoW = 0;
+  if (logoB64) {
+    logoW = 40;
+    var lx = logoPos === 'right' ? PW - M - logoW : M;
+    try { doc.addImage(logoB64, lx, y, logoW, logoW); } catch(e){}
+    if (logoPos === 'left') { M = marge + logoW + 4; UW = PW - M - marge; }
+  }
+
+  // Fonction helper : dessiner une rangée d'en-tête
+  function rowEntete(labels, vals, h, yPos) {
+    var totalW = UW;
+    var nCols  = labels.length;
+    var colW   = totalW / nCols;
+    // Si 2 colonnes avec séparateur
+    if (nCols === 2) {
+      var w1 = UW * sep1; var w2 = UW * (1 - sep1);
+      var cols = [[labels[0], vals[0], w1],[labels[1], vals[1], w2]];
+      var cx = M;
+      cols.forEach(function(col) {
+        // Label bg
+        setBlue();
+        doc.rect(cx, yPos, col[2], h, 'F');
+        // Valeur bg
+        doc.setFillColor(255,255,255);
+        doc.rect(cx, yPos, col[2], h, 'S');
+        // Label text
+        doc.setFillColor(255,255,255); doc.setTextColor(255,255,255);
+        doc.setFontSize(fontEL); doc.setFont('times','bold');
+        doc.text(normaliser(col[0]), cx+2, yPos+h*0.65);
+        // Value text
+        doc.setTextColor(30,30,30); doc.setFont('times','normal');
+        doc.setFontSize(fontEC);
+        var labelW2 = doc.getTextWidth(normaliser(col[0]))+4;
+        doc.text(normaliser(col[1]||'—'), cx+labelW2+2, yPos+h*0.65);
+        cx += col[2];
+      });
+    }
+    return yPos + h;
+  }
+
+  // Ligne 1 : Prof | Niveau
+  var profLabel   = entete.labelProf    || 'Professeur';
+  var niveauLabel = entete.labelNiveau  || 'Niveau';
+  var moduleLabel = entete.labelModule  || 'Module';
+  var seqLabel    = entete.labelSequence|| 'Séquence';
+  var actLabel    = entete.labelActivite|| 'Activité';
+  var supLabel    = entete.labelSupport || 'Support';
+  var objLabel    = entete.labelObjectif|| 'Objectif';
+
+  // Dessiner l'en-tête complet avec jsPDF directement
+  function drawHeaderRow(lbl, val, rowY, rowH2, fullWidth) {
+    var lblW = fullWidth ? UW * sep1 : UW * sep1;
+    // Background ligne alternée
+    doc.setFillColor(mr, mg, mb);
+    doc.setDrawColor(mr, mg, mb);
+    doc.setLineWidth(0.5);
+    doc.rect(M, rowY, UW, rowH2, 'S');
+    // Label cell
+    doc.setFillColor(mr, mg, mb);
+    doc.rect(M, rowY, lblW, rowH2, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('times', 'bold');
+    doc.setFontSize(fontEL);
+    doc.text(normaliser(lbl), M+2, rowY + rowH2*0.68);
+    // Value cell
+    doc.setFillColor(255,255,255);
+    doc.rect(M + lblW, rowY, UW - lblW, rowH2, 'F');
+    doc.setTextColor(30,30,30);
+    doc.setFont('times', 'normal');
+    doc.setFontSize(fontEC);
+    doc.text(normaliser(val||'—').substring(0,120), M + lblW + 2, rowY + rowH2*0.68);
+    return rowY + rowH2;
+  }
+
+  function drawDualRow(lbl1, val1, lbl2, val2, rowY, rowH2) {
+    var half = UW / 2;
+    doc.setFillColor(mr,mg,mb); doc.setDrawColor(mr,mg,mb); doc.setLineWidth(0.5);
+    doc.rect(M, rowY, UW, rowH2, 'S');
+    // Left label
+    doc.setFillColor(mr,mg,mb); doc.rect(M, rowY, half*sep1*2, rowH2, 'F');
+    doc.setTextColor(255,255,255); doc.setFont('times','bold'); doc.setFontSize(fontEL);
+    doc.text(normaliser(lbl1), M+2, rowY+rowH2*0.68);
+    // Left value
+    var lblW1 = half*sep1*2;
+    doc.setFillColor(255,255,255); doc.rect(M+lblW1, rowY, half-lblW1, rowH2, 'F');
+    doc.setTextColor(30,30,30); doc.setFont('times','normal'); doc.setFontSize(fontEC);
+    doc.text(normaliser(val1||'—').substring(0,50), M+lblW1+2, rowY+rowH2*0.68);
+    // Right label
+    doc.setFillColor(mr,mg,mb); doc.rect(M+half, rowY, half*sep1*2, rowH2, 'F');
+    doc.setTextColor(255,255,255); doc.setFont('times','bold'); doc.setFontSize(fontEL);
+    doc.text(normaliser(lbl2), M+half+2, rowY+rowH2*0.68);
+    // Right value
+    doc.setFillColor(255,255,255); doc.rect(M+half+lblW1, rowY, half-lblW1, rowH2, 'F');
+    doc.setTextColor(30,30,30); doc.setFont('times','normal'); doc.setFontSize(fontEC);
+    doc.text(normaliser(val2||'—').substring(0,50), M+half+lblW1+2, rowY+rowH2*0.68);
+    return rowY + rowH2;
+  }
+
+  // Dessiner l'en-tête
+  var dateSeance = ficheData.dateSeance || '';
+  y = drawDualRow(profLabel, stripHtmlSimple(entete.prof||''), niveauLabel, stripHtmlSimple(entete.niveau||''), y, l1h);
+  y = drawHeaderRow(moduleLabel, stripHtmlSimple(entete.module||''), y, l234h, true);
+  y = drawHeaderRow(seqLabel, stripHtmlSimple(entete.sequence||''), y, l234h, true);
+  if (dateSeance) {
+    y = drawDualRow(actLabel, stripHtmlSimple(entete.activite||''), 'Date', dateSeance, y, l234h);
+  } else {
+    y = drawDualRow(actLabel, stripHtmlSimple(entete.activite||''), supLabel, stripHtmlSimple(entete.support||''), y, l234h);
+  }
+  // Objectif (multi-lignes)
+  var objText = normaliser(stripHtmlSimple(entete.objectif||''));
+  var lblW = UW * sep1;
+  doc.setFillColor(mr,mg,mb); doc.rect(M, y, lblW, l5h, 'F');
+  doc.setTextColor(255,255,255); doc.setFont('times','bold'); doc.setFontSize(fontEL);
+  doc.text(normaliser(objLabel), M+2, y+l5h*0.35);
+  doc.setFillColor(255,255,255); doc.rect(M+lblW, y, UW-lblW, l5h, 'F');
+  doc.setTextColor(30,30,30); doc.setFont('times','normal'); doc.setFontSize(fontEC);
+  doc.setDrawColor(mr,mg,mb); doc.rect(M, y, UW, l5h, 'S');
+  var objLines = doc.splitTextToSize(objText, UW-lblW-4);
+  objLines.slice(0,4).forEach(function(line, i) {
+    doc.text(line, M+lblW+2, y+fontEC+i*(fontEC+1.5));
+  });
+  y += l5h;
+
+  // Lignes libres supplémentaires
+  if (ficheData.lignesLibres && ficheData.lignesLibres.length) {
+    ficheData.lignesLibres.forEach(function(ll) {
+      if (!ll) return;
+      var val1 = stripHtmlSimple(ll.val1||'');
+      var val2 = ll.val2 !== undefined ? stripHtmlSimple(ll.val2||'') : null;
+      if (val2 !== null) {
+        y = drawDualRow(ll.label1||'', val1, ll.label2||'', val2, y, l234h);
+      } else {
+        y = drawHeaderRow(ll.label1||'', val1, y, l234h, true);
+      }
+    });
+  }
+
+  y += gap;
+
+  // ── TABLEAU DES ÉTAPES ──
+  var colWidths = [UW*col1pct, UW*col2pct];
+  colsSup.forEach(function(c){ colWidths.push(UW*(c.width/100)); });
+  colWidths.push(UW*col3pct);
+  var colHeaders = [labelEtapes, labelDerou];
+  colsSup.forEach(function(c){ colHeaders.push(c.label||''); });
+  colHeaders.push(labelDuree);
+
+  // Header du tableau
+  setBlue(); doc.setLineWidth(0.5);
+  var cx2 = M;
+  colHeaders.forEach(function(h2, i) {
+    doc.setFillColor(mr,mg,mb); doc.rect(cx2, y, colWidths[i], tblHH, 'F');
+    doc.setTextColor(255,255,255); doc.setFont('times','bold'); doc.setFontSize(fontTH);
+    var tw = doc.getTextWidth(normaliser(h2));
+    doc.text(normaliser(h2), cx2 + colWidths[i]/2 - tw/2, y+tblHH*0.72);
+    cx2 += colWidths[i];
+  });
+  y += tblHH;
+
+  // Lignes étapes
+  etapes.forEach(function(et, ei) {
+    var nomEt  = normaliser(stripHtmlSimple(et.nom||String(ei+1)));
+    var deroul = normaliser(stripHtmlSimple(et.enseignant||''));
+    var duree  = normaliser(et.duree||'—');
+
+    // Calculer hauteur de ligne
+    var deroulLines = doc.splitTextToSize(deroul, colWidths[1]-4);
+    var minH = Math.max(rowH*3, (deroulLines.length)*(fontTC+1.5)+4);
+    var lineY = y;
+
+    // Fond alterné
+    doc.setFillColor(ei%2===0 ? 252:246, ei%2===0 ? 252:248, 255);
+    doc.rect(M, lineY, UW, minH, 'F');
+
+    // Bordures
+    doc.setDrawColor(gr,gg,gb); doc.setLineWidth(0.3);
+    var cx3 = M;
+    colWidths.forEach(function(w) {
+      doc.rect(cx3, lineY, w, minH, 'S');
+      cx3 += w;
+    });
+
+    // Nom étape
+    doc.setTextColor(er,eg,eb); doc.setFont('times','bold'); doc.setFontSize(fontTH);
+    var nomW = doc.getTextWidth(nomEt);
+    doc.text(nomEt, M + colWidths[0]/2 - nomW/2, lineY + minH/2 + fontTH/3);
+
+    // Déroulement
+    doc.setTextColor(30,30,30); doc.setFont('times','normal'); doc.setFontSize(fontTC);
+    var cx4 = M + colWidths[0];
+    deroulLines.slice(0, Math.floor((minH-2)/(fontTC+1.5))).forEach(function(line, li) {
+      doc.text(line, cx4+2, lineY+fontTC+li*(fontTC+1.5)+1);
+    });
+
+    // Colonnes sup
+    var cx5 = M + colWidths[0] + colWidths[1];
+    colsSup.forEach(function(col, ci) {
+      var supVal = normaliser(stripHtmlSimple((et.supVals && et.supVals[col.n])||''));
+      doc.text(supVal.substring(0,40), cx5+2, lineY+minH/2+fontTC/3);
+      cx5 += colWidths[2+ci];
+    });
+
+    // Durée
+    doc.setTextColor(mr,mg,mb); doc.setFont('times','bold'); doc.setFontSize(fontTH);
+    var durW = doc.getTextWidth(duree);
+    doc.text(duree, cx5 + colWidths[colWidths.length-1]/2 - durW/2, lineY + minH/2 + fontTH/3);
+
+    y += minH;
+
+    // Nouvelle page si débordement
+    if (y > PH - M - 20 && ei < etapes.length-1) {
+      doc.addPage();
+      y = M;
+    }
+  });
+
+  // Pied de page
+  doc.setFontSize(8); doc.setTextColor(150,150,150); doc.setFont('times','normal');
+  doc.text(new Date().toLocaleDateString('fr-FR'), M, PH-5);
+  doc.text(normaliser(stripHtmlSimple(entete.prof||'')), PW-M, PH-5, {align:'right'});
+  doc.setFontSize(6); doc.setTextColor(200,200,200);
+  doc.text('\u00A9 EZ-ZAKY AZIZ | App v4.4', M, PH-1);
+
+  // Rétablir marge si logo gauche
+  if (logoB64 && logoPos === 'left') { /* marge locale, pas besoin de reset */ }
+}
+
+// ── Export groupé principal ──
+function exporterGroupePDF() {
+  if (_selectedFiches.size === 0) return;
+  if (typeof window.jspdf === 'undefined') {
+    alert('⚠️ La bibliothèque PDF n\'est pas chargée. Vérifiez votre connexion internet.');
+    return;
+  }
+
+  var fiches   = lireRepertoire();
+  var indices  = Array.from(_selectedFiches).sort(function(a,b){ return a-b; });
+  var selected = indices.map(function(i){ return fiches[i]; }).filter(Boolean);
+
+  if (!selected.length) return;
+
+  // Nommer le dossier
+  var nomDossier = 'DossierPDF_' + selected.length + 'fiches_' + new Date().toLocaleDateString('fr-FR').replace(/\//g,'-');
+
+  afficherModal({
+    icon: '📦',
+    title: 'Exporter ' + selected.length + ' fiche(s) en PDF groupé',
+    body: '<p style="margin-bottom:10px;">Les <strong>' + selected.length + ' fiches</strong> sélectionnées seront fusionnées en un seul PDF multi-pages, dans l\'ordre d\'affichage.</p>' +
+      '<div style="background:#E3F2FD;border-radius:8px;padding:8px 12px;font-size:11px;color:#1565C0;margin-bottom:10px;">' +
+        selected.map(function(f,i){ return '<div>📋 ' + (i+1) + '. ' + (f.nom||'Fiche') + '</div>'; }).join('') +
+      '</div>' +
+      '<label style="font-size:12px;font-weight:600;color:#333;display:block;margin-bottom:4px;">Nom du fichier :</label>' +
+      '<input id="modal-export-nom" type="text" value="' + nomDossier + '" style="width:100%;padding:8px 10px;border:1.5px solid #ddd;border-radius:8px;font-size:12px;font-family:\'Source Serif 4\',serif;">',
+    buttons: [
+      { text: '📦 Générer le PDF groupé', style: 'background:#1565C0;color:white;', onClick: function() {
+        var nom = (document.getElementById('modal-export-nom')?.value || nomDossier).trim() || nomDossier;
+        _lancerExportGroupe(selected, nom);
+      }},
+      { text: 'Annuler', style: 'background:#f5f5f5;color:#666;border:1px solid #ddd;', onClick: function(){} }
+    ]
+  });
+}
+
+function _lancerExportGroupe(fiches, nomFichier) {
+  var overlay = document.getElementById('export-groupe-progress');
+  var bar     = document.getElementById('export-groupe-progress-bar');
+  var label   = document.getElementById('export-groupe-progress-label');
+  var count   = document.getElementById('export-groupe-progress-count');
+  if (overlay) overlay.classList.add('show');
+
+  setTimeout(function() {
+    try {
+      var { jsPDF } = window.jspdf;
+      var doc = new jsPDF({ orientation: _pdfOrientation || 'portrait', unit: 'pt', format: 'a4', putOnlyUsedFonts: true });
+
+      fiches.forEach(function(fiche, i) {
+        if (label) label.textContent = 'Génération : ' + (fiche.nom || 'Fiche ' + (i+1)) + '…';
+        if (count) count.textContent = (i+1) + ' / ' + fiches.length;
+        if (bar)   bar.style.width   = Math.round(((i+1)/fiches.length)*100) + '%';
+        _rendreFicheSurDoc(doc, fiche, i === 0);
+      });
+
+      // Numérotation globale des pages
+      var totalPages = doc.getNumberOfPages();
+      for (var p = 1; p <= totalPages; p++) {
+        doc.setPage(p);
+        doc.setFontSize(8); doc.setTextColor(150,150,150);
+        doc.text('Page ' + p + ' / ' + totalPages,
+          doc.internal.pageSize.width / 2,
+          doc.internal.pageSize.height - 5,
+          { align: 'center' });
+      }
+
+      var safeName = nomFichier.replace(/[^a-zA-Z0-9\u00C0-\u024F_\-]/gi,'_').slice(0,60);
+      doc.save(safeName + '.pdf');
+
+      if (overlay) overlay.classList.remove('show');
+      desactiverModeSelection();
+      showToast('📦 PDF groupé généré — ' + fiches.length + ' fiches !');
+
+    } catch(err) {
+      if (overlay) overlay.classList.remove('show');
+      console.error('Erreur export groupé:', err);
+      alert('❌ Erreur lors de la génération : ' + err.message);
+    }
+  }, 80); // petit délai pour que l'overlay apparaisse avant le calcul lourd
+}
+
+// ═══════════════════════════════════════════════════
+// ★ FIN EXPORT GROUPÉ ★
+// ═══════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════
+// MODE SOMBRE — v4.4
+// ═══════════════════════════════════════════════════
+var _darkMode = false;
+
+function toggleDarkMode() {
+  _darkMode = !_darkMode;
+  document.body.classList.toggle('dark-mode', _darkMode);
+  var btn = document.getElementById('dark-toggle');
+  if (btn) btn.textContent = _darkMode ? '☀️' : '🌙';
+  try { localStorage.setItem('fp_dark_mode', _darkMode ? '1' : '0'); } catch(e) {}
+}
+
+function initDarkMode() {
+  try {
+    var saved = localStorage.getItem('fp_dark_mode');
+    if (saved === '1') {
+      _darkMode = true;
+      document.body.classList.add('dark-mode');
+      var btn = document.getElementById('dark-toggle');
+      if (btn) btn.textContent = '☀️';
+    }
+  } catch(e) {}
+}
+
+window.addEventListener('load', function() {
+  initDarkMode();
+});
+
+// ═══════════════════════════════════════════════════
+// ★ MODE LECTURE SEULE — HTML STATIQUE — v4.4 ★
+// ═══════════════════════════════════════════════════
+
+function exporterHtmlLectureSeule() {
+  var entete = collecterEntete();
+  var etapes = collecterEtapes();
+  var P      = collecterParams();
+  if (!entete.module && !entete.activite) {
+    alert('Veuillez remplir au moins le module et l\'activité avant de générer la version lecture seule.');
+    showTab('entete'); return;
+  }
+  var ficheData = {
+    entete: entete,
+    etapes: etapes,
+    params: {
+      colorMain: P.colorMain,
+      colorAccent: P.colorAccent,
+      labelColEtapes: P.labelColEtapes,
+      labelColDeroulement: P.labelColDeroulement,
+      labelColDuree: P.labelColDuree,
+      colsSup: P.colsSup || []
+    },
+    nom: [entete.activite, entete.niveau].filter(Boolean).join(' — '),
+    dateExport: new Date().toLocaleDateString('fr-FR')
+  };
+  _genererEtTelechargnerHTML(ficheData);
+}
+
+function exporterHtmlFicheRepertoire(index) {
+  var fiches = lireRepertoire();
+  var f = fiches[index];
+  if (!f) return;
+  var ficheData = {
+    entete: f.entete || {},
+    etapes: f.etapes || [],
+    params: f.params || {},
+    nom: f.nom || 'Fiche',
+    dateExport: new Date().toLocaleDateString('fr-FR')
+  };
+  _genererEtTelechargnerHTML(ficheData);
+}
+
+function partagerHtmlLectureSeule() {
+  afficherModal({
+    icon: '📧',
+    title: 'Partager la version lecture seule',
+    body: '<p style="margin-bottom:10px;">La version HTML sera téléchargée. Vous pourrez ensuite :</p>' +
+      '<div style="display:grid;gap:6px;font-size:12px;">' +
+        '<div style="background:#E3F2FD;border-radius:6px;padding:8px 10px;">📎 Joindre le fichier .html à un email</div>' +
+        '<div style="background:#E8F5E9;border-radius:6px;padding:8px 10px;">💬 L\'envoyer via WhatsApp / Telegram</div>' +
+        '<div style="background:#FFF3E0;border-radius:6px;padding:8px 10px;">☁️ Le déposer sur Google Drive et partager le lien</div>' +
+      '</div>',
+    buttons: [
+      { text: '⬇️ Télécharger le HTML', style: 'background:#1565C0;color:white;', onClick: function() { exporterHtmlLectureSeule(); }},
+      { text: 'Annuler', style: 'background:#f5f5f5;color:#666;border:1px solid #ddd;', onClick: function(){} }
+    ]
+  });
+}
+
+function _genererEtTelechargnerHTML(ficheData) {
+  var html = _construireHtmlLectureSeule(ficheData);
+  var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  var safeName = (ficheData.nom || 'fiche').replace(/[^a-zA-Z0-9\u00C0-\u024F]/gi,'_').slice(0,50);
+  a.href     = url;
+  a.download = 'FichePeda_' + safeName + '.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  showToast('👁️ Version lecture seule générée !');
+}
+
+function _construireHtmlLectureSeule(ficheData) {
+  var entete     = ficheData.entete || {};
+  var etapes     = ficheData.etapes || [];
+  var p          = ficheData.params || {};
+  var colorMain  = p.colorMain  || '#1565C0';
+  var colorAccent= p.colorAccent|| '#C9A84C';
+  var nom        = ficheData.nom || 'Fiche pédagogique';
+  var dateExp    = ficheData.dateExport || new Date().toLocaleDateString('fr-FR');
+  var colsSup    = p.colsSup || [];
+  var labelEtapes= p.labelColEtapes    || 'Étapes';
+  var labelDerou = p.labelColDeroulement || p.labelColDerou || 'Déroulement de la séance';
+  var labelDuree = p.labelColDuree     || 'Durée';
+
+  function safe(v) {
+    if (!v) return '—';
+    return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  // Garder le HTML des champs rich (déroulement) pour l'afficher fidèlement
+  function safeRich(v) {
+    if (!v) return '<em style="color:#aaa;">—</em>';
+    // Neutraliser les scripts
+    return String(v).replace(/<script[\s\S]*?<\/script>/gi,'').replace(/on\w+="[^"]*"/gi,'');
+  }
+
+  var lignesLibresHtml = '';
+  if (entete.lignesLibres && entete.lignesLibres.length) {
+    entete.lignesLibres.forEach(function(ll) {
+      if (!ll) return;
+      if (ll.val2 !== undefined) {
+        lignesLibresHtml += '<tr><th>' + safe(ll.label1||'') + '</th><td>' + safe(ll.val1||'') + '</td><th>' + safe(ll.label2||'') + '</th><td>' + safe(ll.val2||'') + '</td></tr>';
+      } else {
+        lignesLibresHtml += '<tr><th>' + safe(ll.label1||'') + '</th><td colspan="3">' + safe(ll.val1||'') + '</td></tr>';
+      }
+    });
+  }
+
+  var colsSupHeaders = colsSup.map(function(c){ return '<th style="width:' + (c.width||10) + '%">' + safe(c.label||'') + '</th>'; }).join('');
+
+  var etapesHtml = etapes.length ? etapes.map(function(et, i) {
+    var supCells = colsSup.map(function(c){
+      return '<td class="sup-cell">' + safeRich((et.supVals && et.supVals[c.n]) || '') + '</td>';
+    }).join('');
+    return '<tr>' +
+      '<td class="etape-nom">' + safe(et.nom || String(i+1)) + '</td>' +
+      '<td class="etape-derou">' + safeRich(et.enseignant || '') + '</td>' +
+      supCells +
+      '<td class="etape-duree">' + safe(et.duree || '—') + '</td>' +
+    '</tr>';
+  }).join('') : '<tr><td colspan="' + (3 + colsSup.length) + '" style="text-align:center;color:#aaa;padding:20px;">Aucune étape définie</td></tr>';
+
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${safe(nom)} — Fiche Pédagogique</title>
+<meta name="description" content="Fiche pédagogique — lecture seule — générée par l'application EZ-ZAKY AZIZ">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: Georgia, 'Times New Roman', serif; background:#F7F5F0; color:#1A1A2E; padding:20px; }
+  .wrapper { max-width:900px; margin:0 auto; }
+
+  /* ── Bandeau supérieur ── */
+  .top-bar {
+    background: linear-gradient(135deg, ${colorMain}, ${colorMain}CC);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .top-bar-title { font-size: 16px; font-weight: 700; font-family: 'Palatino Linotype', Georgia, serif; }
+  .top-bar-meta  { font-size: 11px; opacity: 0.85; }
+  .readonly-badge {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── En-tête fiche ── */
+  .entete-table { width:100%; border-collapse:collapse; background:white; border:2px solid ${colorMain}; }
+  .entete-table th {
+    background: ${colorMain};
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 8px;
+    text-align: left;
+    white-space: nowrap;
+    width: 90px;
+  }
+  .entete-table td {
+    padding: 5px 10px;
+    font-size: 12px;
+    border-bottom: 1px solid ${colorMain}33;
+    vertical-align: top;
+  }
+  .entete-table tr:last-child td,
+  .entete-table tr:last-child th { border-bottom: none; }
+
+  /* ── Tableau étapes ── */
+  .etapes-table { width:100%; border-collapse:collapse; margin-top:12px; }
+  .etapes-table thead tr { background:${colorMain}; }
+  .etapes-table thead th {
+    color: white;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+  }
+  .etapes-table tbody tr:nth-child(even) { background: #F8F9FF; }
+  .etapes-table tbody tr:nth-child(odd)  { background: #FFFFFF; }
+  .etapes-table td { padding: 8px 10px; vertical-align: top; font-size: 12px; border: 1px solid #DDD; }
+  .etape-nom  { font-weight: 700; color: ${colorMain}; text-align: center; width: 14%; }
+  .etape-derou{ line-height: 1.6; }
+  .etape-duree{ text-align: center; color: ${colorMain}; font-weight: 700; width: 8%; }
+  .sup-cell   { font-size: 11px; color: #444; }
+
+  /* ── Pied de page ── */
+  .footer {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 10px;
+    color: #999;
+    border-top: 1px solid #DDD;
+    padding-top: 10px;
+  }
+  .footer strong { color: ${colorAccent}; }
+
+  /* ── Watermark lecture seule ── */
+  .readonly-notice {
+    background: #FFF8E1;
+    border: 1px solid #FFB74D;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 11px;
+    color: #E65100;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .readonly-notice { display: none; }
+    .top-bar { border-radius: 0; }
+  }
+  @media (max-width: 600px) {
+    .top-bar { flex-direction: column; align-items: flex-start; }
+    .entete-table th { width: 70px; font-size: 10px; }
+    .entete-table td { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="readonly-notice">
+    🔒 <strong>Document en lecture seule</strong> — Généré le ${dateExp} · © EZ-ZAKY AZIZ · Non modifiable
+  </div>
+
+  <!-- Bandeau -->
+  <div class="top-bar">
+    <div>
+      <div class="top-bar-title">📋 ${safe(nom)}</div>
+      <div class="top-bar-meta">Fiche pédagogique · ${dateExp}</div>
+    </div>
+    <span class="readonly-badge">👁️ LECTURE SEULE</span>
+  </div>
+
+  <!-- En-tête -->
+  <table class="entete-table">
+    <tr>
+      <th>${safe(entete.labelProf||'Professeur')}</th>
+      <td>${safe(entete.prof||'')}</td>
+      <th>${safe(entete.labelNiveau||'Niveau')}</th>
+      <td>${safe(entete.niveau||'')}</td>
+    </tr>
+    <tr>
+      <th>${safe(entete.labelModule||'Module')}</th>
+      <td colspan="3">${safe(entete.module||'')}</td>
+    </tr>
+    <tr>
+      <th>${safe(entete.labelSequence||'Séquence')}</th>
+      <td colspan="3">${safe(entete.sequence||'')}</td>
+    </tr>
+    <tr>
+      <th>${safe(entete.labelActivite||'Activité')}</th>
+      <td>${safe(entete.activite||'')}</td>
+      <th>${safe(entete.labelSupport||'Support')}</th>
+      <td>${safe(entete.support||'')}</td>
+    </tr>
+    ${lignesLibresHtml}
+    <tr>
+      <th style="vertical-align:top;padding-top:6px;">${safe(entete.labelObjectif||'Objectif')}</th>
+      <td colspan="3" style="line-height:1.6;">${safeRich(entete.objectif||'')}</td>
+    </tr>
+  </table>
+
+  <!-- Tableau des étapes -->
+  <table class="etapes-table">
+    <thead>
+      <tr>
+        <th style="width:14%">${safe(labelEtapes)}</th>
+        <th>${safe(labelDerou)}</th>
+        ${colsSupHeaders}
+        <th style="width:8%">${safe(labelDuree)}</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${etapesHtml}
+    </tbody>
+  </table>
+
+  <div class="footer">
+    Généré avec <strong>Générateur de Fiches Pédagogiques</strong> · © EZ-ZAKY AZIZ · v4.4 · ${dateExp}
+  </div>
+
+</div>
+</body>
+</html>`;
+}
+
+// ═══════════════════════════════════════════════════
+// ★ FIN MODE LECTURE SEULE ★
+// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+
+// ── 1. ORIENTATION PDF ──────────────────────────────────────────
+var _pdfOrientation = 'portrait'; // 'portrait' ou 'landscape'
+
+function setOrientation(mode) {
+  _pdfOrientation = mode;
+  var btnP = document.getElementById('btn-portrait');
+  var btnL = document.getElementById('btn-landscape');
+  var hint = document.getElementById('orientation-hint');
+  if (!btnP || !btnL) return;
+  if (mode === 'portrait') {
+    btnP.style.background = '#1565C0'; btnP.style.color = 'white'; btnP.style.borderColor = '#1565C0';
+    btnL.style.background = '#f5f5f5'; btnL.style.color = '#555'; btnL.style.borderColor = '#ddd';
+    if (hint) hint.textContent = '✅ Format portrait sélectionné (recommandé pour 1-2 colonnes)';
+  } else {
+    btnL.style.background = '#1565C0'; btnL.style.color = 'white'; btnL.style.borderColor = '#1565C0';
+    btnP.style.background = '#f5f5f5'; btnP.style.color = '#555'; btnP.style.borderColor = '#ddd';
+    if (hint) hint.textContent = '✅ Format paysage sélectionné (idéal pour 3+ colonnes)';
+  }
+}
+
+// ── 2. IMPRESSION DIRECTE ────────────────────────────────────────
+function imprimerDirectement() {
+  if (typeof window.jspdf === 'undefined') {
+    alert('⚠️ La bibliothèque PDF n\'est pas chargée.\nAssurez-vous d\'avoir une connexion internet et rechargez la page.');
+    return;
+  }
+  const entete = collecterEntete();
+  const etapes = collecterEtapes();
+  if (!entete.niveau || !entete.module || !entete.sequence || !entete.activite || !entete.objectif) {
+    alert('Veuillez remplir les champs obligatoires avant d\'imprimer.'); showTab('entete'); return;
+  }
+  if (!etapes.length) { alert('Veuillez ajouter au moins une étape.'); showTab('etapes'); return; }
+
+  try {
+    // Générer le PDF en blob URL puis ouvrir la boîte d'impression
+    const { jsPDF } = window.jspdf;
+    // On réutilise genererPDF() mais on intercepte avec output('bloburl')
+    // Pour simplifier : générer dans un iframe caché puis window.print()
+    afficherModal({
+      icon: '🖨️',
+      title: 'Impression directe',
+      body: '<p style="margin-bottom:10px;">Le PDF va être généré puis la fenêtre d\'impression du navigateur s\'ouvrira automatiquement.</p>' +
+            '<p style="font-size:12px;color:#555;">💡 <strong>Astuce :</strong> Dans la boîte d\'impression, sélectionnez « Enregistrer en PDF » pour sauvegarder sans télécharger.</p>',
+      buttons: [
+        { text: '🖨️ Lancer l\'impression', style: 'background:#E65100;color:white;', onClick: function() {
+          _lancerImpressionPDF();
+        }},
+        { text: 'Annuler', style: 'background:#f5f5f5;color:#666;border:1px solid #ddd;', onClick: function() {} }
+      ]
+    });
+  } catch(e) {
+    alert('Erreur : ' + e.message);
+  }
+}
+
+function _lancerImpressionPDF() {
+  try {
+    const { jsPDF } = window.jspdf;
+    const entete = collecterEntete();
+    const etapes = collecterEtapes();
+    const P = collecterParams();
+    // Créer le doc (on réutilise la même logique que genererPDF mais output blob)
+    // Pour éviter la duplication de code, on génère en data URL et on ouvre dans iframe
+    const orientation = _pdfOrientation;
+    const doc = new jsPDF({ orientation: orientation, unit: 'pt', format: 'a4', putOnlyUsedFonts: true });
+    // Appeler le moteur de rendu en passant doc directement
+    // On doit reconstruire le PDF — appeler genererPDF puis intercept
+    // Solution: générer normalement + auto-print
+    _autoPrintMode = true;
+    genererPDF();
+    _autoPrintMode = false;
+  } catch(e) {
+    console.error(e);
+    alert('Erreur impression : ' + e.message);
+  }
+}
+var _autoPrintMode = false;
+
+// ── 3. SAUVEGARDE AUTO DANS LE RÉPERTOIRE APRÈS PDF ─────────────
+var _autoSaveToRep = false;
+
+function toggleAutoSaveToRep(cb) {
+  _autoSaveToRep = cb ? cb.checked : !_autoSaveToRep;
+}
+
+// ── 4. ORIENTATION AUTOMATIQUE SELON COLONNES ────────────────────
+function verifierOrientationAuto() {
+  var colsSup = collecterColonnesSup ? collecterColonnesSup() : [];
+  if (colsSup.length >= 2 && _pdfOrientation === 'portrait') {
+    afficherModal({
+      icon: '📐',
+      title: 'Passer en mode Paysage ?',
+      body: '<p>Vous avez <strong>' + (colsSup.length + 3) + ' colonnes</strong> dans votre tableau.<br>Le format <strong>paysage (A4 horizontal)</strong> est recommandé pour éviter les débordements.</p>',
+      buttons: [
+        { text: '🖼️ Passer en paysage', style: 'background:#1565C0;color:white;', onClick: function() { setOrientation('landscape'); showTab('params'); } },
+        { text: 'Garder portrait', style: 'background:#f5f5f5;color:#666;border:1px solid #ddd;', onClick: function() {} }
+      ]
+    });
+    return true;
+  }
+  return false;
+}
+
+// ── 5. TRI DU RÉPERTOIRE ────────────────────────────────────────
+var _repSortBy    = 'date';
+var _repSortAsc   = false; // Date : plus récent en premier par défaut
+
+function setSortRepertoire(by, btn) {
+  _repSortBy = by;
+  document.querySelectorAll('.rep-sort-btn').forEach(function(b) {
+    b.style.background = '#f5f5f5'; b.style.color = '#555'; b.style.borderColor = '#ddd';
+  });
+  if (btn) { btn.style.background = '#1565C0'; btn.style.color = 'white'; btn.style.borderColor = '#1565C0'; }
+  afficherRepertoire();
+}
+
+function toggleSortOrder() {
+  _repSortAsc = !_repSortAsc;
+  var btn = document.getElementById('sort-order-btn');
+  if (btn) btn.textContent = _repSortAsc ? '⬆️' : '⬇️';
+  afficherRepertoire();
+}
+
+function trierFiches(fiches) {
+  var sorted = fiches.slice();
+  sorted.sort(function(a, b) {
+    var va, vb;
+    if (_repSortBy === 'date') {
+      // Parse date fr "DD/MM/YYYY HH:MM:SS" → timestamp
+      va = parseDateFr(a.savedAt || '');
+      vb = parseDateFr(b.savedAt || '');
+    } else if (_repSortBy === 'nom') {
+      va = (a.nom || '').toLowerCase();
+      vb = (b.nom || '').toLowerCase();
+    } else if (_repSortBy === 'niveau') {
+      va = (a.niveau || '').toLowerCase();
+      vb = (b.niveau || '').toLowerCase();
+    } else if (_repSortBy === 'module') {
+      va = (a.module || '').toLowerCase();
+      vb = (b.module || '').toLowerCase();
+    }
+    if (va < vb) return _repSortAsc ? -1 : 1;
+    if (va > vb) return _repSortAsc ? 1 : -1;
+    return 0;
+  });
+  return sorted;
+}
+
+function parseDateFr(str) {
+  if (!str) return 0;
+  // "17/02/2026 à 14:30:00" ou "17/02/2026 14:30:00"
+  var m = str.match(/(\d{2})\/(\d{2})\/(\d{4})[^\d]*(\d{2}):(\d{2})/);
+  if (m) return new Date(m[3], m[2]-1, m[1], m[4], m[5]).getTime();
+  return new Date(str).getTime() || 0;
+}
+
+// ── 6. STATISTIQUES D'USAGE ──────────────────────────────────────
+function toggleStatsPanel() {
+  var panel = document.getElementById('rep-stats-panel');
+  if (!panel) return;
+  var shown = panel.style.display !== 'none';
+  panel.style.display = shown ? 'none' : 'block';
+  if (!shown) calculerEtAfficherStats();
+}
+
+function calculerEtAfficherStats() {
+  var fiches = lireRepertoire();
+  if (!fiches.length) {
+    document.getElementById('rep-stats-cards').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#aaa;font-size:12px;">Aucune fiche pour calculer des statistiques.</div>';
+    return;
+  }
+  var now = new Date();
+  var moisCourant = now.getMonth();
+  var annéeCourante = now.getFullYear();
+
+  // Fiches ce mois
+  var fichesCeMois = fiches.filter(function(f) {
+    var ts = parseDateFr(f.savedAt || '');
+    var d = new Date(ts);
+    return d.getMonth() === moisCourant && d.getFullYear() === annéeCourante;
+  }).length;
+
+  // Durée totale estimée (en minutes, extraire les chiffres des durées)
+  var totalMin = 0;
+  fiches.forEach(function(f) {
+    (f.etapes || []).forEach(function(e) {
+      var durStr = (e.duree || '').replace(/[^0-9hHmM\s]/g, '');
+      var match = durStr.match(/(\d+)\s*[hH]?\s*(\d*)\s*[mMiI]?/);
+      if (match) {
+        var h = parseInt(match[1]) || 0;
+        var m = parseInt(match[2]) || 0;
+        // Si pas de 'h', c'est des minutes
+        if (!/[hH]/.test(e.duree || '')) { totalMin += h; }
+        else { totalMin += h * 60 + m; }
+      }
+    });
+  });
+
+  // Modules les plus utilisés
+  var moduleCounts = {};
+  fiches.forEach(function(f) {
+    var key = (f.module || 'Non défini').substring(0, 30);
+    moduleCounts[key] = (moduleCounts[key] || 0) + 1;
+  });
+  var topModules = Object.entries(moduleCounts).sort(function(a,b){ return b[1]-a[1]; }).slice(0, 3);
+
+  // Niveaux
+  var niveauCounts = {};
+  fiches.forEach(function(f) {
+    var key = (f.niveau || 'Non défini').substring(0, 20);
+    niveauCounts[key] = (niveauCounts[key] || 0) + 1;
+  });
+  var topNiveaux = Object.entries(niveauCounts).sort(function(a,b){ return b[1]-a[1]; }).slice(0, 3);
+
+  // Affichage cartes
+  var cardsHtml = [
+    { icon:'📋', val: fiches.length, label:'Fiches totales' },
+    { icon:'📅', val: fichesCeMois, label:'Ce mois-ci' },
+    { icon:'⏱️', val: totalMin >= 60 ? Math.round(totalMin/60*10)/10 + 'h' : totalMin + 'min', label:'Durée totale' }
+  ].map(function(c) {
+    return '<div style="background:linear-gradient(135deg,#E3F2FD,#fff);border:1.5px solid #BBDEFB;border-radius:10px;padding:10px 8px;text-align:center;">' +
+      '<div style="font-size:22px;">' + c.icon + '</div>' +
+      '<div style="font-size:18px;font-weight:800;color:#1565C0;margin:3px 0;">' + c.val + '</div>' +
+      '<div style="font-size:10px;color:#555;font-weight:600;">' + c.label + '</div></div>';
+  }).join('');
+
+  document.getElementById('rep-stats-cards').innerHTML = cardsHtml;
+
+  var detailsHtml = '';
+  if (topModules.length) {
+    detailsHtml += '<div style="margin-bottom:8px;"><strong style="color:#1565C0;">📚 Top modules :</strong> ' +
+      topModules.map(function(m){ return '<span style="background:#E8F5E9;color:#1B5E20;border-radius:4px;padding:1px 7px;margin:0 2px;">' + m[0] + ' ×' + m[1] + '</span>'; }).join('') + '</div>';
+  }
+  if (topNiveaux.length) {
+    detailsHtml += '<div><strong style="color:#1565C0;">🎓 Niveaux :</strong> ' +
+      topNiveaux.map(function(n){ return '<span style="background:#FFF3E0;color:#E65100;border-radius:4px;padding:1px 7px;margin:0 2px;">' + n[0] + ' ×' + n[1] + '</span>'; }).join('') + '</div>';
+  }
+  document.getElementById('rep-stats-details').innerHTML = detailsHtml;
+}
+
+// ═══════════════════════════════════════════════════
+// ★ FIN NOUVELLES FONCTIONNALITÉS v4 ★
+// ═══════════════════════════════════════════════════
+
+// ── INITIALISATION v4.4 ───────────────────────────────────────
 
 window.addEventListener('load', function() {
   setTimeout(chargerDepuisURL, 600);
@@ -8678,53 +11297,9 @@ window.addEventListener('load', function() {
     const hasSeenWelcome = localStorage.getItem('fp_welcome_seen');
     
     if (!hasSeenWelcome) {
-      // Attendre 800ms pour que la page soit bien chargée
       setTimeout(function() {
-        const acceptLicense = confirm(
-          '📋 BIENVENUE dans le Générateur de Fiches Pédagogiques !\n\n' +
-          '© 2025-2026 EZ-ZAKY AZIZ — Version 3.0\n\n' +
-          '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' +
-          'LICENCE D\'UTILISATION\n' +
-          '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
-          'Cette application est gratuite et distribuée sous licence\n' +
-          'Creative Commons BY-NC-SA 4.0.\n\n' +
-          '✅ VOUS POUVEZ :\n' +
-          '   • Utiliser l\'application gratuitement\n' +
-          '   • La partager avec vos collègues\n' +
-          '   • La modifier pour vos besoins\n\n' +
-          '⚠️ VOUS DEVEZ :\n' +
-          '   • Toujours créditer l\'auteur (EZ-ZAKY AZIZ)\n' +
-          '   • Partager vos modifications sous la même licence\n\n' +
-          '❌ INTERDIT :\n' +
-          '   • Usage commercial (vente de l\'application)\n' +
-          '   • Retirer le nom de l\'auteur\n\n' +
-          '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
-          'Pour plus de détails, consultez l\'onglet "À propos".\n\n' +
-          'Acceptez-vous ces conditions d\'utilisation ?'
-        );
-        
-        if (acceptLicense) {
-          // Marquer comme vu
-          localStorage.setItem('fp_welcome_seen', 'true');
-          localStorage.setItem('fp_license_accepted', new Date().toISOString());
-          
-          // Message de bienvenue
-          alert(
-            '🎉 Merci et bienvenue !\n\n' +
-            'Consultez l\'onglet "📖 Guide" pour découvrir\n' +
-            'toutes les fonctionnalités de l\'application.\n\n' +
-            'Bonne création de fiches pédagogiques ! 📚'
-          );
-        } else {
-          // L'utilisateur a refusé
-          alert(
-            '⚠️ Conditions non acceptées\n\n' +
-            'Vous devez accepter la licence pour utiliser cette application.\n\n' +
-            'L\'application va maintenant se fermer.'
-          );
-          // Rediriger vers une page blanche
-          document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;text-align:center;padding:20px;"><div><h1 style="color:#1565C0;">📋</h1><h2>Licence non acceptée</h2><p style="color:#666;">Vous devez accepter les conditions d\'utilisation<br>pour utiliser cette application.</p><button onclick="location.reload()" style="margin-top:20px;padding:10px 20px;background:#1565C0;color:white;border:none;border-radius:5px;cursor:pointer;font-size:14px;">🔄 Recharger et accepter</button></div></div>';
-        }
+        // Utiliser un modal custom au lieu de confirm() natif
+        afficherModalLicence();
       }, 800);
     }
   });
@@ -8739,7 +11314,7 @@ window.addEventListener('load', function() {
     © 2025 <a href="#" onclick="showTab('apropos'); return false;">EZ-ZAKY AZIZ</a> — Tous droits réservés
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
-    <span class="version-badge">v3.0</span>
+    <span class="version-badge">v4.4</span>
     <span style="color:#aaa;">|</span>
     <a href="#" onclick="showTab('apropos'); return false;">Licence CC BY-NC-SA 4.0</a>
   </div>
